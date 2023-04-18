@@ -11,12 +11,12 @@ const prodConfig: Configuration = merge(baseConfig, {
   在package.json的scripts中添加  "build": "webpack -c build/webpack.prod.ts"
   */
   plugins:[
-    // 处理生产的
+    // 处理生产的静态文件
     new CopyPlugin({
       patterns:[
         {
-          from: path.join(__dirname, '../public'), // 静态文件入口
-          to: path.join(__dirname, '../dist'), // 静态文件输出
+          from: path.join(__dirname, '../static'), // 静态文件入口
+          to: path.join(__dirname, '../dist/static'), // 静态文件输出
           filter:(sources)=> !sources.includes('index.html') // 过滤掉 index.html
         }
       ]

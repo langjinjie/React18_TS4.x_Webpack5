@@ -33,6 +33,7 @@ const baseConfig: Configuration = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'webpack5-react-ts',
+      favicon: path.join(__dirname, '../src/assets/favicon.ico'), // 引入icon文件，自动会打包到跟index.html同目录下
       filename: 'index.html',
       // 复制 index.html文件，并自动引入打包输出的所有资源(js/css)
       template: path.join(__dirname,'../public/index.html'),

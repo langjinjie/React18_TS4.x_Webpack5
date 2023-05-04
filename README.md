@@ -334,3 +334,108 @@ export default devConfig
 > - 开发中，我们每行到吗不会写的太长，只需要定位到行就行，所以加上cheap
 > - 我们希望能够找到源代码的错误，而不是打包后的，所以需要加上 module
 
+然后在`package.json`中添加启动脚本
+
+```json
+"scripts": {
+  "dev": "webpack serve -c build/webpack.dev.ts"
+},
+```
+
+正当我们准备启动项目的时候，发现还有一个错误：
+
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/471b68584ac04d34bc8a1e63b65a894c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+在`tsconfig.json`中加入一行`"jsx": "react-jsx"`
+
+```json
+{
+    "compilerOptions": {
+        "target": "es2016",
+        "esModuleInterop": true,
+        "module": "commonjs",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "jsx": "react-jsx" // 这里改成react-jsx，就不需要在tsx文件中手动引入React了
+    },
+    "include": ["./src"]
+}
+```
+
+回到`App.tsx`，可以发现`React`的`import`变灰了：
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9e682ec872ae4aa3b060a6342c1ad509~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+> 从`React v17`开始，我们就不需要再显式`import React from 'react'`了。
+
+运行`npm run dev`脚本启动项目，就可以看到页面跑出来了！
+
+### 5.3 webpack.prod.ts
+
+配置`weboack.prod.ts`:
+
+```typescript
+import { Configuration } from "webpack";
+import { merge } from "webpack-merge";
+import baseConfig from "./webpack.base";
+
+const prodConfig: Configuration = merge(baseConfig, {
+    mode: "production", // 生产模式,会开启tree-shaking和压缩代码,以及其他优化
+});
+
+export default prodConfig;
+```
+
+> 打包环境推荐：`none(就是不配置devtool选项了，不是配置devtool: 'none')`
+>
+> 1. `none`话调试只能看到编译后的代码，也不会泄露源代码，打包速度也会比较快。
+> 2. 只是不方便线上排查问题, 但一般都可以根据报错信息在本地环境很快找出问题所在
+
+在`package.json`中添加：
+
+```json
+"scripts": {
+    // ...
+    "build": "webpack -c build/webpack.prod.ts"
+},
+```
+
+### 5.4 copy静态资源
+
+一般`public`文件夹都会放一些静态资源，可以直接根据绝对路径引入，比如图片、`css`、`js`文件等，不需要`webpack`进行解析，只需要打包的时候把`public`下内容复制到构建出口文件夹中，可以借助[copy-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcopy-webpack-plugin)插件，安装依赖：
+
+```shell
+pnpm add copy-webpack-plugin -D
+```
+
+修改`webpack.base.ts`:
+
+```typescript
+// plugin 的配置
+  plugins: [
+    new HtmlWebpackPlugin({
+      title: 'webpack5-react-ts',
+      favicon: path.join(__dirname, '../src/assets/favicon.ico'), // 引入icon文件，自动会打包到跟index.html同目录下
+      filename: 'index.html',
+      // 复制 index.html文件，并自动引入打包输出的所有资源(js/css)
+      template: path.join(__dirname,'../public/index.html'),
+      inject: true, // 自动注入静态资源, 一般在有多个人口文件的时候才会设置为false
+      hash: true,
+      // 压缩html资源
+      minify:{
+        removeAttributeQuotes: true, // 删除HTML中属性值周围的引号
+        collapseWhitespace: true, // 去空格
+        removeComments: true, // 去注释
+        minifyJS: true, // 在脚本元素和事件属性中缩小JavaScript
+        minifyCSS: true, // 缩小css样式元素和样式属性
+      }
+    }),
+    // new DefinePlugin({
+    //   "process.env": JSON.stringify(envConfig.parsed),
+    //   "process.env.BASE_ENV": JSON.stringify(process.env.BASE_ENV),
+    //   "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+    // })
+  ]
+```
+

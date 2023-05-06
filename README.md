@@ -439,3 +439,28 @@ pnpm add copy-webpack-plugin -D
   ]
 ```
 
+## 6 配置环境变量
+
+### 6.1 corss-env + DefinePlugin
+
+环境变量按作用分为两种
+
+1. 区分是开发模式还是打包构建模式
+2. 区分项目业务环境，开发/测试/预测/正式环境
+
+> 区分开发模式还是打包构建模式可以用`process.env.NODE_ENV`，因为很多第三方包里面判断都是采用的这个环境变量。
+
+> 区分项目接口环境可以自定义一个环境变量`process.env.BASE_ENV`，设置环境变量可以借助[cross-env](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcross-env) 和 [webpack.DefinePlugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.webpackjs.com%2Fplugins%2Fdefine-plugin%2F) 来设置。
+
+- `cross-env`：运行跨平台设置和使用环境变量的脚本，兼容各系统的设置环境变量的包
+- `webpack.DefinePlugin`：`webpack`内置的插件，可以为业务代码注入环境变量
+
+`cross-env`解决的问题：当您使用`NODE_ENV=production`，来设置环境变量时，大多数`windows`命令提示会阻塞（报错），（异常是`Windows`上的`Bash`，它使用本机`Bash`。）同样，`Windows`和`POSIX`命令如何使用环境变量也有区别。 使用`POSIX`，您可以使用：`$ ENV_VAR`和使用`％ENV_VAR％`的`Windows`。
+
+安装`cross-env`：
+
+```shell
+pnpm add cross-env -D
+```
+
+修改`package.json`

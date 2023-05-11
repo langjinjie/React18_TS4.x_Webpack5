@@ -463,4 +463,9 @@ pnpm add copy-webpack-plugin -D
 pnpm add cross-env -D
 ```
 
-修改`package.json`
+修改`package.json`中的`script`:
+
+```json
+
+```
+

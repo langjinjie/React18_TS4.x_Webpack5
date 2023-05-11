@@ -1,11 +1,13 @@
 {
-  "name": "React18_TS4.x_Webpack5",
+  "name": "react18_ts4.x_webpack5",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack serve -c build/webpack.dev.ts",
-    "build": "webpack -c build/webpack.prod.ts"
+    "start": "cross-env NODE_ENV=development BASE_ENV=development webpack serve -c build/webpack.dev.ts",
+    "build:test": "cross-env NODE_ENV=production BASE_ENV=test webpack -c build/webpack.prod.ts",
+    "build:pre": "cross-env NODE_ENV=production BASE_ENV=pre webpack -c build/webpack.prod.ts",
+    "build": "cross-env NODE_ENV=development BASE_ENV=development webpack -c build/webpack.prod.ts"
   },
   "keywords": [],
   "author": "",

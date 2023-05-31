@@ -1,6 +1,15 @@
 import { Configuration, DefinePlugin } from 'webpack' // 引入webpack
 import HtmlWebpackPlugin from 'html-webpack-plugin'
+import dotenv from 'dotenv'
+
 const path = require('path') // 需要安装@types/node -D
+
+// 加载配置文件
+const envConfig = dotenv.config({
+  path: path.resolve(__dirname, '../evn/.env.' + process.env.BASE_ENV),
+})
+
+console.log('envConfig', envConfig)
 
 const baseConfig: Configuration = {
   // 入口文件  __dirname 可以用来动态获取当前文件所属目录的绝对路径
@@ -50,7 +59,8 @@ const baseConfig: Configuration = {
     }),
     new DefinePlugin({
       // 将process.env注入到业务代码中，可以借助 dotenv-webpack 插件自动处理，不需要手动处理
-      'process.env': JSON.stringify(process.env),
+      'process.env': JSON.stringify(envConfig.parsed),
+      'process.env.BASE_ENV': JSON.stringify(process.env.BASE_ENV),
     }),
   ],
 }

@@ -466,6 +466,73 @@ pnpm add cross-env -D
 修改`package.json`中的`script`:
 
 ```json
+...
+"scripts": {
+    "start": "cross-env NODE_ENV=development BASE_ENV=dev webpack serve -c build/webpack.dev.ts",
+    "build:test": "cross-env NODE_ENV=production BASE_ENV=test webpack -c build/webpack.prod.ts",
+    "build:pre": "cross-env NODE_ENV=production BASE_ENV=pre webpack -c build/webpack.prod.ts",
+    "build": "cross-env NODE_ENV=development BASE_ENV=development webpack -c build/webpack.prod.ts"
+},
+...
+```
 
+> `process.env.NODE_ENV`环境变量`webpack`会自动根据设置的`mode`字段来给业务代码注入对应的`development`和`prodction`，这里在命令中再次设置环境变量`NODE_ENV`是为了在`webpack`和`babel`的配置文件中访问到。
+
+当前是打包模式，业务环境是开发环境，这里需要把`process.env.BASE_ENV`注入到业务代码里面，就可以通过该环境变量设置对应环境的接口地址和其他数据，要借助`webpack.DefinePlugin`插件。
+
+修改`webpack.base.ts`
+
+```json
+...
+new DefinePlugin({
+    // 将process.env注入到业务代码中，可以借助 dotenv-webpack 插件自动处理，不需要手动处理
+    'process.env': JSON.stringify(process.env),
+}),
+...
+```
+
+### 6.2 配置多环境运行配置
+
+安装依赖
+
+```shell
+pnpm add dotenv
+```
+
+在根目录下新建一个多文件配置文件夹
+
+```txt
+├── env
+   ├── .env.dev # 开发环境
+   ├── .env.test # 测试环境
+   ├── .env.pre # 预发布环境
+   └── .env.prod # 生产环境
+```
+
+文件中可以配置任意我们需要的变量：
+
+```txt
+// env/.env.dev
+REACT_APP_API_URL=https://api-dev.com
+
+// env/.env.test
+REACT_APP_API_URL=https://api-test.com
+
+// env/.env.pre
+REACT_APP_API_URL=https://api-pre.com
+
+// env/.env.prod
+REACT_APP_API_URL=https://api-prod.com
+
+```
+
+然后在`webpck.base.ts`中引入，然后解析对应环境配置，最后通过`DefinePlugin`进行注入：
+
+```typescript
+new DefinePlugin({
+      // 将process.env注入到业务代码中，可以借助 dotenv-webpack 插件自动处理，不需要手动处理
+      'process.env': JSON.stringify(envConfig.parsed),
+      'process.env.BASE_ENV': JSON.stringify(process.env.BASE_ENV),
+    }),
 ```
 

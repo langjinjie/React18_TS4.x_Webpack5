@@ -530,9 +530,13 @@ REACT_APP_API_URL=https://api-prod.com
 
 ```typescript
 new DefinePlugin({
-      // 将process.env注入到业务代码中，可以借助 dotenv-webpack 插件自动处理，不需要手动处理
-      'process.env': JSON.stringify(envConfig.parsed),
-      'process.env.BASE_ENV': JSON.stringify(process.env.BASE_ENV),
-    }),
+    // 将process.env注入到业务代码中，可以借助 dotenv-webpack 插件自动处理，不需要手动处理
+    'process.env': JSON.stringify(envConfig.parsed),
+    'process.env.BASE_ENV': JSON.stringify(process.env.BASE_ENV),
+}),
 ```
+
+## 7文件别名
+
+先在`webpack.base.ts`中配置：
 

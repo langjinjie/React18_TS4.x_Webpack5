@@ -540,3 +540,208 @@ new DefinePlugin({
 
 先在`webpack.base.ts`中配置：
 
+```typescript
+// 配置文件别名
+alias: {
+    src: path.join(__dirname, '../src'),
+        modules: [path.resolve(__dirname, '../node_modules')], // 查找第三方模块只在本项目的node_modules中查找
+},
+```
+
+然后还需要再`tsconfig.json`中配置：在`tsconfig.json`中配置映射路径，那么typescript-eslint检查就不会报错了
+
+```json
+{
+  "compilerOptions": {
+    ...
+    "baseUrl": "./",
+    "paths": {
+      "src/*": [
+        "src/*"
+      ]
+    }
+  }
+}
+```
+
+然后就可以在项目中使用了
+
+```tsx
+// 引入App组件
+import App from 'src/App'
+```
+
+## 8 重启项目时在同一个浏览器Tab中打开页面
+
+windows下不生效
+
+
+
+我们发现，每次运行`pnpm start`命令都会在当前浏览器打开新的`Tab`，虽然也不影响项目开发，但是很影响开发体验，可以参考`Create-React-App`的处理方式：
+
+> 参考：[create-react-app](https://link.juejin.cn/?target=https%3A%2F%2Flink.zhihu.com%2F%3Ftarget%3Dhttps%3A%2F%2Fgithub.com%2Ffacebook%2Fcreate-react-app%2Ftree%2Fmain%2Fpackages%2Freact-dev-utils) 的启动方式
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9efc08268a86464dbfeabceaf5bb02d5~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+复制出这两个文件源码，将其放置在`build`下的`util`中：
+
+```txt
+├── build
+	├── util
+   		├── openBrowser.js
+   		├── openChrome.applescript
+
+```
+
+修改`webpack.dev.ts`:
+
+```typescript
+import path from "path";
+import { merge } from "webpack-merge";
+import webpack, { Configuration as WebpackConfiguration } from "webpack";
+import WebpackDevServer from "webpack-dev-server";
+import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
+import baseConfig from "./webpack.base";
+
+// 运行命令的时候重启一次打开一个tab 页很烦，所以呢优化一下
+// 参考：create-react-app 的启动方式
+// https://github.com/facebook/create-react-app/blob/main/packages/react-dev-utils/openChrome.applescript
+// 记得关闭webpack-dev-server的配置中的自动打开 open: false 或者注释
+const openBrowser = require("./util/openBrowser");
+
+interface Configuration extends WebpackConfiguration {
+    devServer?: WebpackDevServerConfiguration;
+}
+
+const host = "127.0.0.1";
+const port = "8082";
+
+// 合并公共配置,并添加开发环境配置
+const devConfig: Configuration = merge(baseConfig, {
+    mode: "development", // 开发模式,打包更加快速,省了代码优化步骤
+    /**
+    开发环境推荐：eval-cheap-module-source-map
+    - 本地开发首次打包慢点没关系,因为 eval 缓存的原因, 热更新会很快
+    - 开发中,我们每行代码不会写的太长,只需要定位到行就行,所以加上 cheap
+    - 我们希望能够找到源代码的错误,而不是打包后的,所以需要加上 module
+   */
+    devtool: "eval-cheap-module-source-map",
+});
+
+const devServer = new WebpackDevServer(
+    {
+        host, // 地址
+        port, // 端口
+        open: false, // 是否自动打开，关闭
+        setupExitSignals: true, // 允许在 SIGINT 和 SIGTERM 信号时关闭开发服务器和退出进程。
+        compress: false, // gzip压缩,开发环境不开启,提升热更新速度
+        hot: true, // 开启热更新，后面会讲react模块热替换具体配置
+        historyApiFallback: true, // 解决history路由404问题
+        static: {
+            directory: path.join(__dirname, "../public"), // 托管静态资源public文件夹
+        },
+        headers: { "Access-Control-Allow-Origin": "*" },
+    },
+    webpack(devConfig)
+);
+
+devServer.start().then(() => {
+    // 启动界面
+    openBrowser(`http://${host}:${port}`);
+});
+
+export default devConfig;
+
+```
+
+## 9 引入less、sass（scss）、stylus
+
+`less`、`sass（scss）`、`stylus`是三个比较流行的 `CSS Modules` 预处理库。在 `React` 中，使用`CSS Modules` 的好处在于：
+
+1. 避免全局样式冲突：使用 `CSS Modules` 可以确保样式只应用于特定组件，避免全局样式冲突。
+2. 更好的可维护性：`CSS Modules` 使得样式与组件代码紧密关联，方便代码维护。
+3. 提高代码可重用性：`CSS Modules` 可以轻松地将样式从一个组件复制到另一个组件，提高代码可重用性。
+4. 支持动态样式：使用 `CSS Modules` 可以轻松地生成动态样式，例如根据组件状态或属性更改样式。
+5. 更好的性能：`CSS Modules` 使用模块化的方式加载样式，提高了页面加载速度和性能
+
+### 9.1 基本用法
+
+先安装相关的依赖
+
+```shell
+pnpm add less less-loader sass-loader sass stylus stylus-loader -D
+
+```
+
+在`webpack.base.ts`添加相关的`loader`：
+
+```typescript
+// ...
+const cssRegex = /\.css$/;
+const sassRegex = /\.(scss|sass)$/;
+const lessRegex = /\.less$/;
+const stylRegex = /\.styl$/;
+
+const styleLoadersArray = [
+    "style-loader",
+    {
+        loader: "css-loader",
+        options: {
+            modules: {
+                localIdentName: "[path][name]__[local]--[hash:5]",
+            },
+        },
+    },
+];
+
+const baseConfig: Configuration = {
+    // ...
+    module: {
+        rules: [
+            // ...
+            {
+                test: cssRegex, //匹配 css 文件
+                use: styleLoadersArray,
+            },
+            {
+                test: lessRegex,
+                use: [
+                    ...styleLoadersArray,
+                    {
+                        loader: "less-loader",
+                        options: {
+                            lessOptions: {
+                                // 如果要在less中写类型js的语法，需要加这一个配置
+                                javascriptEnabled: true
+                            },
+                        },
+                    },
+                ],
+            },
+            {
+                test: sassRegex,
+                use: [
+                    ...styleLoadersArray,
+                    "sass-loader",
+                ],
+            },
+            {
+                test: stylRegex,
+                use: [
+                    ...styleLoadersArray,
+                    "stylus-loader",
+                ],
+            },
+        ],
+    },
+    // ...
+};
+
+export default baseConfig;
+
+```
+
+> webpack配置说明
+>
+> 1. `localIdenName`：配置生成的css类名组成（`path`路径，`name`文件名，`local`原来的css类名，``）
+

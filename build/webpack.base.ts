@@ -3,13 +3,28 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 import dotenv from 'dotenv'
 
 const path = require('path') // 需要安装@types/node -D
+const cssRegex = /\.css$/
+const sassRegex = /\.(scss|sass)$/
+const lessRegex = /\.less$/
+const stylRegex = /\.styl$/
+
+// 样式编译
+const styleLoadersArray = [
+  'style-loader',
+  {
+    loader: 'css-loader',
+    option: {
+      module: {
+        localIdentName: '[path][name]__[local]--[hash:5]',
+      },
+    },
+  },
+]
 
 // 加载配置文件
 const envConfig = dotenv.config({
   path: path.resolve(__dirname, '../evn/.env.' + process.env.BASE_ENV),
 })
-
-console.log('envConfig', envConfig)
 
 const baseConfig: Configuration = {
   // 入口文件  __dirname 可以用来动态获取当前文件所属目录的绝对路径
@@ -29,14 +44,42 @@ const baseConfig: Configuration = {
         use: 'babel-loader', // 配置文件
       },
       {
-        test: /.(css)$/, // 匹配css文件
-        use: ['style-loader', 'css-loader'],
+        test: cssRegex, // 匹配css文件
+        use: styleLoadersArray,
+      },
+      {
+        test: lessRegex, // 匹配less文件
+        use: [
+          ...styleLoadersArray,
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                // 如果要在less中写类型js的语法，需要加这一个配置
+                javascriptEnabled: true,
+              },
+            },
+          },
+        ],
+      },
+      {
+        test: sassRegex, // 匹配sass文件
+        use: [...styleLoadersArray, 'sass-loader'],
+      },
+      {
+        test: stylRegex, // 匹配stylus文件
+        use: [...styleLoadersArray, 'stylus-loader'],
       },
     ],
   },
   resolve: {
     // 不需要添加后缀的文件
-    extensions: ['.tsx', '.ts', '.jsx', '.js'],
+    extensions: ['.tsx', '.ts', '.jsx', '.js', '.css', '.less'],
+    // 配置文件别名，别名需要配置两个地方，这里和tsconfig.json 需要给tsconfig.json配置映射路径，那么typescript-eslint检查就不会报错了
+    alias: {
+      src: path.join(__dirname, '../src'),
+      modules: [path.resolve(__dirname, '../node_modules')], // 查找第三方模块只在本项目的node_modules中查找
+    },
   },
   // plugin 的配置
   plugins: [

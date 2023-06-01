@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
-import { test } from '../utils/base'
-import './App.css'
+import { test } from 'src/utils/base'
+import 'src/App.css'
 
 function App() {
   useEffect(() => {

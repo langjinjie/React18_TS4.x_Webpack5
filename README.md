@@ -744,4 +744,94 @@ export default baseConfig;
 > webpack配置说明
 >
 > 1. `localIdenName`：配置生成的css类名组成（`path`路径，`name`文件名，`local`原来的css类名，``）
+>
+> 2. 如下的配置（`localIdentName: '[local]__[hash:base64:5]'`）：生成的css类名类似 `class="edit__275ih"`这种，既能达到`scoped`的效果，又保留原来的`css`类名(`edit`)。
+>
+>    推荐阅读：[【Webpack进阶】less-loader、css-loader、style-loader实现原理](https://juejin.cn/post/6944668149849522213)
+
+然后就可以在业务中使用了
+
+重启项目，就会发现生成了带有`hash`值的`class`类名，且里面包含了我们自定义的类名，方便日后调试用：
+
+> **Tips**：虽然我们在样式文件名上加一个 `.module` 的后缀，可以明确这是 `css modules`，但也带来了额外的码字开销。可以在 `global.d.ts` 加入样式文件的声明，就可以避免写 `.module` 后缀。
+
+```typescript
+// src/typings/global.d.ts
+
+/* CSS MODULES */
+declare module '*.css' {
+    const classes: { [key: string]: string };
+    export default classes;
+}
+
+declare module '*.scss' {
+    const classes: { [key: string]: string };
+    export default classes;
+}
+
+declare module '*.sass' {
+    const classes: { [key: string]: string };
+    export default classes;
+}
+
+declare module '*.less' {
+    const classes: { [key: string]: string };
+    export default classes;
+}
+
+declare module '*.styl' {
+    const classes: { [key: string]: string };
+    export default classes;
+}
+
+```
+
+### 9.2 处理CSS3前缀在浏览器中的兼容
+
+虽然`css3`现在浏览器支持率已经很高了, 但有时候需要兼容一些低版本浏览器，需要给`css3`加前缀,可以借助插件来自动加前缀，[postcss-loader](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Floaders%2Fpostcss-loader%2F) 就是来给`css3`加浏览器前缀的，安装依赖：
+
+```shell
+pnpm add postcss-loader autoprefixer -D
+```
+
+为了避免`webpack.base.ts`文件过于庞大，我们将一些`loader`配置提取成单独的文件来进行管理，根目录新建`postcss.config.js`，作为`postcss-loader`的配置文件，会自动读取配置：
+
+```js
+module.exports = {
+    ident: "postcss",
+    plugins: [require("autoprefixer")],
+};
+```
+
+修改`webpack.base.ts`，在解析`css`和`less`的规则中添加配置：
+
+```typescript
+// ...
+const styleLoadersArray = [
+    "style-loader",
+    {
+        loader: "css-loader",
+        options: {
+            modules: {
+                localIdentName: "[path][name]__[local]--[hash:5]",
+            },
+        },
+    },
+    // 添加 postcss-loader
+    'postcss-loader'
+];
+```
+
+配置完成后，需要有一份要兼容浏览器的清单，让`postcss-loader`知道要加哪些浏览器的前缀，在根目录创建`.browserslistrc`文件：
+
+```txt
+IE 9 # 兼容IE 9
+chrome 35 # 兼容chrome 35
+```
+
+以兼容到`ie9`和`chrome35`版本为例，配置好后，在`app.module.less`中加入一些CSS3的语法，重新启动项目，就可以在浏览器的控制台-Elements 中看到配置成功了。
+
+执行`pnpm run build:dev`打包，也可以看到打包后的`css`文件已经加上了`ie`和谷歌内核的前缀。
+
+## 10 处理其他常用资源
 

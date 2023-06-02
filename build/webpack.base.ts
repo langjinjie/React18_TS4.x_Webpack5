@@ -3,6 +3,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 import dotenv from 'dotenv'
 
 const path = require('path') // 需要安装@types/node -D
+
 const cssRegex = /\.css$/
 const sassRegex = /\.(scss|sass)$/
 const lessRegex = /\.less$/
@@ -13,12 +14,15 @@ const styleLoadersArray = [
   'style-loader',
   {
     loader: 'css-loader',
-    option: {
-      module: {
-        localIdentName: '[path][name]__[local]--[hash:5]',
+    options: {
+      modules: {
+        // localIdentName: '[path][name]__[local]_[hash:5]',
+        localIdentName: '[local]_[hash:5]',
       },
     },
   },
+  // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
+  'postcss-loader',
 ]
 
 // 加载配置文件

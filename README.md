@@ -245,22 +245,22 @@ const baseConfig: Configuration = {
 
 ```js
 module.exports = {
-  // 预设执行顺序从右到左，所以先处理ts，在处理jsx
-  presets: [
-    [
-      "@babel/preset-env",
-      {
-        // 设置兼容目标浏览器，也可以在根目录配置.browserslistrc文件，babel-loader会自动寻找上面配置好的文件.browserlistrc
-        targets: { browsers: [">1%", "last 2 versions", "not ie <= 8"] },
-        useBuiltIns: "usage", // 根据配置的浏览器兼容，以及代码中使用到的api进行引入polyfill按需添加
-        corejs: 3, // 配置使用core-js的版本
-        loose: true // 松散模式
-      }
-    ],
-    // 如果使用的是babel和react17,可能需要将"runtime":"automotic"添加到配置中,否则可能会出现Uncaught ReferenceError: React is not defined
-    ["@babel/presest-react", { runtime: "automatic" }],
-    "@babel/preset-typescript"
-  ]
+    // 预设执行顺序从右到左，所以先处理ts，在处理jsx
+    presets: [
+        [
+            "@babel/preset-env",
+            {
+                // 设置兼容目标浏览器，也可以在根目录配置.browserslistrc文件，babel-loader会自动寻找上面配置好的文件.browserlistrc
+                targets: { browsers: [">1%", "last 2 versions", "not ie <= 8"] },
+                useBuiltIns: "usage", // 根据配置的浏览器兼容，以及代码中使用到的api进行引入polyfill按需添加
+                corejs: 3, // 配置使用core-js的版本
+                loose: true // 松散模式
+            }
+        ],
+        // 如果使用的是babel和react17,可能需要将"runtime":"automotic"添加到配置中,否则可能会出现Uncaught ReferenceError: React is not defined
+        ["@babel/presest-react", { runtime: "automatic" }],
+        "@babel/preset-typescript"
+    ]
 }
 ```
 
@@ -338,7 +338,7 @@ export default devConfig
 
 ```json
 "scripts": {
-  "dev": "webpack serve -c build/webpack.dev.ts"
+    "dev": "webpack serve -c build/webpack.dev.ts"
 },
 ```
 
@@ -413,30 +413,30 @@ pnpm add copy-webpack-plugin -D
 
 ```typescript
 // plugin 的配置
-  plugins: [
+plugins: [
     new HtmlWebpackPlugin({
-      title: 'webpack5-react-ts',
-      favicon: path.join(__dirname, '../src/assets/favicon.ico'), // 引入icon文件，自动会打包到跟index.html同目录下
-      filename: 'index.html',
-      // 复制 index.html文件，并自动引入打包输出的所有资源(js/css)
-      template: path.join(__dirname,'../public/index.html'),
-      inject: true, // 自动注入静态资源, 一般在有多个人口文件的时候才会设置为false
-      hash: true,
-      // 压缩html资源
-      minify:{
-        removeAttributeQuotes: true, // 删除HTML中属性值周围的引号
-        collapseWhitespace: true, // 去空格
-        removeComments: true, // 去注释
-        minifyJS: true, // 在脚本元素和事件属性中缩小JavaScript
-        minifyCSS: true, // 缩小css样式元素和样式属性
-      }
+        title: 'webpack5-react-ts',
+        favicon: path.join(__dirname, '../src/assets/favicon.ico'), // 引入icon文件，自动会打包到跟index.html同目录下
+        filename: 'index.html',
+        // 复制 index.html文件，并自动引入打包输出的所有资源(js/css)
+        template: path.join(__dirname,'../public/index.html'),
+        inject: true, // 自动注入静态资源, 一般在有多个人口文件的时候才会设置为false
+        hash: true,
+        // 压缩html资源
+        minify:{
+            removeAttributeQuotes: true, // 删除HTML中属性值周围的引号
+            collapseWhitespace: true, // 去空格
+            removeComments: true, // 去注释
+            minifyJS: true, // 在脚本元素和事件属性中缩小JavaScript
+            minifyCSS: true, // 缩小css样式元素和样式属性
+        }
     }),
     // new DefinePlugin({
     //   "process.env": JSON.stringify(envConfig.parsed),
     //   "process.env.BASE_ENV": JSON.stringify(process.env.BASE_ENV),
     //   "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     // })
-  ]
+]
 ```
 
 ## 6 配置环境变量
@@ -552,15 +552,15 @@ alias: {
 
 ```json
 {
-  "compilerOptions": {
-    ...
-    "baseUrl": "./",
-    "paths": {
-      "src/*": [
-        "src/*"
-      ]
+    "compilerOptions": {
+        ...
+        "baseUrl": "./",
+        "paths": {
+            "src/*": [
+                "src/*"
+            ]
+        }
     }
-  }
 }
 ```
 
@@ -670,29 +670,44 @@ export default devConfig;
 
 ```shell
 pnpm add less less-loader sass-loader sass stylus stylus-loader -D
-
 ```
 
 在`webpack.base.ts`添加相关的`loader`：
 
 ```typescript
 // ...
-const cssRegex = /\.css$/;
-const sassRegex = /\.(scss|sass)$/;
-const lessRegex = /\.less$/;
-const stylRegex = /\.styl$/;
+const cssModuleRegex = /\module.css$/
+const cssRegex = /\.css$/
+const sassModuleRegex = /\module.(scss|sass)$/
+const sassRegex = /\.(scss|sass)$/
+const lessModuleRegex = /\.module.less$/
+const lesseRegex = /\.less$/
+const stylModuleRegex = /\module.styl$/
+const stylRegex = /\.styl$/
 
-const styleLoadersArray = [
-    "style-loader",
+// 模块化样式编译
+const moduleStyleLoadersArray = [
+    'style-loader',
     {
-        loader: "css-loader",
+        loader: 'css-loader',
         options: {
             modules: {
-                localIdentName: "[path][name]__[local]--[hash:5]",
+                // localIdentName: '[path][name]__[local]_[hash:5]',
+                localIdentName: '[local]_[hash:5]',
             },
         },
     },
-];
+    // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
+    'postcss-loader',
+]
+
+// 非模块化样式编译
+const styleLoadersArray = [
+    'style-loader',
+    'css-loader',
+    // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
+    // 'postcss-loader',
+]
 
 const baseConfig: Configuration = {
     // ...
@@ -700,44 +715,56 @@ const baseConfig: Configuration = {
         rules: [
             // ...
             {
-                test: cssRegex, //匹配 css 文件
+                test: cssRegex, // 匹配非模块化css文件
+                exclude: cssModuleRegex, // 排除模块化css文件
                 use: styleLoadersArray,
             },
             {
-                test: lessRegex,
+                test: cssModuleRegex, // 匹配模块化css文件
+                use: moduleStyleLoadersArray,
+            },
+            {
+                test: lesseRegex, // 匹配非模块化less文件
+                exclude: lessModuleRegex, // 排除模块化less文件
+                use: [...styleLoadersArray, 'less-loader'],
+            },
+            {
+                test: lessModuleRegex, // 匹配模块化less文件
                 use: [
-                    ...styleLoadersArray,
+                    ...moduleStyleLoadersArray,
                     {
-                        loader: "less-loader",
+                        loader: 'less-loader',
                         options: {
                             lessOptions: {
                                 // 如果要在less中写类型js的语法，需要加这一个配置
-                                javascriptEnabled: true
+                                javascriptEnabled: true,
                             },
                         },
                     },
                 ],
             },
             {
-                test: sassRegex,
-                use: [
-                    ...styleLoadersArray,
-                    "sass-loader",
-                ],
+                test: sassRegex, // 匹配非模块化sass文件
+                exclude: sassModuleRegex, // 排除模块化sass文件
+                use: [...styleLoadersArray, 'sass-loader'],
             },
             {
-                test: stylRegex,
-                use: [
-                    ...styleLoadersArray,
-                    "stylus-loader",
-                ],
+                test: sassModuleRegex, // 匹配模块化sass文件
+                use: [...moduleStyleLoadersArray, 'sass-loader'],
             },
-        ],
-    },
-    // ...
-};
+            {
+                test: stylRegex, // 匹配非模块化stylus文件
+                exclude: stylModuleRegex, // 排除模块化stylus文件
+                use: [...styleLoadersArray, 'stylus-loader'],
+            },
+            {
+                test: stylModuleRegex, // 匹配模块化stylus文件
+                use: [...moduleStyleLoadersArray, 'stylus-loader'],
+            },
+            // ...
+            };
 
-export default baseConfig;
+            export default baseConfig;
 
 ```
 
@@ -834,4 +861,89 @@ chrome 35 # 兼容chrome 35
 执行`pnpm run build:dev`打包，也可以看到打包后的`css`文件已经加上了`ie`和谷歌内核的前缀。
 
 ## 10 处理其他常用资源
+
+### 10.1处理图片
+
+对于图片文件，`webpack4`使用`file-loader`和`url-loader`来处理的，但`webpack5`不使用这两个`loader`了，而是采用自带的 [asset-module](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fguides%2Fasset-modules%2F%23root) 来处理，修改`webpack.base.ts`，添加图片解析配置
+
+```typescript
+{
+    output: {
+        // ... 这里自定义输出文件名的方式是，将某些资源发送到指定目录
+        assetModuleFilename: 'images/[hash][ext][query]'
+    },
+        module: {
+            rules: [
+                // ...
+                {
+                    test: /\.(png|jpe?g|gif|svg)$/i, // 匹配图片文件
+                    type: "asset", // type选择asset
+                    parser: {
+                        dataUrlCondition: {
+                            maxSize: 20 * 1024, // 小于10kb转base64
+                        }
+                    },
+                    generator:{ 
+                        filename:'static/images/[hash][ext][query]', // 文件输出目录和命名
+                    },
+                },
+            ]
+        }
+}
+
+```
+
+| 资源模块类型     | 描述                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| `asset/resource` | 发送一个单独的文件，并导出 `URL`，替代 `file-loader`，相当于`file-loader`, 将文件转化成`Webpack`能识别的资源，其他不做处理。 |
+| `asset/inline`   | 导出一个资源的 `data URI`，以前使用 `url-loader` 实现。      |
+| `asset/source`   | 导出资源的源代码 ，以前是使用 `raw-loader` 实现。            |
+| `asset`          | 相当于自动选择 `asset/resource` 或 `asset/inline`，替换 `url-loader` 中的 `limit`，相当于`url-loader`将文件转化成`Webpack`能识别的资源，同时小于某个大小的资源会处理成`data URI`形式。 |
+
+> 将文件编译为 `Data URI` 使用，可以节省 `HTTP` 请求，是一个性能优化的点。但是将图片文件经过 `base64` 编码转为 `Data URI`，体积会增加大约33%。所以，我们一般只针对小图片做Base64的处理，对于一些比较大的文件来说，转为 `Data URI` 会明显增加打包后文件的体积，反而会加大对带宽资源和流量的需求。
+
+由于我们希望通过 `ES6` 的新语法 `ESModule` 的方式导入资源，为了使 `TypeScript` 可以识别图片模块，需要在 `src/typings/global.d.ts` 中加入声明：
+
+```typescript
+// ...
+
+/* IMAGES */
+declare module '*.svg' {
+    const ref: string;
+    export default ref;
+}
+
+declare module '*.bmp' {
+    const ref: string;
+    export default ref;
+}
+
+declare module '*.gif' {
+    const ref: string;
+    export default ref;
+}
+
+declare module '*.jpg' {
+    const ref: string;
+    export default ref;
+}
+
+declare module '*.jpeg' {
+    const ref: string;
+    export default ref;
+}
+
+declare module '*.png' {
+    const ref: string;
+    export default ref;
+}
+
+```
+
+### 10.2 处理字体和媒体
+
+字体文件和媒体文件这两种资源处理方式和处理图片是一样的，只需要把匹配的路径和打包后放置的路径修改一下就可以了。修改`webpack.base.ts`文件：
+
+```typescript
+```
 

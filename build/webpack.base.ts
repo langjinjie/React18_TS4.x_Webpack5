@@ -4,13 +4,17 @@ import dotenv from 'dotenv'
 
 const path = require('path') // 需要安装@types/node -D
 
+const cssModuleRegex = /\module.css$/
 const cssRegex = /\.css$/
+const sassModuleRegex = /\module.(scss|sass)$/
 const sassRegex = /\.(scss|sass)$/
-const lessRegex = /\.less$/
+const lessModuleRegex = /\.module.less$/
+const lesseRegex = /\.less$/
+const stylModuleRegex = /\module.styl$/
 const stylRegex = /\.styl$/
 
-// 样式编译
-const styleLoadersArray = [
+// 模块化样式编译
+const moduleStyleLoadersArray = [
   'style-loader',
   {
     loader: 'css-loader',
@@ -23,6 +27,14 @@ const styleLoadersArray = [
   },
   // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
   'postcss-loader',
+]
+
+// 非模块化样式编译
+const styleLoadersArray = [
+  'style-loader',
+  'css-loader',
+  // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
+  // 'postcss-loader',
 ]
 
 // 加载配置文件
@@ -39,6 +51,8 @@ const baseConfig: Configuration = {
     path: path.join(__dirname, '../dist'), // 打包的输出路径
     clean: true, // webpack4需要配置clear-webpack-plugin来删除dist文件，webpack5内置了
     publicPath: '/', // 打包后文件的公共前缀路径
+    // ... 这里自定义输出文件名的方式是，将某些资源发送到指定目录
+    assetModuleFilename: 'images/[hash][ext][query]',
   },
   // loader 配置
   module: {
@@ -48,13 +62,23 @@ const baseConfig: Configuration = {
         use: 'babel-loader', // 配置文件
       },
       {
-        test: cssRegex, // 匹配css文件
+        test: cssRegex, // 匹配非模块化css文件
+        exclude: cssModuleRegex, // 排除模块化css文件
         use: styleLoadersArray,
       },
       {
-        test: lessRegex, // 匹配less文件
+        test: cssModuleRegex, // 匹配模块化css文件
+        use: moduleStyleLoadersArray,
+      },
+      {
+        test: lesseRegex, // 匹配非模块化less文件
+        exclude: lessModuleRegex, // 排除模块化less文件
+        use: [...styleLoadersArray, 'less-loader'],
+      },
+      {
+        test: lessModuleRegex, // 匹配模块化less文件
         use: [
-          ...styleLoadersArray,
+          ...moduleStyleLoadersArray,
           {
             loader: 'less-loader',
             options: {
@@ -67,12 +91,34 @@ const baseConfig: Configuration = {
         ],
       },
       {
-        test: sassRegex, // 匹配sass文件
+        test: sassRegex, // 匹配非模块化sass文件
+        exclude: sassModuleRegex, // 排除模块化sass文件
         use: [...styleLoadersArray, 'sass-loader'],
       },
       {
-        test: stylRegex, // 匹配stylus文件
+        test: sassModuleRegex, // 匹配模块化sass文件
+        use: [...moduleStyleLoadersArray, 'sass-loader'],
+      },
+      {
+        test: stylRegex, // 匹配非模块化stylus文件
+        exclude: stylModuleRegex, // 排除模块化stylus文件
         use: [...styleLoadersArray, 'stylus-loader'],
+      },
+      {
+        test: stylModuleRegex, // 匹配模块化stylus文件
+        use: [...moduleStyleLoadersArray, 'stylus-loader'],
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i, // 匹配图片文件
+        type: 'asset', // type选择asset
+        parser: {
+          dataUrlCondition: {
+            maxSize: 20 * 1024, // 小于10kb转base64
+          },
+        },
+        generator: {
+          filename: 'static/images/[hash][ext][query]', // 文件输出目录和命名
+        },
       },
     ],
   },

@@ -1,8 +1,3 @@
-h2 {
-  color: red;
-}
-
-.cssStyleBox {
-  height: 80px;
-  background-color: #bfa;
+.noModuleCss {
+  color: yellow;
 }

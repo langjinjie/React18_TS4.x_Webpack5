@@ -1,0 +1,19 @@
+.lessStyleBox {
+  height: 80px;
+  background-color: #bfa;
+}
+.bgImgTest {
+  & > div {
+    height: 200px;
+    background: url('src/assets/image/1cc35821-7988-410f-88e7-ace8abcc7f38.jpg') no-repeat;
+  }
+  & > :first-child {
+    background-image: url('src/assets/image/1cc35821-7988-410f-88e7-ace8abcc7f38.jpg');
+  }
+  & > :nth-child(2) {
+    background-image: url('src/assets/image/3c5c6aaa3a0be16af90fdf3b9a87487.png');
+  }
+  & > :nth-child(3) {
+    background-image: url('src/assets/image/6ac.jpg');
+  }
+}

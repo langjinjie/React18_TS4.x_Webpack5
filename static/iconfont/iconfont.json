@@ -1,0 +1,135 @@
+{
+  "id": "1773839",
+  "name": "my iconfont",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "7090060",
+      "name": "双箭头 右",
+      "font_class": "shuangjiantouyou",
+      "unicode": "e713",
+      "unicode_decimal": 59155
+    },
+    {
+      "icon_id": "11938722",
+      "name": "打勾",
+      "font_class": "dagou",
+      "unicode": "e618",
+      "unicode_decimal": 58904
+    },
+    {
+      "icon_id": "486905",
+      "name": "叉号",
+      "font_class": "chahao",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "7609653",
+      "name": "地点",
+      "font_class": "xiaochengxu_tubiao",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "4437606",
+      "name": "向下",
+      "font_class": "xiangxia1",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "339042",
+      "name": "向下",
+      "font_class": "xiangxia",
+      "unicode": "e62d",
+      "unicode_decimal": 58925
+    },
+    {
+      "icon_id": "2955575",
+      "name": "三角形",
+      "font_class": "sanjiaoxing1",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "6729052",
+      "name": "人工客服",
+      "font_class": "rengongkefu",
+      "unicode": "e737",
+      "unicode_decimal": 59191
+    },
+    {
+      "icon_id": "10472384",
+      "name": "个人中心",
+      "font_class": "renwu",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "10508927",
+      "name": "售后服务 (2)",
+      "font_class": "shouhoufuwu1",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "13878159",
+      "name": "手机",
+      "font_class": "shouji",
+      "unicode": "e6ae",
+      "unicode_decimal": 59054
+    },
+    {
+      "icon_id": "6066361",
+      "name": "房子",
+      "font_class": "fangzi-copy",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "840782",
+      "name": "小米",
+      "font_class": "xiaomi1",
+      "unicode": "e68c",
+      "unicode_decimal": 59020
+    },
+    {
+      "icon_id": "12653279",
+      "name": "小米",
+      "font_class": "xiaomi",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "8777512",
+      "name": "arrow_right",
+      "font_class": "icon-test61",
+      "unicode": "e670",
+      "unicode_decimal": 58992
+    },
+    {
+      "icon_id": "8776822",
+      "name": "cart_empty",
+      "font_class": "icon-test10",
+      "unicode": "e63d",
+      "unicode_decimal": 58941
+    },
+    {
+      "icon_id": "8776842",
+      "name": "search",
+      "font_class": "icon-test12",
+      "unicode": "e63f",
+      "unicode_decimal": 58943
+    },
+    {
+      "icon_id": "8776873",
+      "name": "setting",
+      "font_class": "icon-test16",
+      "unicode": "e643",
+      "unicode_decimal": 58947
+    }
+  ]
+}

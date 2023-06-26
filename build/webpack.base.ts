@@ -57,10 +57,13 @@ const baseConfig: Configuration = {
   // loader 配置
   module: {
     rules: [
+
       {
         test: /.(ts|tsx)$/, // 正则匹配 .ts .tsx文件
         use: 'babel-loader', // 配置文件
       },
+
+      /* ---------- 处理样式 ---------- */
       {
         test: cssRegex, // 匹配非模块化css文件
         exclude: cssModuleRegex, // 排除模块化css文件
@@ -108,6 +111,8 @@ const baseConfig: Configuration = {
         test: stylModuleRegex, // 匹配模块化stylus文件
         use: [...moduleStyleLoadersArray, 'stylus-loader'],
       },
+
+      /* ---------- 处理图片 ---------- */
       {
         test: /\.(png|jpe?g|gif|svg)$/i, // 匹配图片文件
         type: 'asset', // type选择asset
@@ -117,9 +122,37 @@ const baseConfig: Configuration = {
           },
         },
         generator: {
-          filename: 'static/images/[hash][ext][query]', // 文件输出目录和命名
+          filename: 'assets/images/[hash][ext][query]', // 文件输出目录和命名
         },
       },
+
+      /* ---------- 处理字体 ---------- */
+      {
+        test: /.(woff2?|eot|ttf|otf)$/, // 匹配字体图标文件
+        type: "asset", // type选择asset
+        parser:{
+          dataUrlCondition:{
+            maxSize: 10*1024, // 小于10k转base64
+          }
+        },
+        generator: {
+          fileName: "assets/fonts/[hash][ext][query]", // 文件输出目录和命名
+        }
+      },
+
+      /* ---------- 处理媒体文件 ---------- */
+      {
+        test: /.(mp4|webm|ogg|mp3|wav|flac|aac)$/, // 匹配媒体文件
+        type: 'asset', // type选择
+        parser: {
+          dataUrlCondition: {
+            maxSize: 10 * 1024, // 小于10kb转base64
+          }
+        },
+        generator: {
+          filename: 'assets/media/[hash][ext][query]', // 文件输出目录和命名
+        },
+      }
     ],
   },
   resolve: {
@@ -135,7 +168,7 @@ const baseConfig: Configuration = {
   plugins: [
     new HtmlWebpackPlugin({
       title: 'webpack5-react-ts',
-      favicon: path.join(__dirname, '../static/favicon.ico'), // 引入icon文件，自动会打包到跟index.html同目录下
+      favicon: path.join(__dirname, '../public/favicon.ico'), // 引入icon文件，自动会打包到跟index.html同目录下
       filename: 'index.html',
       // 复制 index.html文件，并自动引入打包输出的所有资源(js/css)
       template: path.join(__dirname, '../public/index.html'),

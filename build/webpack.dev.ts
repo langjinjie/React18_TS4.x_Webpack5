@@ -23,9 +23,9 @@ const devConfig: IConfiguration  = merge(baseConfig,{
     hot: true,
     historyApiFallback: true, // 解决history路由404问题
     setupExitSignals:  true, // 允许在 SIGINT 和 SIGTERM 信号时关闭开发服务器进程。
-    static:{
-      directory: path.join(__dirname, '../public') // 托管静态资源public文件夹
-    },
+    // static:{
+    //   directory: path.join(__dirname, '../'), // 托管静态资源public文件夹
+    // },
     headers: {"Access-Control-Allow-Origin": "*" }, // 允许跨域
 
   }

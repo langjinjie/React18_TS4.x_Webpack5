@@ -122,7 +122,7 @@ const baseConfig: Configuration = {
           },
         },
         generator: {
-          filename: 'assets/images/[hash][ext][query]', // 文件输出目录和命名
+          filename: 'static/images/[hash][ext][query]', // 文件输出目录和命名
         },
       },
 
@@ -136,7 +136,7 @@ const baseConfig: Configuration = {
           }
         },
         generator: {
-          fileName: "assets/fonts/[hash][ext][query]", // 文件输出目录和命名
+          fileName: "static/fonts/[hash][ext][query]", // 文件输出目录和命名
         }
       },
 
@@ -150,7 +150,7 @@ const baseConfig: Configuration = {
           }
         },
         generator: {
-          filename: 'assets/media/[hash][ext][query]', // 文件输出目录和命名
+          filename: 'static/media/[hash][ext][query]', // 文件输出目录和命名
         },
       }
     ],

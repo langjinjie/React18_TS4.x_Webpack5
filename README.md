@@ -945,5 +945,44 @@ declare module '*.png' {
 字体文件和媒体文件这两种资源处理方式和处理图片是一样的，只需要把匹配的路径和打包后放置的路径修改一下就可以了。修改`webpack.base.ts`文件：
 
 ```typescript
+module: {
+    rules: [
+        // ...
+        {
+            test:/.(woff2?|eot|ttf|otf)$/, // 匹配字体图标文件
+            type: "asset", // type选择asset
+            parser: {
+                dataUrlCondition: {
+                    maxSize: 10 * 1024, // 小于10kb转base64
+                }
+            },
+            generator:{ 
+                filename:'static/fonts/[hash][ext][query]', // 文件输出目录和命名
+            },
+        },
+        {
+            test:/.(mp4|webm|ogg|mp3|wav|flac|aac)$/, // 匹配媒体文件
+            type: "asset", // type选择asset
+            parser: {
+                dataUrlCondition: {
+                    maxSize: 10 * 1024, // 小于10kb转base64
+                }
+            },
+            generator:{ 
+                filename:'static/media/[hash][ext][query]', // 文件输出目录和命名
+            },
+        },
+    ]
+}
+
+```
+
+**注意：处理iconfont等静态文件时，在devServer上要做如下配置**
+
+```typescript
+// 开发环境静态文件托管，也可以借助CopyPlugin插件进行管理
+static:{
+    directory: path.join(__dirname, '../'), // 整个项目作为静态文件根目录
+},
 ```
 

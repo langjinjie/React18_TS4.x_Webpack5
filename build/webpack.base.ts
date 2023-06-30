@@ -143,7 +143,7 @@ const baseConfig: Configuration = {
       /* ---------- 处理媒体文件 ---------- */
       {
         test: /.(mp4|webm|ogg|mp3|wav|flac|aac)$/, // 匹配媒体文件
-        type: 'asset', // type选择
+        type: 'asset', // type选择asset
         parser: {
           dataUrlCondition: {
             maxSize: 10 * 1024, // 小于10kb转base64
@@ -153,14 +153,14 @@ const baseConfig: Configuration = {
           filename: 'static/media/[hash][ext][query]', // 文件输出目录和命名
         },
       },
-      /*  */
+      /* 处理json文件 */
       {
         // 匹配json文件
         test: /\.json$/,
         type: "asset/resource", // 将json文件视为文件类型
         generator: {
           // 这里专门针对json文件的处理
-          filename: "static/json/[name].[hash][ext][query]",
+          filename: "static/json/[name][hash][ext][query]",
         },
       },
     ],
@@ -171,6 +171,7 @@ const baseConfig: Configuration = {
     // 配置文件别名，别名需要配置两个地方，这里和tsconfig.json 需要给tsconfig.json配置映射路径，那么typescript-eslint检查就不会报错了
     alias: {
       src: path.join(__dirname, '../src'),
+      static: path.join(__dirname, '../static'),
       modules: [path.resolve(__dirname, '../node_modules')], // 查找第三方模块只在本项目的node_modules中查找
     },
   },

@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import { test } from 'src/utils/base'
 import { Icon } from 'src/components'
+import jsonTest  from 'src/assets/json/test.json'
 import lessStyle from './style.module.less'
 import scssStyle from './style.module.scss'
 
 function Index() {
   useEffect(() => {
     test()
+    console.log('jsonTest', (jsonTest))
     console.log('123')
   }, [])
   return (

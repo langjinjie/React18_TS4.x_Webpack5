@@ -980,7 +980,7 @@ module: {
 **注意：处理iconfont等静态文件时，在devServer上要做如下配置**
 
 ```typescript
-// 开发环境静态文件托管，也可以借助CopyPlugin插件进行管理
+// 开发环境静态文件托管，也可以在webpack.base.ts借助CopyPlugin插件进行管理
 static:{
     directory: path.join(__dirname, '../'), // 整个项目作为静态文件根目录
 },

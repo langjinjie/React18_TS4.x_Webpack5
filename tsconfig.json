@@ -8,9 +8,13 @@
     "skipLibCheck": true, /* Skip type checking all .d.ts files. */
     "jsx": "react-jsx", // 这里改成react-jsx，就不需要在tsx文件中手动引入React了
     "baseUrl": "./",
+    "resolveJsonModule": true,
     "paths": {
       "src/*": [
         "src/*"
+      ],
+      "static/*": [
+        "static/*"
       ]
     }
   }

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { test } from 'src/utils/base'
 import { Icon } from 'src/components'
+import Class from 'src/pages/Class/Class'
 import jsonTest  from 'src/assets/json/test.json'
 import lessStyle from './style.module.less'
 import scssStyle from './style.module.scss'
@@ -8,7 +9,8 @@ import scssStyle from './style.module.scss'
 function Index() {
   useEffect(() => {
     test()
-    console.log('jsonTest', (jsonTest))
+    // @ts-ignore
+    console.log('jsonTest',  JSON.parse((jsonTest as string)))
     console.log('123')
   }, [])
   return (
@@ -47,6 +49,7 @@ function Index() {
       </div>
       <h2>字体引入测试</h2>
       <div className={lessStyle.fontTest}>文字字体测试哈哈哈</div>
+      <Class/>
     </>
   )
 }

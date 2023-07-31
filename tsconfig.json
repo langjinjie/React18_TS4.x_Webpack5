@@ -9,6 +9,7 @@
     "jsx": "react-jsx", // 这里改成react-jsx，就不需要在tsx文件中手动引入React了
     "baseUrl": "./",
     "resolveJsonModule": true,
+    "experimentalDecorators": true, // 开启装饰器
     "paths": {
       "src/*": [
         "src/*"

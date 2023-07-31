@@ -986,3 +986,104 @@ static:{
 },
 ```
 
+### 10.3处理json
+
+```json
+// ...
+{
+    // 匹配json文件
+    test: /\.json$/,
+    type: "asset/source", // 将json文件视为文件类型,并且输出
+    generator: {
+        // 这里专门针对json文件的处理
+        filename: "static/json/[name].[hash][ext][query]",
+    },
+},
+// ...
+
+```
+
+> 在Webpack中，`asset/source`和`asset/resource`是两种资源处理模式，用于处理项目中的静态资源（例如图像、字体、视频等）。它们是Webpack 5中新引入的资源处理方式。
+>
+> 
+> 在Webpack中，`asset/source`和`asset/resource`是两种资源处理模式，用于处理项目中的静态资源（例如图像、字体、视频等）。它们是Webpack 5中新引入的资源处理方式。
+>
+> 1. `asset/source`: 这个模式会将资源处理为一个JavaScript模块，返回资源内容的字符串。通常适用于处理文本文件，如SVG图像、文本文件等。处理后的资源可以直接在JavaScript中导入并使用
+> 2. `asset/resource`: 这个模式会将资源原封不动地复制到输出目录，并返回资源的URL路径。通常适用于处理二进制文件，如图像、字体、视频等。处理后的资源可以通过URL路径进行访问。
+> 3. `asset/inline`: 这个模式将资源转换为Data URL，并直接嵌入到生成的文件中。适用于较小的资源文件，这样可以减少HTTP请求，但会增加文件的大小。适用于一些小图标或其他小文件
+> 4. `asset`: 这是一个自动选择模式，Webpack会根据资源的大小自动选择是使用`asset/resource`还是`asset/inline`，对于较小的资源，它会使用`asset/inline`，对于较大的资源，它会使用`asset/resource`。这是Webpack 5中默认的资源处理模式，适用于大多数的资源文件。
+
+> 总结：
+>
+> - `asset/source`用于将资源处理为JavaScript模块，适用于处理文本文件。
+> - `asset/resource`用于将资源原封不动地复制到输出目录，适用于处理二进制文件。
+> - `asset/inline`用于将资源转换为Data URL并嵌入到文件中，适用于较小的资源文件。
+> - `asset`是自动选择模式，根据资源大小选择`asset/resource`或`asset/inline`，是Webpack 5中的默认资源处理模式。
+
+## 11、babel处理js非标准语法
+
+现在`react`主流开发都是函数组件和`react-hooks`，但有时也会用类组件，可以用装饰器简化代码。
+
+新增`Class.tsx`组件，在`App.tsx`中引入改组件使用
+
+```tsx
+import { PureComponent, ReactNode } from "react"
+
+/**
+ * @description 装饰器，为组件添加age属性
+ * @param Target 
+ */
+function AddAge(Target: Function) {
+    Target.prototype.age = 111
+}
+
+// 使用装饰器
+@AddAge
+export default class Class extends PureComponent<any, any> {
+    constructor(props:any){
+        super(props)
+        this.state = {
+            name:'jeff'
+        }
+    }
+
+    age?: number
+
+    render(): ReactNode {
+        return(
+            <>
+            <h2>我是类组件</h2>
+            <h2>我是{this.state.name}</h2>
+            <h2>我已经{this.age}</h2>
+            </>
+        )
+    }
+}
+```
+
+需要开启一下`ts`装饰器支持
+
+```json
+{
+    "compilerOptions":{
+        // ...
+        "experimentalDecorators": true, // 开启装饰器
+        // ...
+    }
+
+}
+```
+
+上面Class组件代码中使用了装饰器目前`js`标准语法是不支持的，现在运行或者打包会报错，不识别装饰器语法，需要借助`babel-loader`插件，安装依赖：
+
+```shell
+pnpm add @babel/plugin-proposal-decorators -D
+```
+
+在 `babel.config.js` 中添加插件：
+
+```typescript
+// 装饰器配置
+  plugins:[["@babel/plugin-proposal-decorators", { legacy: true }],].filter(Boolean) // 过滤空值
+```
+

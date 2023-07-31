@@ -14,5 +14,7 @@ module.exports = {
     // 如果使用的是babel和react17,可能需要将"runtime":"automotic"添加到配置中,否则可能会出现Uncaught ReferenceError: React is not defined
     ["@babel/preset-react", { runtime: "automatic" }],
     "@babel/preset-typescript"
-  ]
+  ],
+  // 装饰器配置
+  plugins:[["@babel/plugin-proposal-decorators", { legacy: true }],].filter(Boolean) // 过滤空值
 }

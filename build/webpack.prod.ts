@@ -10,18 +10,6 @@ const prodConfig: Configuration = merge(baseConfig, {
   打包环境推荐：none（不配置devTool选项了，不是配置devTool:"none"）
   在package.json的scripts中添加  "build": "webpack -c build/webpack.prod.ts"
   */
-  plugins:[
-    // 处理生产的静态文件
-    new CopyPlugin({
-      patterns:[
-        {
-          from: path.join(__dirname, '../static'), // 静态文件入口
-          to: path.join(__dirname, '../dist/static'), // 静态文件输出
-          filter:(sources)=> !sources.includes('index.html') // 过滤掉 index.html
-        }
-      ]
-    })
-  ]
 })
 
 export default prodConfig

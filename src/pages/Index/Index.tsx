@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { test } from 'src/utils/base'
 import { Icon } from 'src/components'
 import Class from 'src/pages/Class/Class'
@@ -7,6 +7,13 @@ import lessStyle from './style.module.less'
 import scssStyle from './style.module.scss'
 
 function Index() {
+  const [count, setCount]=useState(1);
+  
+  // 计数器+1
+  const addCount = () => {
+    setCount(count+1)
+  }
+
   useEffect(() => {
     test()
     // @ts-ignore
@@ -50,6 +57,8 @@ function Index() {
       <h2>字体引入测试</h2>
       <div className={lessStyle.fontTest}>文字字体测试哈哈哈</div>
       <Class/>
+      <h2>热更新22222</h2>
+      <button className={lessStyle.btn} onClick={addCount}>count：{count}</button>
     </>
   )
 }

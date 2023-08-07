@@ -1,4 +1,3 @@
-
 # webpack项目搭建
 
 ## 1、依赖管理
@@ -112,40 +111,40 @@ export default App
 
 ## 4、引入Typescript
 
-为什么要使用`Typescript`
+为什么要使用 `Typescript`
 
 1. 更好的代码质量：`Typescript`的**静态类型系统**可以帮助开发人员在编写代码时**捕获错误**，这可以提高代码**质量和稳定性**。
 2. 更好的可读性和可维护性：`Typescript`的静态类型系统和类可以提高代码的可读性和可维护性，特别是在大型项目中。这可以使代码更易于理解和修改。
-3. 更好的`IDE`支持：`TypeScript` 具有出色的IDE支持，包括自动完成，语法突出显示和类型检查。这可以提高开发人员的生产力和准确性。
+3. 更好的 `IDE`支持：`TypeScript` 具有出色的IDE支持，包括自动完成，语法突出显示和类型检查。这可以提高开发人员的生产力和准确性。
 4. 更好的扩展性：`Typescript`支持面向对象编程，可以帮助开发人员创建复杂的数据类型和接口，并使代码更易于扩展和维护。
 5. 更好的协作：`Typescript`可以帮助开发团队更好的协作，因为代码的结构和类型是显式声明的。这可以减少在协作开发中出现的潜在问题和错误。
-6. 更好的性能：由于`Typescript`可以在编译时捕获错误，因此可以减少运行时错误并提高性能。
+6. 更好的性能：由于 `Typescript`可以在编译时捕获错误，因此可以减少运行时错误并提高性能。
 
-> 总的来说，`Typescript`可以提高代码质量，可读性，可扩展性和协作，并且可以提高性能，这些优点使得`Typescript`成为编写大型项目的优秀选择。
+> 总的来说，`Typescript`可以提高代码质量，可读性，可扩展性和协作，并且可以提高性能，这些优点使得 `Typescript`成为编写大型项目的优秀选择。
 
-安装`Typescript`依赖
+安装 `Typescript`依赖
 
 ```shell
 pnpm add typescript -D
 pnpm add babel-loader ts-node @babel/core @babel/preset-react @babel/preset-typescript @babel/preset-env core-js -D
 ```
 
-> - 由于`webpack`默认只能识别`js`文件，不能识别`jsx`语法，需要配置`loader`的预设预设 `@babel/preset-typescript` 来先将`ts`语法转换为`js`语法，再借助预设 `@babel/preset-react` 来识别`jsx`语法。
+> - 由于 `webpack`默认只能识别 `js`文件，不能识别 `jsx`语法，需要配置 `loader`的预设预设 `@babel/preset-typescript` 来先将 `ts`语法转换为 `js`语法，再借助预设 `@babel/preset-react` 来识别 `jsx`语法。
 > - `ts-node`：编译 `ts` 文件，它可以立即编译并执行指定的 `TypeScript` 文件，因此不需要单独的编译步骤。
 > - `babel-loader`: 使用 `babel` 加载最新 `js` 代码并将其转换为 `ES5`（上面已经安装过）
 > - `@babel/corer`: `babel` 编译的核心包
-> - `@babel/preset-env`: `babel` 编译的预设，可以转换目前最新的`js`标准语法
-> - `core-js`: 使用低版本`js`语法模拟高版本的库，也就是垫片
+> - `@babel/preset-env`: `babel` 编译的预设，可以转换目前最新的 `js`标准语法
+> - `core-js`: 使用低版本 `js`语法模拟高版本的库，也就是垫片
 >
-> 现在`js`不断新增很多方便好用的标准语法来方便开发，甚至还有非标准语法比如装饰器，都极大的提升了代码可读性和开发效率。但前者标准语法很多低版本浏览器不支持，后者非标准语法所有的浏览器都不支持。需要把最新的标准语法转换为低版本语法，把非标准语法转换为标准语法才能让浏览器识别解析，而 `babel` 就是来做这件事的，这里只讲配置，更详细的可以看[Babel 那些事儿](https://juejin.cn/post/6992371845349507108)。
+> 现在 `js`不断新增很多方便好用的标准语法来方便开发，甚至还有非标准语法比如装饰器，都极大的提升了代码可读性和开发效率。但前者标准语法很多低版本浏览器不支持，后者非标准语法所有的浏览器都不支持。需要把最新的标准语法转换为低版本语法，把非标准语法转换为标准语法才能让浏览器识别解析，而 `babel` 就是来做这件事的，这里只讲配置，更详细的可以看[Babel 那些事儿](https://juejin.cn/post/6992371845349507108)。
 
-初始化`tsconfig.json`
+初始化 `tsconfig.json`
 
 ```shell
 tsc --init
 ```
 
-就会在根目录生成一个`tsconfig.json`文件
+就会在根目录生成一个 `tsconfig.json`文件
 
 ```json
 {
@@ -162,7 +161,7 @@ tsc --init
 
 ## 5、webpack配置
 
-> 既然都使用了`typescript`，那就尽可能都使用`ts`编写，所以`webpack`配置文件，我们也将会使用`ts`来写
+> 既然都使用了 `typescript`，那就尽可能都使用 `ts`编写，所以 `webpack`配置文件，我们也将会使用 `ts`来写
 
 安装依赖，属于开发依赖，打包完成之后就不再需要
 
@@ -172,7 +171,7 @@ pnpm add webpack webpack webpack-cli -D
 
 ### 5.1 webpack.base.ts
 
-配置`webpack.base.ts`文件：
+配置 `webpack.base.ts`文件：
 
 ```typescript
 // 引入webpack
@@ -241,7 +240,46 @@ const baseConfig: Configuration = {
 
 ```
 
-因为`webpack.base.ts`文件承载了基本得配置，随着`webpack`做的事情越来越多，会逐渐变得很庞大，我们可以将其中得`bael-loader`相关的配置抽离出来进行管理。在根目录新建`babel.config.js`
+> PS：[path.resolve 与 path.join 的区别](https://juejin.cn/post/6844903861920989198)
+
+将会出现以下问题： ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/144a1c6f8e7d47e4a7392406537b7be3~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?) 需要我们安装 `@types/node` 这个依赖：
+
+```shell
+shell
+复制代码pnpm add @types/node -D
+```
+
+错误消失~ 错误虽然消失了，但是这个库是干嘛用的呢？看官方 `npm`包的介绍： ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8f1433102d92480a8b3c8bf59f588136~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+> 这是由于typescript自身的机制，需要一份 `xx.d.ts`声明文件，来说明模块对外公开的方法和属性的类型以及内容。对于内建模块，安装一个 `@types/node`模块可以整体解决模块的声明文件问题。
+
+让我们回到 `TypeScript`的基本理念。`TypeScript`希望所有全局使用的代码都是类型化的，当你的项目有一个合理的配置时，它对你自己的代码也是如此。`TypeScript`库本身只包含 `TypeScript`包的代码类型。你可以为一个库编写自己的类型，但这几乎是不需要的 —— 因为 `TypeScript`社区已经为我们做了这个工作。
+
+与 `npm`一样，`TypeScript`世界也在庆祝开源代码。社区很活跃，不断对常用的 `npm`包的更新和变化做出反应。你几乎总能找到npm包的类型，所以你不必单独为你的成千上万的依赖创建类型。
+
+通常，现有软件包的类型可以从 `npm`内部的 `@types`组织中找到，你可以通过安装一个带有 `@types/`前缀的软件包名称的 `npm`包将相关类型添加到你的项目中。比如说 `npm install --save-dev @types/react @types/express @types/lodash @types/jest @types/mongoose`等等，等等。 `@types/*` 由[Definitely typed](https://link.juejin.cn?target=http%3A%2F%2Fdefinitelytyped.org%2F)维护，这是一个社区项目，目的是在一个地方维护所有的类型。
+
+有时，一个 `npm`包也可以在代码中包含它的类型，在这种情况下，安装相应的 `@types/*` 就没有必要。
+
+> - 由于类型只在编译前使用，所以在生产构建中不需要类型，它们应该放在 `package.json`的 `devDependencies`中。
+> - 比如后面我们会用到的全局变量：`process`，是由Node本身定义的，我们从包 `@types/node`中获得其类型。
+> - 从 `10.0`版本开始，`ts-node`已经将 `@types/node`定义为一个[对等依赖](https://link.juejin.cn?target=https%3A%2F%2Fdocs.npmjs.com%2Fcli%2Fv8%2Fconfiguring-npm%2Fpackage-json%23peerdependencies)。如果你使用的是npm，npm的版本至少是7.0，那么一个项目的对等依赖就会自动被npm安装。如果你有一个更老的npm，同行依赖必须明确安装。
+>
+> 关于TypeScript的类型声明，可以阅读这位同学写的入门指南：[TypeScript类型声明完全指南](https://link.juejin.cn?target=https%3A%2F%2Fwww.pengfeixc.com%2Fblogs%2Fjavascript%2Ftypescript-declarations)
+
+另外因为我们在 `App.tsx`中引入了 `css`文件，所以还需要安装相关的 `loader`：
+
+```shell
+shell
+复制代码pnpm add style-loader css-loader -D
+```
+
+作者：_你当像鸟飞往你的山
+链接：https://juejin.cn/post/7203169721839042615
+来源：稀土掘金
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+因为 `webpack.base.ts`文件承载了基本得配置，随着 `webpack`做的事情越来越多，会逐渐变得很庞大，我们可以将其中得 `bael-loader`相关的配置抽离出来进行管理。在根目录新建 `babel.config.js`
 
 ```js
 module.exports = {
@@ -264,7 +302,7 @@ module.exports = {
 }
 ```
 
-然后再`webpack.base.ts`文件中，就可以将`babel-loader`配置简化成：
+然后再 `webpack.base.ts`文件中，就可以将 `babel-loader`配置简化成：
 
 ```js
 // ...
@@ -281,9 +319,11 @@ module: {
 //...
 ```
 
+typescript自身的机制，需要一份 `xx.d.ts`声明文件，来说明模块对外公开的方法和属性的类型以及内容。对于内建模块，安装一个 `@types/node`模块可以整体解决模块的声明文件问题。
+
 ### 5.2 webpack.dev.ts
 
-接下来，我们需要通过`webpack-dev-server`来启动我们的项目，所以需要安装相关的依赖：
+接下来，我们需要通过 `webpack-dev-server`来启动我们的项目，所以需要安装相关的依赖：
 
 ```shell
 pnpm add webpack-dev-server webpack-merge -D
@@ -334,7 +374,7 @@ export default devConfig
 > - 开发中，我们每行到吗不会写的太长，只需要定位到行就行，所以加上cheap
 > - 我们希望能够找到源代码的错误，而不是打包后的，所以需要加上 module
 
-然后在`package.json`中添加启动脚本
+然后在 `package.json`中添加启动脚本
 
 ```json
 "scripts": {
@@ -346,7 +386,7 @@ export default devConfig
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/471b68584ac04d34bc8a1e63b65a894c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
-在`tsconfig.json`中加入一行`"jsx": "react-jsx"`
+在 `tsconfig.json`中加入一行 `"jsx": "react-jsx"`
 
 ```json
 {
@@ -363,17 +403,17 @@ export default devConfig
 }
 ```
 
-回到`App.tsx`，可以发现`React`的`import`变灰了：
+回到 `App.tsx`，可以发现 `React`的 `import`变灰了：
 
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9e682ec872ae4aa3b060a6342c1ad509~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
-> 从`React v17`开始，我们就不需要再显式`import React from 'react'`了。
+> 从 `React v17`开始，我们就不需要再显式 `import React from 'react'`了。
 
-运行`npm run dev`脚本启动项目，就可以看到页面跑出来了！
+运行 `npm run dev`脚本启动项目，就可以看到页面跑出来了！
 
 ### 5.3 webpack.prod.ts
 
-配置`weboack.prod.ts`:
+配置 `weboack.prod.ts`:
 
 ```typescript
 import { Configuration } from "webpack";
@@ -392,7 +432,7 @@ export default prodConfig;
 > 1. `none`话调试只能看到编译后的代码，也不会泄露源代码，打包速度也会比较快。
 > 2. 只是不方便线上排查问题, 但一般都可以根据报错信息在本地环境很快找出问题所在
 
-在`package.json`中添加：
+在 `package.json`中添加：
 
 ```json
 "scripts": {
@@ -403,13 +443,13 @@ export default prodConfig;
 
 ### 5.4 copy静态资源
 
-一般`public`文件夹都会放一些静态资源，可以直接根据绝对路径引入，比如图片、`css`、`js`文件等，不需要`webpack`进行解析，只需要打包的时候把`public`下内容复制到构建出口文件夹中，可以借助[copy-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcopy-webpack-plugin)插件，安装依赖：
+一般 `public`文件夹都会放一些静态资源，可以直接根据绝对路径引入，比如图片、`css`、`js`文件等，不需要 `webpack`进行解析，只需要打包的时候把 `public`下内容复制到构建出口文件夹中，可以借助[copy-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcopy-webpack-plugin)插件，安装依赖：
 
 ```shell
 pnpm add copy-webpack-plugin -D
 ```
 
-修改`webpack.base.ts`:
+修改 `webpack.base.ts`:
 
 ```typescript
 // plugin 的配置
@@ -448,22 +488,22 @@ plugins: [
 1. 区分是开发模式还是打包构建模式
 2. 区分项目业务环境，开发/测试/预测/正式环境
 
-> 区分开发模式还是打包构建模式可以用`process.env.NODE_ENV`，因为很多第三方包里面判断都是采用的这个环境变量。
+> 区分开发模式还是打包构建模式可以用 `process.env.NODE_ENV`，因为很多第三方包里面判断都是采用的这个环境变量。
 
-> 区分项目接口环境可以自定义一个环境变量`process.env.BASE_ENV`，设置环境变量可以借助[cross-env](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcross-env) 和 [webpack.DefinePlugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.webpackjs.com%2Fplugins%2Fdefine-plugin%2F) 来设置。
+> 区分项目接口环境可以自定义一个环境变量 `process.env.BASE_ENV`，设置环境变量可以借助[cross-env](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcross-env) 和 [webpack.DefinePlugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.webpackjs.com%2Fplugins%2Fdefine-plugin%2F) 来设置。
 
 - `cross-env`：运行跨平台设置和使用环境变量的脚本，兼容各系统的设置环境变量的包
 - `webpack.DefinePlugin`：`webpack`内置的插件，可以为业务代码注入环境变量
 
-`cross-env`解决的问题：当您使用`NODE_ENV=production`，来设置环境变量时，大多数`windows`命令提示会阻塞（报错），（异常是`Windows`上的`Bash`，它使用本机`Bash`。）同样，`Windows`和`POSIX`命令如何使用环境变量也有区别。 使用`POSIX`，您可以使用：`$ ENV_VAR`和使用`％ENV_VAR％`的`Windows`。
+`cross-env`解决的问题：当您使用 `NODE_ENV=production`，来设置环境变量时，大多数 `windows`命令提示会阻塞（报错），（异常是 `Windows`上的 `Bash`，它使用本机 `Bash`。）同样，`Windows`和 `POSIX`命令如何使用环境变量也有区别。 使用 `POSIX`，您可以使用：`$ ENV_VAR`和使用 `％ENV_VAR％`的 `Windows`。
 
-安装`cross-env`：
+安装 `cross-env`：
 
 ```shell
 pnpm add cross-env -D
 ```
 
-修改`package.json`中的`script`:
+修改 `package.json`中的 `script`:
 
 ```json
 ...
@@ -476,11 +516,11 @@ pnpm add cross-env -D
 ...
 ```
 
-> `process.env.NODE_ENV`环境变量`webpack`会自动根据设置的`mode`字段来给业务代码注入对应的`development`和`prodction`，这里在命令中再次设置环境变量`NODE_ENV`是为了在`webpack`和`babel`的配置文件中访问到。
+> `process.env.NODE_ENV`环境变量 `webpack`会自动根据设置的 `mode`字段来给业务代码注入对应的 `development`和 `prodction`，这里在命令中再次设置环境变量 `NODE_ENV`是为了在 `webpack`和 `babel`的配置文件中访问到。
 
-当前是打包模式，业务环境是开发环境，这里需要把`process.env.BASE_ENV`注入到业务代码里面，就可以通过该环境变量设置对应环境的接口地址和其他数据，要借助`webpack.DefinePlugin`插件。
+当前是打包模式，业务环境是开发环境，这里需要把 `process.env.BASE_ENV`注入到业务代码里面，就可以通过该环境变量设置对应环境的接口地址和其他数据，要借助 `webpack.DefinePlugin`插件。
 
-修改`webpack.base.ts`
+修改 `webpack.base.ts`
 
 ```json
 ...
@@ -526,7 +566,7 @@ REACT_APP_API_URL=https://api-prod.com
 
 ```
 
-然后在`webpck.base.ts`中引入，然后解析对应环境配置，最后通过`DefinePlugin`进行注入：
+然后在 `webpck.base.ts`中引入，然后解析对应环境配置，最后通过 `DefinePlugin`进行注入：
 
 ```typescript
 new DefinePlugin({
@@ -538,7 +578,7 @@ new DefinePlugin({
 
 ## 7文件别名
 
-先在`webpack.base.ts`中配置：
+先在 `webpack.base.ts`中配置：
 
 ```typescript
 // 配置文件别名
@@ -548,7 +588,7 @@ alias: {
 },
 ```
 
-然后还需要再`tsconfig.json`中配置：在`tsconfig.json`中配置映射路径，那么typescript-eslint检查就不会报错了
+然后还需要再 `tsconfig.json`中配置：在 `tsconfig.json`中配置映射路径，那么typescript-eslint检查就不会报错了
 
 ```json
 {
@@ -575,15 +615,13 @@ import App from 'src/App'
 
 windows下不生效
 
-
-
-我们发现，每次运行`pnpm start`命令都会在当前浏览器打开新的`Tab`，虽然也不影响项目开发，但是很影响开发体验，可以参考`Create-React-App`的处理方式：
+我们发现，每次运行 `pnpm start`命令都会在当前浏览器打开新的 `Tab`，虽然也不影响项目开发，但是很影响开发体验，可以参考 `Create-React-App`的处理方式：
 
 > 参考：[create-react-app](https://link.juejin.cn/?target=https%3A%2F%2Flink.zhihu.com%2F%3Ftarget%3Dhttps%3A%2F%2Fgithub.com%2Ffacebook%2Fcreate-react-app%2Ftree%2Fmain%2Fpackages%2Freact-dev-utils) 的启动方式
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9efc08268a86464dbfeabceaf5bb02d5~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
-复制出这两个文件源码，将其放置在`build`下的`util`中：
+复制出这两个文件源码，将其放置在 `build`下的 `util`中：
 
 ```txt
 ├── build
@@ -593,7 +631,7 @@ windows下不生效
 
 ```
 
-修改`webpack.dev.ts`:
+修改 `webpack.dev.ts`:
 
 ```typescript
 import path from "path";
@@ -656,7 +694,7 @@ export default devConfig;
 
 ## 9 引入less、sass（scss）、stylus
 
-`less`、`sass（scss）`、`stylus`是三个比较流行的 `CSS Modules` 预处理库。在 `React` 中，使用`CSS Modules` 的好处在于：
+`less`、`sass（scss）`、`stylus`是三个比较流行的 `CSS Modules` 预处理库。在 `React` 中，使用 `CSS Modules` 的好处在于：
 
 1. 避免全局样式冲突：使用 `CSS Modules` 可以确保样式只应用于特定组件，避免全局样式冲突。
 2. 更好的可维护性：`CSS Modules` 使得样式与组件代码紧密关联，方便代码维护。
@@ -672,7 +710,7 @@ export default devConfig;
 pnpm add less less-loader sass-loader sass stylus stylus-loader -D
 ```
 
-在`webpack.base.ts`添加相关的`loader`：
+在 `webpack.base.ts`添加相关的 `loader`：
 
 ```typescript
 // ...
@@ -771,14 +809,13 @@ const baseConfig: Configuration = {
 > webpack配置说明
 >
 > 1. `localIdenName`：配置生成的css类名组成（`path`路径，`name`文件名，`local`原来的css类名，``）
->
-> 2. 如下的配置（`localIdentName: '[local]__[hash:base64:5]'`）：生成的css类名类似 `class="edit__275ih"`这种，既能达到`scoped`的效果，又保留原来的`css`类名(`edit`)。
+> 2. 如下的配置（`localIdentName: '[local]__[hash:base64:5]'`）：生成的css类名类似 `class="edit__275ih"`这种，既能达到 `scoped`的效果，又保留原来的 `css`类名(`edit`)。
 >
 >    推荐阅读：[【Webpack进阶】less-loader、css-loader、style-loader实现原理](https://juejin.cn/post/6944668149849522213)
 
 然后就可以在业务中使用了
 
-重启项目，就会发现生成了带有`hash`值的`class`类名，且里面包含了我们自定义的类名，方便日后调试用：
+重启项目，就会发现生成了带有 `hash`值的 `class`类名，且里面包含了我们自定义的类名，方便日后调试用：
 
 > **Tips**：虽然我们在样式文件名上加一个 `.module` 的后缀，可以明确这是 `css modules`，但也带来了额外的码字开销。可以在 `global.d.ts` 加入样式文件的声明，就可以避免写 `.module` 后缀。
 
@@ -815,13 +852,13 @@ declare module '*.styl' {
 
 ### 9.2 处理CSS3前缀在浏览器中的兼容
 
-虽然`css3`现在浏览器支持率已经很高了, 但有时候需要兼容一些低版本浏览器，需要给`css3`加前缀,可以借助插件来自动加前缀，[postcss-loader](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Floaders%2Fpostcss-loader%2F) 就是来给`css3`加浏览器前缀的，安装依赖：
+虽然 `css3`现在浏览器支持率已经很高了, 但有时候需要兼容一些低版本浏览器，需要给 `css3`加前缀,可以借助插件来自动加前缀，[postcss-loader](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Floaders%2Fpostcss-loader%2F) 就是来给 `css3`加浏览器前缀的，安装依赖：
 
 ```shell
 pnpm add postcss-loader autoprefixer -D
 ```
 
-为了避免`webpack.base.ts`文件过于庞大，我们将一些`loader`配置提取成单独的文件来进行管理，根目录新建`postcss.config.js`，作为`postcss-loader`的配置文件，会自动读取配置：
+为了避免 `webpack.base.ts`文件过于庞大，我们将一些 `loader`配置提取成单独的文件来进行管理，根目录新建 `postcss.config.js`，作为 `postcss-loader`的配置文件，会自动读取配置：
 
 ```js
 module.exports = {
@@ -830,7 +867,7 @@ module.exports = {
 };
 ```
 
-修改`webpack.base.ts`，在解析`css`和`less`的规则中添加配置：
+修改 `webpack.base.ts`，在解析 `css`和 `less`的规则中添加配置：
 
 ```typescript
 // ...
@@ -849,22 +886,22 @@ const styleLoadersArray = [
 ];
 ```
 
-配置完成后，需要有一份要兼容浏览器的清单，让`postcss-loader`知道要加哪些浏览器的前缀，在根目录创建`.browserslistrc`文件：
+配置完成后，需要有一份要兼容浏览器的清单，让 `postcss-loader`知道要加哪些浏览器的前缀，在根目录创建 `.browserslistrc`文件：
 
 ```txt
 IE 9 # 兼容IE 9
 chrome 35 # 兼容chrome 35
 ```
 
-以兼容到`ie9`和`chrome35`版本为例，配置好后，在`app.module.less`中加入一些CSS3的语法，重新启动项目，就可以在浏览器的控制台-Elements 中看到配置成功了。
+以兼容到 `ie9`和 `chrome35`版本为例，配置好后，在 `app.module.less`中加入一些CSS3的语法，重新启动项目，就可以在浏览器的控制台-Elements 中看到配置成功了。
 
-执行`pnpm run build:dev`打包，也可以看到打包后的`css`文件已经加上了`ie`和谷歌内核的前缀。
+执行 `pnpm run build:dev`打包，也可以看到打包后的 `css`文件已经加上了 `ie`和谷歌内核的前缀。
 
 ## 10 处理其他常用资源
 
 ### 10.1处理图片
 
-对于图片文件，`webpack4`使用`file-loader`和`url-loader`来处理的，但`webpack5`不使用这两个`loader`了，而是采用自带的 [asset-module](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fguides%2Fasset-modules%2F%23root) 来处理，修改`webpack.base.ts`，添加图片解析配置
+对于图片文件，`webpack4`使用 `file-loader`和 `url-loader`来处理的，但 `webpack5`不使用这两个 `loader`了，而是采用自带的 [asset-module](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fguides%2Fasset-modules%2F%23root) 来处理，修改 `webpack.base.ts`，添加图片解析配置
 
 ```typescript
 {
@@ -893,12 +930,12 @@ chrome 35 # 兼容chrome 35
 
 ```
 
-| 资源模块类型     | 描述                                                         |
-| ---------------- | ------------------------------------------------------------ |
-| `asset/resource` | 发送一个单独的文件，并导出 `URL`，替代 `file-loader`，相当于`file-loader`, 将文件转化成`Webpack`能识别的资源，其他不做处理。 |
-| `asset/inline`   | 导出一个资源的 `data URI`，以前使用 `url-loader` 实现。      |
-| `asset/source`   | 导出资源的源代码 ，以前是使用 `raw-loader` 实现。            |
-| `asset`          | 相当于自动选择 `asset/resource` 或 `asset/inline`，替换 `url-loader` 中的 `limit`，相当于`url-loader`将文件转化成`Webpack`能识别的资源，同时小于某个大小的资源会处理成`data URI`形式。 |
+| 资源模块类型       | 描述                                                                                                                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `asset/resource` | 发送一个单独的文件，并导出 `URL`，替代 `file-loader`，相当于 `file-loader`, 将文件转化成 `Webpack`能识别的资源，其他不做处理。                                                                  |
+| `asset/inline`   | 导出一个资源的 `data URI`，以前使用 `url-loader` 实现。                                                                                                                                             |
+| `asset/source`   | 导出资源的源代码 ，以前是使用 `raw-loader` 实现。                                                                                                                                                     |
+| `asset`          | 相当于自动选择 `asset/resource` 或 `asset/inline`，替换 `url-loader` 中的 `limit`，相当于 `url-loader`将文件转化成 `Webpack`能识别的资源，同时小于某个大小的资源会处理成 `data URI`形式。 |
 
 > 将文件编译为 `Data URI` 使用，可以节省 `HTTP` 请求，是一个性能优化的点。但是将图片文件经过 `base64` 编码转为 `Data URI`，体积会增加大约33%。所以，我们一般只针对小图片做Base64的处理，对于一些比较大的文件来说，转为 `Data URI` 会明显增加打包后文件的体积，反而会加大对带宽资源和流量的需求。
 
@@ -942,7 +979,7 @@ declare module '*.png' {
 
 ### 10.2 处理字体和媒体
 
-字体文件和媒体文件这两种资源处理方式和处理图片是一样的，只需要把匹配的路径和打包后放置的路径修改一下就可以了。修改`webpack.base.ts`文件：
+字体文件和媒体文件这两种资源处理方式和处理图片是一样的，只需要把匹配的路径和打包后放置的路径修改一下就可以了。修改 `webpack.base.ts`文件：
 
 ```typescript
 module: {
@@ -1003,28 +1040,27 @@ static:{
 
 ```
 
-> 在Webpack中，`asset/source`和`asset/resource`是两种资源处理模式，用于处理项目中的静态资源（例如图像、字体、视频等）。它们是Webpack 5中新引入的资源处理方式。
+> 在Webpack中，`asset/source`和 `asset/resource`是两种资源处理模式，用于处理项目中的静态资源（例如图像、字体、视频等）。它们是Webpack 5中新引入的资源处理方式。
 >
-> 
-> 在Webpack中，`asset/source`和`asset/resource`是两种资源处理模式，用于处理项目中的静态资源（例如图像、字体、视频等）。它们是Webpack 5中新引入的资源处理方式。
+> 在Webpack中，`asset/source`和 `asset/resource`是两种资源处理模式，用于处理项目中的静态资源（例如图像、字体、视频等）。它们是Webpack 5中新引入的资源处理方式。
 >
 > 1. `asset/source`: 这个模式会将资源处理为一个JavaScript模块，返回资源内容的字符串。通常适用于处理文本文件，如SVG图像、文本文件等。处理后的资源可以直接在JavaScript中导入并使用
 > 2. `asset/resource`: 这个模式会将资源原封不动地复制到输出目录，并返回资源的URL路径。通常适用于处理二进制文件，如图像、字体、视频等。处理后的资源可以通过URL路径进行访问。
 > 3. `asset/inline`: 这个模式将资源转换为Data URL，并直接嵌入到生成的文件中。适用于较小的资源文件，这样可以减少HTTP请求，但会增加文件的大小。适用于一些小图标或其他小文件
-> 4. `asset`: 这是一个自动选择模式，Webpack会根据资源的大小自动选择是使用`asset/resource`还是`asset/inline`，对于较小的资源，它会使用`asset/inline`，对于较大的资源，它会使用`asset/resource`。这是Webpack 5中默认的资源处理模式，适用于大多数的资源文件。
+> 4. `asset`: 这是一个自动选择模式，Webpack会根据资源的大小自动选择是使用 `asset/resource`还是 `asset/inline`，对于较小的资源，它会使用 `asset/inline`，对于较大的资源，它会使用 `asset/resource`。这是Webpack 5中默认的资源处理模式，适用于大多数的资源文件。
 
 > 总结：
 >
 > - `asset/source`用于将资源处理为JavaScript模块，适用于处理文本文件。
 > - `asset/resource`用于将资源原封不动地复制到输出目录，适用于处理二进制文件。
 > - `asset/inline`用于将资源转换为Data URL并嵌入到文件中，适用于较小的资源文件。
-> - `asset`是自动选择模式，根据资源大小选择`asset/resource`或`asset/inline`，是Webpack 5中的默认资源处理模式。
+> - `asset`是自动选择模式，根据资源大小选择 `asset/resource`或 `asset/inline`，是Webpack 5中的默认资源处理模式。
 
 ## 11、babel处理js非标准语法
 
-现在`react`主流开发都是函数组件和`react-hooks`，但有时也会用类组件，可以用装饰器简化代码。
+现在 `react`主流开发都是函数组件和 `react-hooks`，但有时也会用类组件，可以用装饰器简化代码。
 
-新增`Class.tsx`组件，在`App.tsx`中引入改组件使用
+新增 `Class.tsx`组件，在 `App.tsx`中引入改组件使用
 
 ```tsx
 import { PureComponent, ReactNode } from "react"
@@ -1061,7 +1097,7 @@ export default class Class extends PureComponent<any, any> {
 }
 ```
 
-需要开启一下`ts`装饰器支持
+需要开启一下 `ts`装饰器支持
 
 ```json
 {
@@ -1074,7 +1110,7 @@ export default class Class extends PureComponent<any, any> {
 }
 ```
 
-上面Class组件代码中使用了装饰器目前`js`标准语法是不支持的，现在运行或者打包会报错，不识别装饰器语法，需要借助`babel-loader`插件，安装依赖：
+上面Class组件代码中使用了装饰器目前 `js`标准语法是不支持的，现在运行或者打包会报错，不识别装饰器语法，需要借助 `babel-loader`插件，安装依赖：
 
 ```shell
 pnpm add @babel/plugin-proposal-decorators -D
@@ -1085,5 +1121,46 @@ pnpm add @babel/plugin-proposal-decorators -D
 ```typescript
 // 装饰器配置
   plugins:[["@babel/plugin-proposal-decorators", { legacy: true }],].filter(Boolean) // 过滤空值
+```
+
+## 12、热更新
+
+```typescript
+import path from "path";
+import { Configuration as WebpackConfiguration } from "webpack";
+import { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
+import { merge } from "webpack-merge";
+import baseConfig from "./webpack.base";
+import ReactRefreshWebpackPlugin from "@pmmmwh/react-refresh-webpack-plugin";
+
+interface Configuration extends WebpackConfiguration {
+    devServer?: WebpackDevServerConfiguration;
+}
+
+const host = "127.0.0.1";
+const port = "8082";
+
+// 合并公共配置,并添加开发环境配置
+const devConfig: Configuration = merge(baseConfig, {
+    mode: "development", // 开发模式,打包更加快速,省了代码优化步骤
+    devtool: "eval-cheap-module-source-map",
+    plugins: [
+        new ReactRefreshWebpackPlugin(), // 添加热更新插件
+    ],
+    devServer: {
+        host, // 地址
+        port, // 端口
+        open: true, // 是否自动打开，关闭
+        compress: false, // gzip压缩,开发环境不开启,提升热更新速度
+        hot: true, // 开启热更新，后面会讲react模块热替换具体配置
+        historyApiFallback: true, // 解决history路由404问题
+        setupExitSignals: true, // 允许在 SIGINT 和 SIGTERM 信号时关闭开发服务器和退出进程。
+        // static: {
+        //   directory: path.join(__dirname, "../static"), // 托管静态资源，注意：此处不能让整个根目录作为静态文件的根目录，不然会热更新不生效
+        // },
+        headers: { "Access-Control-Allow-Origin": "*" },
+    }
+});
+export default devConfig;
 ```
 

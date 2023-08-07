@@ -1,6 +1,7 @@
 import { Configuration, DefinePlugin } from 'webpack' // 引入webpack
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import dotenv from 'dotenv'
+import CopyPlugin from 'copy-webpack-plugin'
 
 const path = require('path') // 需要安装@types/node -D
 
@@ -122,7 +123,7 @@ const baseConfig: Configuration = {
           },
         },
         generator: {
-          filename: 'static/images/[hash][ext][query]', // 文件输出目录和命名
+          filename: 'assets/images/[hash][ext][query]', // 文件输出目录和命名
         },
       },
 
@@ -136,7 +137,7 @@ const baseConfig: Configuration = {
           }
         },
         generator: {
-          filename: "static/fonts/[hash][ext][query]", // 文件输出目录和命名
+          filename: "assets/fonts/[hash][ext][query]", // 文件输出目录和命名
         }
       },
 
@@ -150,7 +151,7 @@ const baseConfig: Configuration = {
           }
         },
         generator: {
-          filename: 'static/media/[hash][ext][query]', // 文件输出目录和命名
+          filename: 'assets/media/[hash][ext][query]', // 文件输出目录和命名
         },
       },
       /* 处理json文件 */
@@ -160,7 +161,7 @@ const baseConfig: Configuration = {
         type: "asset/source", // 将json文件视为文件类型
         generator: {
           // 这里专门针对json文件的处理
-          filename: "static/json/[name][hash][ext][query]",
+          filename: "assets/json/[name][hash][ext][query]",
         },
       },
     ],
@@ -171,7 +172,7 @@ const baseConfig: Configuration = {
     // 配置文件别名，别名需要配置两个地方，这里和tsconfig.json 需要给tsconfig.json配置映射路径，那么typescript-eslint检查就不会报错了
     alias: {
       src: path.join(__dirname, '../src'),
-      static: path.join(__dirname, '../static'),
+      assets: path.join(__dirname, '../assets'),
       modules: [path.resolve(__dirname, '../node_modules')], // 查找第三方模块只在本项目的node_modules中查找
     },
   },
@@ -199,7 +200,18 @@ const baseConfig: Configuration = {
       'process.env': JSON.stringify(envConfig.parsed),
       'process.env.BASE_ENV': JSON.stringify(process.env.BASE_ENV),
     }),
+    // 处理静态文件
+    new CopyPlugin({
+      patterns:[
+        {
+          from: path.join(__dirname, '../static'), // 静态文件入口
+          to: path.join(__dirname, '../dist/static'), // 静态文件输出
+          filter:(sources)=> !sources.includes('index.html') // 过滤掉 index.html
+        }
+      ]
+    })
   ],
+  
 }
 // 导出
 export default baseConfig

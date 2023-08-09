@@ -2,6 +2,7 @@ import { Configuration, DefinePlugin } from 'webpack' // 引入webpack
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import dotenv from 'dotenv'
 import CopyPlugin from 'copy-webpack-plugin'
+import WebPackBar from 'webpackbar' // 进度条
 
 const path = require('path') // 需要安装@types/node -D
 
@@ -209,6 +210,12 @@ const baseConfig: Configuration = {
           filter:(sources)=> !sources.includes('index.html') // 过滤掉 index.html
         }
       ]
+    }),
+    // 打包进度条
+    new WebPackBar({
+      color: "#85d", // 默认green,进度条颜色支持hex
+      basic:false, // 默认true,启用一个简单的日志报告器
+      profile:false,  // 默认false，启用探查器。
     })
   ],
   

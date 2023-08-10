@@ -1125,6 +1125,23 @@ pnpm add @babel/plugin-proposal-decorators -D
 
 ## 12、热更新
 
+
+在之前的章节我们已经在 `devServer`中配置 `hot`为 `true`，在 `webpack4`中，还需要在插件中添加了 `HotModuleReplacementPlugin`，在 `webpack5`中，只要 `devServer.hot`为 `true`了，该插件就已经内置了。
+
+现在开发模式下修改 `css`和 `less`文件，页面样式可以在不刷新浏览器的情况实时生效，因为此时样式都在 `style`标签里面，`style-loader`做了替换样式的热替换功能。但是修改 `App.tsx`，浏览器会自动刷新后再显示修改后的内容，但我们想要的不是刷新浏览器，而是在不需要刷新浏览器的前提下模块热更新，并且能够保留 `react`组件的状态。
+
+在之前的章节我们已经在 `devServer`中配置 `hot`为 `true`，在 `webpack4`中，还需要在插件中添加了 `HotModuleReplacementPlugin`，在 `webpack5`中，只要 `devServer.hot`为 `true`了，该插件就已经内置了。
+
+现在开发模式下修改 `css`和 `less`文件，页面样式可以在不刷新浏览器的情况实时生效，因为此时样式都在 `style`标签里面，`style-loader`做了替换样式的热替换功能。但是修改 `App.tsx`，浏览器会自动刷新后再显示修改后的内容，但我们想要的不是刷新浏览器，而是在不需要刷新浏览器的前提下模块热更新，并且能够保留 `react`组件的状态。
+
+可以借助 [@pmmmwh/react-refresh-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40pmmmwh%2Freact-refresh-webpack-plugin "https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2F%40pmmmwh%2Freact-refresh-webpack-plugin") 插件来实现，该插件又依赖于[react-refresh](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Freact-refresh "https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Freact-refresh"), 安装依赖：
+
+```powershell
+pnpm add @pmmmwh/react-refresh-webpack-plugin react-refresh -D
+```
+
+配置 `react`热更新插件，修改 `webpack.dev.ts`：
+
 ```typescript
 import path from "path";
 import { Configuration as WebpackConfiguration } from "webpack";
@@ -1164,3 +1181,37 @@ const devConfig: Configuration = merge(baseConfig, {
 export default devConfig;
 ```
 
+为 `babel-loader`配置 `react-refesh`刷新插件，修改 `babel.config.js`文件
+
+```typescript
+const isDEV = process.env.NODE_ENV === "development"; // 是否是开发模式
+
+module.exports = {
+  // 执行顺序由右往左,所以先处理ts,再处理jsx,最后再试一下babel转换为低版本语法
+  presets: [
+    [
+      "@babel/preset-env",
+      {
+        // 设置兼容目标浏览器版本,这里可以不写,babel-loader会自动寻找上面配置好的文件.browserslistrc
+        // "targets": {
+        //  "chrome": 35,
+        //  "ie": 9
+        // },
+        targets: { browsers: ["> 1%", "last 2 versions", "not ie <= 8"] },
+        useBuiltIns: "usage", // 根据配置的浏览器兼容,以及代码中使用到的api进行引入polyfill按需添加
+        corejs: 3, // 配置使用core-js使用的版本
+        loose: true,
+      },
+    ],
+    // 如果您使用的是 Babel 和 React 17，您可能需要将 "runtime": "automatic" 添加到配置中。
+    // 否则可能会出现错误：Uncaught ReferenceError: React is not defined
+    ["@babel/preset-react", { runtime: "automatic" }],
+    "@babel/preset-typescript",
+  ],
+  plugins: [
+    ["@babel/plugin-proposal-decorators", { legacy: true }],
+    isDEV && require.resolve("react-refresh/babel"), // 如果是开发模式,就启动react热更新插件
+  ].filter(Boolean), // 过滤空值
+};
+
+```

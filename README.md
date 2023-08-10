@@ -1215,3 +1215,82 @@ module.exports = {
 };
 
 ```
+## 13、webpack构建速度优化
+
+### 13.1webpack进度条
+
+`webpack`这是一款个人十分美观优雅的进度条，很多成名框架都用过他。而且使用起来也极其方便，也可以支持多个并发构建是个十分强大的进度插件。
+
+```shell
+pnpm add webpackbar -D
+```
+
+```typescript
+// ...
+import WebpackBar from 'webpackbar';
+
+// ...
+
+const baseConfig: Configuration = {
+    // ...
+
+    // plugins 的配置
+    plugins: [
+        // ...
+        new WebpackBar({
+            color: "#85d",  // 默认green，进度条颜色支持HEX
+            basic: false,   // 默认true，启用一个简单的日志报告器
+            profile:false,  // 默认false，启用探查器。
+        })
+    ],
+};
+
+export default baseConfig;
+
+```
+
+当然里面还有一个属性就是 `reporters` 还没有写上，可以在里面注册事件，也可以理解为各种钩子函数。如下：
+
+```typescript
+{   // 注册一个自定义记者数组
+    start(context) {
+      // 在（重新）编译开始时调用
+      const { start, progress, message, details, request, hasErrors } = context
+    },
+    change(context) {
+      // 在 watch 模式下文件更改时调用
+    },
+    update(context) {
+      // 在每次进度更新后调用
+    },
+    done(context) {
+      // 编译完成时调用
+    },
+    progress(context) {
+      // 构建进度更新时调用
+    },
+    allDone(context) {
+      // 当编译完成时调用
+    },
+    beforeAllDone(context) {
+      // 当编译完成前调用
+    },
+    afterAllDone(context) {
+      // 当编译完成后调用
+    },
+}
+
+```
+
+> 其他的工具可看：[聊聊webpack的打包进度展示及美化](https://juejin.cn/post/7055321034454466596)
+
+### 13.1构建耗时
+
+当进行优化的时候，肯定要先知道时间都花费在哪些步骤上了，而 [speed-measure-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fspeed-measure-webpack-plugin) 插件可以帮我们做到，安装依赖：
+
+```shell
+pnpm add speed-measure-webpack-plugin -D
+```
+
+
+

@@ -57,7 +57,7 @@ function Index() {
       <h2>字体引入测试</h2>
       <div className={lessStyle.fontTest}>文字字体测试哈哈哈</div>
       <Class/>
-      <h2>热更新22222</h2>
+      <h2>热更新测试111</h2>
       <button className={lessStyle.btn} onClick={addCount}>count：{count}</button>
     </>
   )

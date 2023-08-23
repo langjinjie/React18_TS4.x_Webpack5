@@ -1292,5 +1292,175 @@ export default baseConfig;
 pnpm add speed-measure-webpack-plugin -D
 ```
 
+使用的时候为了不影响到正常的开发/打包模式，我们选择新建一个配置文件，新增`webpack`构建分析配置文件`build/webpack.analy.ts`
+
+```typescript
+const prodConfig = require('./webpack.prod.js') // 引入打包配置
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin'); // 引入webpack打包速度分析插件
+const smp = new SpeedMeasurePlugin(); // 实例化分析插件
+const { merge } = require('webpack-merge') // 引入合并webpack配置方法
+
+// 使用smp.wrap方法,把生产环境配置传进去,由于后面可能会加分析配置,所以先留出合并空位
+module.exports = smp.wrap(merge(prodConfig, {
+
+}))
+
+```
+
+修改`package.json`添加启动`webpack`打包分析脚本命令，在`script`新增：
+
+```json
+{
+    // ...
+    "scripts": {
+        // ...
+        "build:analy": "cross-env NODE_ENV=production BASE_ENV=production webpack -c build/webpack.analy.ts"
+    }
+    // ...
+}
+
+```
+
+执行`npm run build:analy`命令
+
+![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e4a14a7402ba4e2ca3e7a139a371045c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+可以在图中看到各`plugin`和`loader`的耗时时间,现在因为项目内容比较少，所以耗时都比较少，在真正的项目中可以通过这个来分析打包时间花费在什么地方，然后来针对性的优化。
+
+### 13.2 开启持久化存储缓存
+
+在`webpack5`之前做缓存是使用`babel-loader`缓存解决 js 的解析结果，`cache-loader`缓存`css`等资源的解析结果，还有模块缓存插件`hard-source-webpack-plugin`，配置好缓存后第二次打包，通过对文件做哈希对比来验证文件前后是否一致，如果一致则采用上一次的缓存，可以极大地节省时间。
+
+`webpack5` 较于 `webpack4`，新增了持久化缓存、改进缓存算法等优化，通过配置 [webpack 持久化缓存](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Fconfiguration%2Fcache%2F%23root)，来缓存生成的 `webpack` 模块和 `chunk`，改善下一次打包的构建速度,可提速 `90%` 左右,配置也简单，修改`webpack.base.ts`：
+
+```ts
+ts复制代码// webpack.base.ts
+// ...
+module.exports = {
+  // ...
+  cache: {
+    type: 'filesystem', // 使用文件缓存
+  },
+}
+```
+
+当前代码的测试结果：
+
+| 模式     | 第一次耗时 | 第二次耗时 |
+| -------- | ---------- | ---------- |
+| 开发模式 | 4151毫秒   | 1310毫秒   |
+| 打包模式 | 4945毫秒   | 590毫秒    |
 
 
+
+通过开启`webpack5`持久化存储缓存，极大缩短了启动和打包的时间。缓存的存储位置在`node_modules/.cache/webpack`，里面又区分了`development`和`production`缓存。
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fd880d8b1f5b46ffa9d012209f92c6af~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+### 13.3 开启多线程loader
+
+运行在 `Node.js` 之上的 `webpack` 是单线程模式的，也就是说，`webpack` 打包只能逐个文件处理，当 `webpack` 需要打包大量文件时，打包时间就会比较漫长。
+
+多进程/多实例构建的方案比较知名的有以下三种：
+
+- `thread-loader`
+- `parallel-webpack`
+- `HappyPack`
+
+`webpack`的`loader`默认在单线程执行，现代电脑一般都有多核`cpu`，可以借助多核`cpu`开启多线程`loader`解析，可以极大地提升loader解析的速度，[thread-loader](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Floaders%2Fthread-loader%2F%23root)就是用来开启多进程解析`loader`的，安装依赖
+
+```arduino
+arduino
+复制代码pnpm add thread-loader -D
+```
+
+使用时,需将此 `loader` 放置在其他 `loader` 之前。放置在此 `loader` 之后的 `loader` 会在一个独立的 `worker` 池中运行。
+
+修改`webpack.base.ts`
+
+```typescript
+module: {
+  rules: [
+    {
+      test: tsxRegex, // 匹配.ts, tsx文件
+      use: ['thread-loader', 'babel-loader']
+    }
+  ]
+}
+```
+
+由于`thread-loader`不支持抽离`css`插件`MiniCssExtractPlugin.loader`(下面会讲)，所以这里只配置了多进程解析 `ts`。
+
+> 值得注意的是，开启多线程也是需要启动时间，`thread-loader` 会将你的 `loader` 放置在一个 `worker` 池里面运行，每个 `worker` 都是一个单独的有 `600ms` 限制的 node.js 进程。同时跨进程的数据交换也会被限制，所以最好是项目变大到一定程度之时再采用，否则效果反而不好。
+
+### 13.4 缩小构建目标
+
+一般第三库都是已经处理好的,不需要再次使用`loader`去解析，可以按照实际情况合理配置`loader`的作用范围，来减少不必要的`loader`解析，节省时间，通过使用 `include`和`exclude` 两个配置项，可以实现这个功能，常见的例如：
+
+- `include`：只解析该选项配置的模块
+- `exclude`：不解该选项配置的模块,优先级更高
+
+修改`webpack.base.ts`
+
+```ts
+ts复制代码module: {
+  rules: [
+    {
+      test: tsxRegex, // 匹配.ts, tsx文件
+      exclude: /node_modules/,
+      use: ['thread-loader', 'babel-loader']
+    }
+  ]
+}
+```
+
+其他`loader`也是相同的配置方式，如果除`src`文件外也还有需要解析的，就把对应的目录地址加上就可以了，比如需要引入`antd`的`css`，可以把`antd`的文件目录路径添加解析`css`规则到`include`里面。
+
+### 13.5 devtools配置
+
+开发过程中或者打包后的代码都是`webpack`处理后的代码，如果进行调试肯定希望看到源代码，而不是编译后的代码，`source map`就是用来做源码映射的，不同的映射模式会明显影响到构建和重新构建的速度，`devtool`选项就是`webpack`提供的选择源码映射方式的配置。
+
+`devtool`的命名规则为：
+
+```shell
+^(inline-|hidden-|eval-)?(nosources-)?(cheap-(module-)?)?source-map$
+```
+
+| 关键字      | 描述                                                         |
+| ----------- | ------------------------------------------------------------ |
+| `inline`    | 代码内通过 `dataUrl` 形式引入 `SourceMap`                    |
+| `hidden`    | 生成 `SourceMap` 文件,但不使用                               |
+| `eval`      | `eval(...)` 形式执行代码,通过 `dataUrl` 形式引入 `SourceMap` |
+| `nosources` | 不生成 `SourceMap`                                           |
+| `cheap`     | 只需要定位到行信息,不需要列信息                              |
+| `module`    | 展示源代码中的错误位置                                       |
+
+
+
+开发环境推荐：`eval-cheap-module-source-map`
+
+- 本地开发首次打包慢点没关系，因为 `eval` 缓存的原因，热更新会很快
+- 开发中，我们每行代码不会写的太长，只需要定位到行就行，所以加上 `cheap`
+- 我们希望能够找到源代码的错误，而不是打包后的，所以需要加上 `module`
+
+修改`webpack.dev.ts`
+
+```ts
+// webpack.dev.ts
+module.exports = {
+  // ...
+  devtool: 'eval-cheap-module-source-map'
+}
+```
+
+打包环境推荐：none(就是不配置devtool选项了，不是配置devtool: 'none')
+
+```ts
+// webpack.prod.ts
+module.exports = {
+    // ...
+    // devtool: '', // 不用配置devtool此项
+}
+```
+
+> `none`配置在调试的时候，只能看到编译后的代码，也不会泄露源代码，打包速度也会比较快。只是不方便线上排查问题，但一般都可以根据报错信息在本地环境很快找出问题所在。

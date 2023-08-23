@@ -1,8 +1,6 @@
-import path from 'path'
-import { Configuration, sources } from 'webpack' // 引入webpack的类型接口
+import { Configuration } from 'webpack' // 引入webpack的类型接口
 import { merge } from 'webpack-merge'
 import baseConfig from './webpack.base' // 引入基本配置
-import CopyPlugin  from 'copy-webpack-plugin'
 
 const prodConfig: Configuration = merge(baseConfig, {
   mode:'production', // 生产模式，会开启tree-shaking和压缩代码，以及其他优化

@@ -62,7 +62,8 @@ const baseConfig: Configuration = {
 
       {
         test: /.(ts|tsx)$/, // 正则匹配 .ts .tsx文件
-        use: 'babel-loader', // 配置文件
+        exclude:'/node_modules/', // 不解该选项配置的模块,优先级更高
+        use: ['thread-loader', 'babel-loader'], // 配置文件 thread-loader 多线程打包 由于thread-loader不支持抽离css插件MiniCssExtractPlugin.loader
       },
 
       /* ---------- 处理样式 ---------- */
@@ -218,7 +219,10 @@ const baseConfig: Configuration = {
       profile:false,  // 默认false，启用探查器。
     })
   ],
-  
+  // 开启持持久化存储缓存
+  cache: {
+    type: 'filesystem', // 使用文件缓存
+  },
 }
 // 导出
 export default baseConfig

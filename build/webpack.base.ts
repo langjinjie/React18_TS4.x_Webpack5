@@ -3,8 +3,10 @@ import HtmlWebpackPlugin from 'html-webpack-plugin'
 import dotenv from 'dotenv'
 import CopyPlugin from 'copy-webpack-plugin'
 import WebPackBar from 'webpackbar' // 进度条
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
 const path = require('path') // 需要安装@types/node -D
+const isDev = process.env.NODE_ENV === 'development' // 是否是开发模式
 
 const cssModuleRegex = /\module.css$/
 const cssRegex = /\.css$/
@@ -17,7 +19,7 @@ const stylRegex = /\.styl$/
 
 // 模块化样式编译
 const moduleStyleLoadersArray = [
-  'style-loader',
+  isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
   {
     loader: 'css-loader',
     options: {
@@ -33,7 +35,7 @@ const moduleStyleLoadersArray = [
 
 // 非模块化样式编译
 const styleLoadersArray = [
-  'style-loader',
+  isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
   'css-loader',
   // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
   // 'postcss-loader',

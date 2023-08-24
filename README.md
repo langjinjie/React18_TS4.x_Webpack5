@@ -1464,3 +1464,109 @@ module.exports = {
 ```
 
 > `none`配置在调试的时候，只能看到编译后的代码，也不会泄露源代码，打包速度也会比较快。只是不方便线上排查问题，但一般都可以根据报错信息在本地环境很快找出问题所在。
+
+## 14 webpack构建产物优化
+
+### 14.1bundle体积分析工具
+
+`webpack-bundle-analyzer`是分析`webpack`打包后文件的插件，使用交互式可缩放树形图可视化`webpack` 输出文件的大小。通过该插件可以对打包后的文件进行观察和分析，可以方便我们对不完美的地方针对性的优化，安装依赖：
+
+```shell
+pnpm add webpack-bundle-analyzer -D
+```
+
+修改 `webpack.analy.ts`：
+
+```typescript
+import prodConfig from './webpack.prod' // 引入打包配置 import才会自动打开页面
+// const prodConfig = require('./webpack.prod'); // 引入打包配置
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin'); // 引入webpack打包速度分析插件
+const smp = new SpeedMeasurePlugin(); // 实例化分析插件
+const { merge } = require('webpack-merge') // 引入合并webpack配置方法
+
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+
+// 使用smp.wrap方法,把生产环境配置传进去,由于后面可能会加分析配置,所以先留出合并空位
+module.exports = smp.wrap(merge(prodConfig, {
+    plugins:[
+        new BundleAnalyzerPlugin()// 配置分析打包
+    ]
+}))
+
+```
+
+配置好后，执行 `pnpm run build:analy` 命令，打包完成后浏览器会自动打开窗口，可以看到打包文件的分析结果页面，可以看到各个文件所占的资源大小：
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/d0b67d7ec1c1456c9460ca97f547fd54~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+### 14.2 样式提取
+
+在开发环境我们希望`css`嵌入在`style`标签里面，方便样式热替换，但打包时我们希望把`css`单独抽离出来,方便配置缓存策略。而插件[mini-css-extract-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fwebpack-contrib%2Fmini-css-extract-plugin)就是来帮我们做这件事的，安装依赖：
+
+```shell
+pnpm add mini-css-extract-plugin -D
+```
+
+修改 `webpack.base.ts`，根据环境变量设置开发环境使用 `style-looader`，打包模式抽离`css`
+
+```typescript
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+
+const isDev = process.env.NODE_ENV === 'development' // 是否是开发模式
+
+// 模块化样式编译
+const moduleStyleLoadersArray = [
+    isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+    {
+        loader: 'css-loader',
+        options: {
+            modules: {
+                // localIdentName: '[path][name]__[local]_[hash:5]',
+                localIdentName: '[local]_[hash:5]',
+            },
+        },
+    },
+    // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
+    'postcss-loader',
+]
+
+// 非模块化样式编译
+const styleLoadersArray = [
+    isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+    'css-loader',
+    // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
+    // 'postcss-loader',
+]
+```
+
+再修改`webpack.prod.ts`，打包时添加抽离`css`插件：
+
+```typescript
+import { Configuration } from 'webpack' // 引入webpack的类型接口
+import { merge } from 'webpack-merge'
+import baseConfig from './webpack.base' // 引入基本配置
+// const baseConfig = require('./webpack.base') // 引入基本配置
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+
+const prodConfig: Configuration = merge(baseConfig, {
+    mode:'production', // 生产模式，会开启tree-shaking和压缩代码，以及其他优化
+    /* 
+  打包环境推荐：none（不配置devTool选项了，不是配置devTool:"none"）
+  在package.json的scripts中添加  "build": "webpack -c build/webpack.prod.ts"
+  */
+    plugins:[
+        new MiniCssExtractPlugin({
+            filename:'css/[name].css'
+        })
+    ]
+})
+
+export default prodConfig
+```
+
+配置完成后，在开发模式`css`会嵌入到`style`标签里面，方便样式热替换，打包时会把`css`抽离成单独的`css`文件。
+
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/92dabe1db7ea482ba14f54785c9299e0~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+### 14.3 样式压缩
+

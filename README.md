@@ -1570,3 +1570,98 @@ export default prodConfig
 
 ### 14.3 样式压缩
 
+可以看到，上面配置了打包时把`css`抽离为单独`css`文件的配置，打开打包后的文件查看，可以看到默认`css`是没有压缩的，需要手动配置一下压缩`css`的插件。
+
+可以借助 [css-minimizer-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcss-minimizer-webpack-plugin) 来压缩css，安装依赖：
+
+```shell
+复制代码pnpm add css-minimizer-webpack-plugin -D
+```
+
+修改 `webpack.prod.ts` 文件， 需要在优化项 [optimization](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Foptimization%2F) 下的 [minimizer](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Foptimization%2F%23optimizationminimizer) 属性中配置：
+
+```ts
+// ...
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+
+module.exports = {
+  // ...
+  optimization: {
+    minimizer: [
+      new CssMinimizerPlugin(), // 压缩css
+    ],
+  },
+}
+```
+
+再次执行打包就可以看到`css`已经被压缩了：
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7b24ef715b9e421b90fddaeacdacb7b1~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+### 14.4 js压缩
+
+| 依赖                         | 说明                                                       |
+| ---------------------------- | ---------------------------------------------------------- |
+| terser-webpack-plugin        | 用于处理 js 的压缩和混淆                                   |
+| css-minimizer-webpack-plugin | 压缩css文件                                                |
+| compression-webpack-plugin   | 预先准备的资源压缩版本，使用 Content-Encoding 提供访问服务 |
+
+
+
+设置mode为production时,webpack会使用内置插件[terser-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fterser-webpack-plugin)压缩js文件,该插件默认支持多线程压缩,但是上面配置optimization.minimizer压缩css后,js压缩就失效了,需要手动再添加一下,webpack内部安装了该插件,由于pnpm解决了幽灵依赖问题,如果用的pnpm的话,需要手动再安装一下依赖。
+
+```shell
+pnpm i terser-webpack-plugin compression-webpack-plugin -D
+```
+
+修改 `webpack.prod.ts` 文件：
+
+```ts
+import { Configuration } from 'webpack' // 引入webpack的类型接口
+import { merge } from 'webpack-merge'
+import baseConfig from './webpack.base' // 引入基本配置
+// const baseConfig = require('./webpack.base') // 引入基本配置
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
+import TerserPlugin from 'terser-webpack-plugin' // 多线程压缩混淆
+import CompressionPlugin from 'compression-webpack-plugin' // 压缩css js
+
+const prodConfig: Configuration = merge(baseConfig, {
+    mode: 'production', // 生产模式，会开启tree-shaking和压缩代码，以及其他优化
+    /* 
+  打包环境推荐：none（不配置devTool选项了，不是配置devTool:"none"）
+  在package.json的scripts中添加  "build": "webpack -c build/webpack.prod.ts"
+  */
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'css/[name].css'
+        }),
+        new CompressionPlugin({
+            test: /\.(js|css)$/, // 压缩js和css文件
+            filename: '[path][base].gz', // 文件命名
+            algorithm: 'gzip', // 压缩格式,默认是gzip
+            threshold: 10240, // 只有大小大于该值的资源会被处理。默认值是 10k
+            minRatio: 0.8 // 压缩率,默认值是 0.8
+        })
+    ],
+    optimization: {
+        minimizer: [
+            new CssMinimizerPlugin(), // 压缩css
+            new TerserPlugin({
+                parallel: true, // 开启多线程压缩
+                terserOptions: {
+                    compress: {
+                        pure_funcs: ['console.log'] // 删除console.log
+                    }
+                }
+            })
+        ],
+    },
+})
+
+export default prodConfig
+```
+
+配置完成后再打包，css和js就都可以被压缩了：
+
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c649350842284fbd8813e20e2bf38b3e~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)

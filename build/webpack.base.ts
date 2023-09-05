@@ -25,7 +25,7 @@ const moduleStyleLoadersArray = [
     options: {
       modules: {
         // localIdentName: '[path][name]__[local]_[hash:5]',
-        localIdentName: '[local]_[hash:5]',
+        localIdentName: '[local]_[hash:5]', // 样式名称
       },
     },
   },
@@ -51,7 +51,7 @@ const baseConfig: Configuration = {
   entry: path.join(__dirname, '../src/Index.tsx'),
   // 打包出口文件
   output: {
-    filename: 'js/[name].js', // 每个输出的文件名
+    filename: 'js/[name].[chunkhash:8].js', // 每个输出的文件名
     path: path.join(__dirname, '../dist'), // 打包的输出路径
     clean: true, // webpack4需要配置clear-webpack-plugin来删除dist文件，webpack5内置了
     publicPath: '/', // 打包后文件的公共前缀路径
@@ -127,7 +127,7 @@ const baseConfig: Configuration = {
           },
         },
         generator: {
-          filename: 'assets/images/[hash][ext][query]', // 文件输出目录和命名
+          filename: 'assets/images/[name].[contenthash:8][ext][query]', // 文件输出目录和命名,不加[ext]会没有后缀名
         },
       },
 

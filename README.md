@@ -1608,7 +1608,7 @@ module.exports = {
 
 
 
-设置mode为production时,webpack会使用内置插件[terser-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fterser-webpack-plugin)压缩js文件,该插件默认支持多线程压缩,但是上面配置optimization.minimizer压缩css后,js压缩就失效了,需要手动再添加一下,webpack内部安装了该插件,由于pnpm解决了幽灵依赖问题,如果用的pnpm的话,需要手动再安装一下依赖。
+设置mode为production时,webpack会使用内置插件[terser-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fterser-webpack-plugin)压缩js文件,该插件默认支持多线程压缩,但是上面配置`optimization.minimizer`压缩css后,js压缩就失效了,需要手动再添加一下,`webpack`内部安装了该插件,由于`pnpm`解决了幽灵依赖问题,如果用的`pnpm`的话,需要手动再安装一下依赖。
 
 ```shell
 pnpm i terser-webpack-plugin compression-webpack-plugin -D
@@ -1629,9 +1629,9 @@ import CompressionPlugin from 'compression-webpack-plugin' // 压缩css js
 const prodConfig: Configuration = merge(baseConfig, {
     mode: 'production', // 生产模式，会开启tree-shaking和压缩代码，以及其他优化
     /* 
-  打包环境推荐：none（不配置devTool选项了，不是配置devTool:"none"）
-  在package.json的scripts中添加  "build": "webpack -c build/webpack.prod.ts"
-  */
+          打包环境推荐：none（不配置devTool选项了，不是配置devTool:"none"）
+          在package.json的scripts中添加  "build": "webpack -c build/webpack.prod.ts"
+          */
     plugins: [
         new MiniCssExtractPlugin({
             filename: 'css/[name].css'
@@ -1665,3 +1665,155 @@ export default prodConfig
 配置完成后再打包，css和js就都可以被压缩了：
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c649350842284fbd8813e20e2bf38b3e~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+### 14.5 文件指纹
+
+项目维护的时候，一般只会修改一部分代码，可以合理配置文件缓存，来提升前端加载页面速度和减少服务器压力，而 `hash` 就是浏览器缓存策略很重要的一部分。`webpack` 打包的 `hash` 分三种：
+
+- `hash`：跟整个项目的构建相关，只要项目里有文件更改，整个项目构建的 `hash` 值都会更改，并且全部文件都共用相同的 `hash` 值
+- `chunkhash`：不同的入口文件进行依赖文件解析、构建对应的`chunk`，生成对应的哈希值，文件本身修改或者依赖文件修改，`chunkhash` 值会变化
+- `contenthash`：每个文件自己单独的 `hash` 值，文件的改动只会影响自身的 `hash` 值
+
+`hash` 是在输出文件时配置的，格式是 `filename: "[name].[chunkhash:8][ext]"`，`[xx]` 格式是 `webpack` 提供的占位符，`:8` 是生成 `hash` 的长度。
+
+| 占位符        | 解释                         |
+| ------------- | ---------------------------- |
+| `ext`         | 文件后缀名                   |
+| `name`        | 文件名                       |
+| `path`        | 文件相对路径                 |
+| `folder`      | 文件所在文件夹               |
+| `hash`        | 每次构建生成的唯一 `hash` 值 |
+| `chunkhash`   | 根据 `chunk` 生成 `hash` 值  |
+| `contenthash` | 根据文件内容生成 `hash` 值   |
+
+
+
+因为 `js` 我们在生产环境里会把一些公共库和程序入口文件区分开，单独打包构建，采用 `chunkhash` 的方式生成哈希值，那么只要我们不改动公共库的代码，就可以保证其哈希值不会受影响，可以继续使用浏览器缓存，所以js适合使用 `chunkhash`。
+
+`css` 和图片资源媒体资源一般都是单独存在的，可以采用 `contenthash`，只有文件本身变化后会生成新hash值。
+
+修改 `webpack.base.ts`，把js输出的文件名称格式加上 `chunkhash`，把 `css` 和图片媒体资源输出格式加上 `contenthash`：
+
+```typescript
+    /* ---------- 处理图片 ---------- */
+          {
+            test: /\.(png|jpe?g|gif|svg)$/i, // 匹配图片文件
+            type: 'asset', // type选择asset
+            parser: {
+              dataUrlCondition: {
+                maxSize: 20 * 1024, // 小于10kb转base64
+              },
+            },
+            generator: {
+              filename: 'assets/images/[name].[contenthash:8][ext][query]', // 文件输出目录和命名,不加[ext]会没有后缀名
+            },
+          },
+
+          /* ---------- 处理字体 ---------- */
+          {
+            test: /.(woff2?|eot|ttf|otf)$/, // 匹配字体图标文件
+            type: "asset", // type选择asset
+            parser: {
+              dataUrlCondition: {
+                maxSize: 10 * 1024, // 小于10k转base64
+              }
+            },
+            generator: {
+              filename: "assets/fonts/[hash][ext][query]", // 文件输出目录和命名
+            }
+          },
+
+          /* ---------- 处理媒体文件 ---------- */
+          {
+            test: /.(mp4|webm|ogg|mp3|wav|flac|aac)$/, // 匹配媒体文件
+            type: 'asset', // type选择asset
+            parser: {
+              dataUrlCondition: {
+                maxSize: 10 * 1024, // 小于10kb转base64
+              }
+            },
+            generator: {
+              filename: 'assets/media/[hash][ext][query]', // 文件输出目录和命名
+            },
+          },
+          /* 处理json文件 */
+          {
+            // 匹配json文件
+            test: /\.json$/,
+            type: "asset/source", // 将json文件视为文件类型
+            generator: {
+              // 这里专门针对json文件的处理
+              filename: "assets/json/[name][hash][ext][query]",
+            },
+          },
+```
+
+再修改 `webpack.prod.ts`，修改抽离 `css` 文件名称格式：
+
+```typescript
+// 抽离css文件 在开发环境中，css是嵌在style中的 plugins
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].[contenthash:8].css'
+    }),
+```
+
+### 14.6 代码分割
+
+一般第三方包的代码变化频率比较小，可以单独把 `node_modules` 中的代码单独打包，当第三包代码没变化时，对应 `chunkhash` 值也不会变化，可以有效利用浏览器缓存，还有公共的模块也可以提取出来，避免重复打包加大代码整体体积，`webpack` 提供了代码分隔功能，需要我们手动在优化项 [optimization](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Foptimization%2F) 中手动配置下代码分割 [splitChunks](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Foptimization%2F%23optimizationsplitchunks) 规则。
+
+修改 `webpack.prod.ts`：
+
+```typescript
+// 分隔代码
+    splitChunks:{
+      cacheGroups:{
+        vendors:{ // 提取node_modules代码o
+          test:"/node_modules", // 只匹配node_modules里面的模块
+          name: "vendors", // 提取文件名为vendors，js后缀和chunkhash会自动加
+          minChunks: 1, // 只要使用了一次就提取出来
+          chunks: "initial", // 只提取初始化就能获取到的模块，不管异步的
+          minSize: 0, // 代码体积大于0就提取出来
+          priority: 1, // 提取优先级
+        },
+        // 提取页面公共代码
+        commons:{
+          name:"commons", // 提取文件名
+          minChunks: 2, // 只要使用两次就提取出来
+          chunks: 'initial', // 只提取初始化就能获取到的模块,不管异步的
+          minSize: 0, 
+        }
+      }
+    }
+```
+
+### 14.7 tree-shaking清理未引用js
+
+js中会有未使用到的代码，css中也会有未被页面使用到的样式，可以通过 [purgecss-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fpurgecss-webpack-plugin) 插件打包的时候移除未使用到的css样式，这个插件是和 [mini-css-extract-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fmini-css-extract-plugin) 插件配合使用的,在上面已经安装过，还需要 [glob-all](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fglob-all) 来选择要检测哪些文件里面的类名和id还有标签名称，安装依赖:
+
+```shell
+pnpm i purgecss-webpack-plugin glob-all -D
+```
+
+
+
+修改`webpack.prod.ts`:
+
+```typescript
+// 清理无用css，检测src下所有tsx文件和public下index.html中使用的类名和id和标签名称
+    // 只打包这些文件中用到的样式
+    new PurgeCSSPlugin({
+      paths: globAll.sync(
+        [`${path.join(__dirname, '../src')}/**/*`, path.join(__dirname, '../public/index.html')],
+        {
+          nodir: true
+        }
+      ),
+      // 用 only 来指定 purgecss-webpack-plugin 的入口
+      // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
+      only: ["dist"],
+      safelist: {
+        standard: [/^ant-/] // 过滤以ant-开头的类名，哪怕没用到也不删除
+      }
+    }),
+```
+

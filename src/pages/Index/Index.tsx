@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { test } from 'src/utils/base'
-import { Icon } from 'src/components'
+import { Icon, Demo1 } from 'src/components'
 import Class from 'src/pages/Class/Class'
 import jsonTest  from 'src/assets/json/test.json'
 import lessStyle from './style.module.less'
@@ -59,6 +59,7 @@ function Index() {
       <Class/>
       <h2>热更新测试111</h2>
       <button className={lessStyle.btn} onClick={addCount}>count：{count}</button>
+      <Demo1/>
     </>
   )
 }

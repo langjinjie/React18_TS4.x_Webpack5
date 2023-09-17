@@ -1817,3 +1817,53 @@ pnpm i purgecss-webpack-plugin glob-all -D
     }),
 ```
 
+### 14.8 tree-shaking清理未使用css
+
+js中会有未安装使用到的代码，css中也会有未被页面使用到的样式，可以通过 [purgecss-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fpurgecss-webpack-plugin) 插件打包的时候移除未使用到的css样式，这个插件是和 [mini-css-extract-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fmini-css-extract-plugin) 插件配合使用的，在上面已经安装过，还需要 [glob-all](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fglob-all) 来选择检测哪些文件里面的类名和id还有标签名称，安装依赖：
+
+```shell
+pnpm i purgecss-webpack-plugin glob-all -D
+```
+
+修改`webpack.prod.ts`：
+
+```typescript
+// 清理无用css，检测src下所有tsx文件和public下index.html中使用的类名和id和标签名称
+// 只打包这些文件中用到的样式
+new PurgeCSSPlugin({
+    paths: globAll.sync(
+        [`${path.join(__dirname, '../src')}/**/*`, path.join(__dirname, '../public/index.html')],
+        {
+            nodir: true
+        }
+    ),
+    // 用 only 来指定 purgecss-webpack-plugin 的入口
+    // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
+    only: ["dist"],
+    safelist: {
+        standard: [/^ant-/] // 过滤以ant-开头的类名，哪怕没用到也不删除
+    }
+}),
+```
+
+### 14.9 资源懒加载
+
+像`react`，`vue`等单页面应用打包默认回打包到一个js文件中，虽然使用代码分割可以把`node_modules`模块和公共模块分离，但页面初始加载还是会把整个项目的代码下载下来，其实只需要公共资源和当前页面的资源就可以了，其他页面可以等使用到的时候在加载，可以有效提升首屏加载速度。
+
+`webpack`默认支持资源懒加载，只需要引入资源使用`import`语法来引入资源，`webpack`打包的时候就会自动打包为单独的资源文件，等使用到的时候动态加载。
+
+以懒加载组件和`css`为例，新建懒加载组件`src/component/LazyDemo.tsx`：
+
+```tsx
+import React from "react";
+
+function LazyDemo() {
+    return <h3>我是懒加载组件组件</h3>
+}
+
+export default LazyDemo
+
+```
+
+
+

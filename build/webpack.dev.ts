@@ -13,8 +13,12 @@ const port = "8082";
 
 // 合并公共配置,并添加开发环境配置
 const devConfig: Configuration = merge(baseConfig, {
-  mode: "development", // 开发模式,打包更加快速,省了代码优化步骤
+  mode: 'development', // 开发模式,打包更加快速,省了代码优化步骤
   devtool: "eval-cheap-module-source-map",
+  performance:{
+    maxAssetSize: 30 *1024 * 1024, // 整数类型(以字节为单位)
+    maxEntrypointSize: 30 * 1024 * 1024 // 整数类型(以字节为单位)
+  },
   plugins: [
     new ReactRefreshWebpackPlugin(), // 添加热更新插件
   ],

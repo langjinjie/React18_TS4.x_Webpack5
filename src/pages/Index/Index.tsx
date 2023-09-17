@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { test } from 'src/utils/base'
 import { Icon, Demo1 } from 'src/components'
 import Class from 'src/pages/Class/Class'
@@ -6,12 +6,20 @@ import jsonTest  from 'src/assets/json/test.json'
 import lessStyle from './style.module.less'
 import scssStyle from './style.module.scss'
 
+const LazyDemo = lazy(()=>import('src/pages/LazyDemo/LazyDemo'))
+
 function Index() {
   const [count, setCount]=useState(1);
+  const [show, setShow]=useState(false)
   
   // 计数器+1
   const addCount = () => {
     setCount(count+1)
+  }
+
+  // 显示/隐藏
+  const showHandle = () => {
+    setShow(!show)
   }
 
   useEffect(() => {
@@ -60,6 +68,13 @@ function Index() {
       <h2>热更新测试111</h2>
       <button className={lessStyle.btn} onClick={addCount}>count：{count}</button>
       <Demo1/>
+      <h2>懒1加载测试</h2>
+      <button onClick={showHandle}>{show ? '隐藏' : '显示'}</button>
+      {show && 
+      <Suspense fallback="组件加载中...">
+        <LazyDemo/>
+      </Suspense>
+      }
     </>
   )
 }

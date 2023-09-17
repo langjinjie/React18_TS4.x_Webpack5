@@ -2,18 +2,19 @@ import { Configuration } from 'webpack' // 引入webpack的类型接口
 import { merge } from 'webpack-merge'
 import baseConfig from './webpack.base' // 引入基本配置
 // const baseConfig = require('./webpack.base') // 引入基本配置
-import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin' // css样式提取及css的tree-shaking
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin'
 import TerserPlugin from 'terser-webpack-plugin' // 多线程压缩混淆
 import CompressionPlugin from 'compression-webpack-plugin' // 压缩css js
 
-const globAll = require('glob-all')
-const { PurgeCSSPlugin } = require('purgecss-webpack-plugin')
+const globAll = require('glob-all'); // 用于css的tree-shaking（树摇）
+const { PurgeCSSPlugin } = require('purgecss-webpack-plugin'); // 用于css的tree-shaking(树摇)
 
 const path = require('path') // 需要安装@types/node -D
 
 const prodConfig: Configuration = merge(baseConfig, {
   mode: "production", // 生产模式，会开启tree-shaking和压缩代码，以及其他优化
+  performance:{maxAssetSize: 30 * 1024 * 1024},
   /* 
   打包环境推荐：none（不配置devTool选项了，不是配置devTool:"none"）
   在package.json的scripts中添加  "build": "webpack -c build/webpack.prod.ts"
@@ -25,7 +26,7 @@ const prodConfig: Configuration = merge(baseConfig, {
     }),
     new CompressionPlugin({
       test: /\.(js|css)$/, // 压缩js和css文件
-      filename: '[path][base].gz', // 文件命名
+      filename: '[path][name][base].gz', // 文件命名 加上[path]，就会自动打包到对应的目录
       algorithm: 'gzip', // 压缩格式,默认是gzip
       threshold: 10240, // 只有大小大于该值的资源会被处理。默认值是 10k
       minRatio: 0.8 // 压缩率,默认值是 0.8

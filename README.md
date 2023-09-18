@@ -1862,8 +1862,28 @@ function LazyDemo() {
 }
 
 export default LazyDemo
-
 ```
 
+### 14.10 资源预加载（待验证）
 
+上面配置了资源懒加载之后，虽然提升了首屏渲染速度，但是加载到资源的时候会有一个请求去请求资源的延时，如果资源比较大会出现延迟卡顿现象，可以借助link标签的rel属性prefetch和preload，link标签除了加载cs之外也可以加载js资源，设置rel可以规定link提前加载资源，但是加载资源后不执行，等用到了在执行
 
+rel的属性值
+
+- `preload`是告诉浏览器页面必定需要的资源，浏览器一定会加载这些资源。
+- `prefetch`是告诉浏览器页面可能需要的资源，浏览器不一定会加载这些资源，会在空闲时加载。
+
+### 14.11 gzip压缩
+
+见 14.4
+
+### 15 webpack其他优化
+
+优化并不是一蹴而就的，一般是随着项目的发展逐步针对性优化，本系列主要谈论一个项目的基本架子，故只对 `webpack` 做基础的优化。除了上面的配置外，`webpack`还提供了其他的一些优化方式，可以在真正实际开发的时候逐步实践，网上已经有大量的资源来对这个方面多深入的实践，可以参考如下：
+
+- 优化点
+  - [DllPlugin](https://link.juejin.cn?target=https%3A%2F%2Fwebpack.docschina.org%2Fplugins%2Fdll-plugin%23root)：动态链接库
+  - [sideEffect](https://link.juejin.cn?target=https%3A%2F%2Fwebpack.docschina.org%2Fconfiguration%2Foptimization%2F%23optimizationsideeffects)：副作用
+  - [externals](https://link.juejin.cn?target=https%3A%2F%2Fwww.webpackjs.com%2Fconfiguration%2Fexternals%2F): 外包拓展，打包时会忽略配置的依赖，会从上下文中寻找对应变量
+  - [module.noParse](https://link.juejin.cn?target=https%3A%2F%2Fwww.webpackjs.com%2Fconfiguration%2Fmodule%2F%23module-noparse): 匹配到设置的模块，将不进行依赖解析，适合`jquery`，`boostrap`这类不依赖外部模块的包
+  - [ignorePlugin](https://link.juejin.cn?target=https%3A%2F%2Fwebpack.js.org%2Fplugins%2Fignore-plugin%2F%23root): 可以使用正则忽略一部分文件，常在使用多语言的包时可以把非中文语言包过滤掉

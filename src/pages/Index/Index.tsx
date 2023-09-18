@@ -7,10 +7,23 @@ import lessStyle from './style.module.less'
 import scssStyle from './style.module.scss'
 
 const LazyDemo = lazy(()=>import('src/pages/LazyDemo/LazyDemo'))
+const PrefetchDemo = lazy(()=>import(
+  /* webpackChunkName: "PreFetchDemo" */
+  /*webpackPrefetch: true*/
+  'src/pages/PrefetchDemo/PrefetchDemo'
+  ))
+
+const PreloadDemo = lazy(()=>import(
+  /* webpackChunkName: "PreloadDemo" */
+  /*webpackPreload: true*/
+  'src/pages/PreloadDemo/PreloadDemo'
+  ))
 
 function Index() {
   const [count, setCount]=useState(1);
   const [show, setShow]=useState(false)
+  const [prefetchShow, setPrefetchShow]=useState(false)
+  const [preloadShow, setPreloadShow]=useState(false)
   
   // 计数器+1
   const addCount = () => {
@@ -21,6 +34,17 @@ function Index() {
   const showHandle = () => {
     setShow(!show)
   }
+
+  // 预加载prefetch
+  const prefetchShowHanle = ()=>{
+    setPrefetchShow(!prefetchShow)
+  }
+
+  // 预加载preload
+  const preloadShowHanle = ()=>{
+    setPreloadShow(!preloadShow)
+  }
+
 
   useEffect(() => {
     test()
@@ -73,6 +97,20 @@ function Index() {
       {show && 
       <Suspense fallback="组件加载中...">
         <LazyDemo/>
+      </Suspense>
+      }
+      <h2>Prefetch预加载</h2>
+      <button onClick={prefetchShowHanle}>{prefetchShow ? '隐藏' : '显示'}</button>
+      {prefetchShow &&
+      <Suspense fallback="组件加载中...">
+        <PrefetchDemo/>
+      </Suspense>
+      }
+      <h2>Preload预加载</h2>
+      <button onClick={preloadShowHanle}>{preloadShow ? '隐藏' : '显示'}</button>
+      {preloadShow && 
+      <Suspense fallback="组件加载中...">
+      <PreloadDemo/>
       </Suspense>
       }
     </>

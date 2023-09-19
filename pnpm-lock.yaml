@@ -40,6 +40,9 @@ devDependencies:
   '@types/react-dom':
     specifier: ^18.0.11
     version: 18.0.11
+  '@vue/preload-webpack-plugin':
+    specifier: ^2.0.0
+    version: 2.0.0(html-webpack-plugin@5.5.0)(webpack@5.76.2)
   autoprefixer:
     specifier: ^10.4.14
     version: 10.4.14(postcss@8.4.24)
@@ -1930,6 +1933,17 @@ packages:
     resolution: {integrity: sha512-6i0aC7jV6QzQB8ne1joVZ0eSFIstHsCrobmOtghM11yGlH0j43FKL2UhWdELkyps0zuf7qVTUVCCR+tgSlyLLw==}
     dependencies:
       '@types/yargs-parser': 21.0.0
+    dev: true
+
+  /@vue/preload-webpack-plugin@2.0.0(html-webpack-plugin@5.5.0)(webpack@5.76.2):
+    resolution: {integrity: sha512-RoorRB50WehYbsiWu497q8egZBYlrvOo9KBUG41uth4O023Cbs+7POLm9uw2CAiViBAIhvpw1Y4w4i+MZxOfXw==}
+    engines: {node: '>=6.0.0'}
+    peerDependencies:
+      html-webpack-plugin: ^5.0.0 || ^4.5.1
+      webpack: ^5.20.0 || ^4.1.0
+    dependencies:
+      html-webpack-plugin: 5.5.0(webpack@5.76.2)
+      webpack: 5.76.2(webpack-cli@5.0.1)
     dev: true
 
   /@webassemblyjs/ast@1.11.1:

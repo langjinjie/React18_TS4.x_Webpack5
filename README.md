@@ -1873,11 +1873,172 @@ rel的属性值
 - `preload`是告诉浏览器页面必定需要的资源，浏览器一定会加载这些资源。
 - `prefetch`是告诉浏览器页面可能需要的资源，浏览器不一定会加载这些资源，会在空闲时加载。
 
+借助`preload-webpack-plugin`插件
+
+#### 1.基础配置
+
+```javascript
+javascript
+复制代码const PreloadWebpackPlugin = require('preload-webpack-plugin');
+```
+
+必须用在HtmlWebpackPlugin插件之后：
+
+```javascript
+javascript复制代码plugins: [
+  new HtmlWebpackPlugin(),
+  new PreloadWebpackPlugin()
+]
+```
+
+#### 2.配置项
+
+##### as
+
+当[](https://link.juejin.cn?target=https%3A%2F%2Fdeveloper.mozilla.org%2Fzh-CN%2Fdocs%2FWeb%2FHTML%2FElement%2Flink)元素设置了 `rel="preload"` 或者 `rel="prefetch"` 时,可以使用as属性用来规定加载的内容的类型。
+
+在预加载文件的时候，插件会根据每个文件的类型使用不同的as属性：
+
+- `.css`结尾，`as=style`;
+- `.woff2`结尾，`as=font`;
+- 其他，`as=script`;
+
+```html
+html
+复制代码<link href="xx/xx/chunk-xxx.f01555ba.css" rel="preload" as="style">
+```
+
+如果不希望as取自文件名的后缀，也可以使用as显示命名：
+
+```javascript
+javascript复制代码plugins: [
+  new HtmlWebpackPlugin(),
+  new PreloadWebpackPlugin({
+    rel: 'preload',
+    as: 'script'
+  })
+]
+```
+
+也可以使用一个函数来进行更细粒度的控制：
+
+```javascript
+javascript复制代码plugins: [
+  new HtmlWebpackPlugin(),
+  new PreloadWebpackPlugin({
+    rel: 'preload',
+    as(entry) {
+      if (/.css$/.test(entry)) return 'style';
+      if (/.woff$/.test(entry)) return 'font';
+      if (/.png$/.test(entry)) return 'image';
+      return 'script';
+    }
+  })
+]
+```
+
+##### include 需要预加载的模块
+
+有以下几个值可以选择：
+
+- `asyncChunks`：异步模块对应生成的chunk文件；
+- `allChunks`：所有的chunk文件(vendor, async, and normal chunks)；
+- `initial`：entry项对应生成的chunk文件；
+- `allAssets`：所有chunk文件 + loaders生成的文件；
+- `[文件name]`：如果chunks是显示命名的，可以使用这种方式；
+
+```javascript
+javascript复制代码plugins: [
+  new HtmlWebpackPlugin(),
+  new PreloadWebpackPlugin({
+    rel: 'preload',
+    include: 'allChunks' // or 'initial', or 'allAssets'
+  })
+]
+javascript复制代码plugins: [
+  new HtmlWebpackPlugin(),
+  new PreloadWebpackPlugin({
+    rel: 'preload',
+    include: ['home']
+  })
+]
+```
+
+结果：
+
+```html
+html
+复制代码<link rel="preload" as="script" href="home.31132ae6680e598f8879.js">
+```
+
+##### fileBlacklist黑名单
+
+1.默认值，不会加载任何sourcemaps：
+
+```javascript
+javascript复制代码new PreloadWebpackPlugin({
+  fileBlacklist: [/\.map/]
+})
+```
+
+2.其他例子：
+
+```javascript
+javascript复制代码new PreloadWebpackPlugin({
+  fileBlacklist: [/.map/, /.whatever/]
+})
+```
+
+##### excludeHtmlNames 需要忽略的html文件
+
+```javascript
+javascript复制代码plugins: [
+  new HtmlWebpackPlugin({
+    filename: 'index.html',
+    template: 'src/index.html',
+    chunks: ['main']
+  }),
+  new HtmlWebpackPlugin({
+    filename: 'example.html',
+    template: 'src/example.html',
+    chunks: ['exampleEntry']
+  }),
+  // Only apply the plugin to index.html, not example.html.
+  new PreloadWebpackPlugin({
+    excludeHtmlNames: ['example.html'],
+  })
+```
+
+##### prefetch
+
+```javascript
+javascript复制代码plugins: [
+  new HtmlWebpackPlugin(),
+  new PreloadWebpackPlugin({
+    rel: 'prefetch'
+  })
+]
+```
+
+### media
+
+```javascript
+javascript复制代码plugins: [
+  new HtmlWebpackPlugin(),
+  new PreloadWebpackPlugin({
+    rel: 'preload',
+    media: '(min-width: 600px)'
+  })
+]
+```
+
+
+
 ### 14.11 gzip压缩
 
 见 14.4
 
-### 15 webpack其他优化
+## 15 webpack其他优化
 
 优化并不是一蹴而就的，一般是随着项目的发展逐步针对性优化，本系列主要谈论一个项目的基本架子，故只对 `webpack` 做基础的优化。除了上面的配置外，`webpack`还提供了其他的一些优化方式，可以在真正实际开发的时候逐步实践，网上已经有大量的资源来对这个方面多深入的实践，可以参考如下：
 
@@ -1887,3 +2048,51 @@ rel的属性值
   - [externals](https://link.juejin.cn?target=https%3A%2F%2Fwww.webpackjs.com%2Fconfiguration%2Fexternals%2F): 外包拓展，打包时会忽略配置的依赖，会从上下文中寻找对应变量
   - [module.noParse](https://link.juejin.cn?target=https%3A%2F%2Fwww.webpackjs.com%2Fconfiguration%2Fmodule%2F%23module-noparse): 匹配到设置的模块，将不进行依赖解析，适合`jquery`，`boostrap`这类不依赖外部模块的包
   - [ignorePlugin](https://link.juejin.cn?target=https%3A%2F%2Fwebpack.js.org%2Fplugins%2Fignore-plugin%2F%23root): 可以使用正则忽略一部分文件，常在使用多语言的包时可以把非中文语言包过滤掉
+
+## 16 代码规范
+
+一套完善的开发环境配置可以极大的提升开发效率，提高代码质量，方便多人合作，以及后期的项目迭代和维护。所以说，前端代码格式规范和语法检测的工具可以提高代码的质量和可读性，减少低级错误和维护成本，提高团队的协作效率和开发效率，是非常有必要的。
+
+### 16.1 代码规范格式规范和语法检测工具
+
+1. [**EditorConfig**](https://link.juejin.cn?target=https%3A%2F%2Feditorconfig.org%2F)：`EditorConfig` 是一个用于统一编辑器和 IDE 的配置文件的工具。它可以帮助团队协作中的开发人员保持一致的编码风格，无论他们使用的是哪个编辑器或 IDE。`EditorConfig` 支持配置文件的语法规则、缩进、换行符、字符编码等，可以通过在项目中添加一个 `.editorconfig` 文件来使用。
+
+2. [**ESLint**](https://link.juejin.cn?target=https%3A%2F%2Feslint.org%2F)：`ESLint` 是一个广泛使用的 JavaScript 代码检查工具，它可以帮助开发人员遵循代码风格规范，并发现代码中潜在的问题。`ESLint` 有很多可定制的规则，可以根据团队的代码风格和项目的要求进行配置。ESLint 还支持集成到许多编辑器和 IDE 中，如 Visual Studio Code、Sublime Text、Atom、WebStorm 等，以提供实时的语法和格式错误检查。
+
+3. [**Prettier**](https://link.juejin.cn?target=https%3A%2F%2Fprettier.io%2F)：`Prettier` 是一个代码格式化工具，它可以自动化地将代码格式化为一致的风格。与 `ESLint` 不同的是，`Prettier` 不关心代码的语义或质量，只关心代码的外观。`Prettier` 与 `ESLint` 集成使用可以让代码保持一致性和规范性。
+
+4. [**Stylelint**](https://link.juejin.cn?target=https%3A%2F%2Fstylelint.io%2F)：`Stylelint` 是一个 CSS 样式检查工具，它可以帮助开发人员遵循 CSS 代码风格规范，并发现代码中潜在的问题。`Stylelint` 有很多可定制的规则，可以根据团队的代码风格和项目的要求进行配置。`Stylelint` 也支持集成到许多编辑器和 IDE 中，如 Visual Studio Code、Sublime Text、Atom、WebStorm 等，以提供实时的语法和格式错误检查。
+
+5. [**Markdownlint**](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2FDavidAnson%2Fmarkdownlint)：`Markdownlint` 是一个用于检查 `Markdown` 文件中语法和格式的工具，它可以帮助你保证 `Markdown` 文件的一致性和可读性。`Markdownlint` 支持在命令行、编辑器和 `CI/CD` 工具中使用。
+
+这些工具都有相似的目标：
+
+- 使代码本身和团队成员之间更加一致
+- 检测可能导致潜在错误的有问题的代码
+
+总的来说：
+
+- `EditorConfig`: 跨编辑器和IDE编写代码，保持一致的简单编码风格；
+
+- `Prettier`: 专注于代码格式化的工具，美化代码；
+
+- `ESLint`：专注于代码质量检测、编码风格约束等；
+
+- `Stylelint`：专注于样式代码语法检查和格式错误检查；
+
+- `Markdownlint`：专注作为 `Markdown` 的 `linter`；
+
+### 16.2 代码提交规范工具
+
+1. [**Commitizen**](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fcommitizen%2Fcz-cli)：`Commitizen` 是一个 Git 提交信息格式化工具，可以通过命令行交互式地创建符合规范的 Git 提交信息。`Commitizen` 支持自定义提交信息的格式，并且可以与其他规范工具（如 `ESLint` 和 `Prettier`）集成使用。
+2. [**Conventional Commits**](https://link.juejin.cn?target=https%3A%2F%2Fwww.conventionalcommits.org%2Fen%2Fv1.0.0%2F)：`Conventional Commits` 是一个 Git 提交信息规范标准，规定了 Git 提交信息的格式和内容，包括提交类型、作用域、描述、消息体和消息页脚等部分。`Conventional Commits` 规范可以帮助团队协作中的开发人员更好地理解和管理代码变更历史。
+3. [**Husky**](https://link.juejin.cn?target=https%3A%2F%2Ftypicode.github.io%2Fhusky%2F%23%2F) 和 [**Commitlint**](https://link.juejin.cn?target=https%3A%2F%2Fcommitlint.js.org%2F%23%2F)：`Husky` 和 `Commitlint` 是两个工具，可以结合使用来规范 Git 提交信息。`Husky` 可以在 Git 提交前执行一些预定义的钩子（如 `pre-commit` 和 `pre-push`），而 `Commitlint` 可以检查 Git 提交信息是否符合规范。
+4. [**Git Hooks**](https://link.juejin.cn?target=https%3A%2F%2Fgit-scm.com%2Fbook%2Fzh%2Fv2)：`Git Hooks` 是 Git 自带的一个钩子系统，可以在 Git 的各个生命周期（如 `pre-commit` 和 `post-commit`）执行自定义的脚本。开发人员可以使用 `Git Hooks` 来规范化 Git 提交信息，例如在 `pre-commit` 钩子中执行提交信息的格式检查。
+
+代码 Git 提交规范工具是非常有用的，可以帮助开发人员更好地管理代码变更历史，提高代码可维护性和协作效率。开发人员可以根据自己的需求和团队的规范选择合适的工具和标准来使用。
+
+## 17 editorconfig
+
+在项目中引入 `editorconfig` 是为了在多人协作开发中保持代码的风格和一致性。不同的开发者使用不同的编辑器或IDE，可能会有不同的缩进（比如有的人喜欢4个空格，有的喜欢2个空格）、换行符、编码格式等。甚至相同的编辑器因为开发者自定义配置的不同也会导致不同风格的代码，这会导致代码的可读性降低，增加代码冲突的可能性，降低了代码的可维护性。
+
+> **EditorConfig 使不同编辑器可以保持同样的配置。因此，我们得以无需在每次编写新代码时，再依靠 Prettier 来按照团队约定格式化一遍（出现保存时格式化突然改变的情况）** 。当然这需要在你的 IDE 上安装了必要的 EditorConfig 插件或扩展。

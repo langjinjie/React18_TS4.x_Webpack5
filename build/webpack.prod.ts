@@ -9,8 +9,9 @@ import CompressionPlugin from 'compression-webpack-plugin' // 压缩css js
 
 const globAll = require('glob-all'); // 用于css的tree-shaking（树摇）
 const { PurgeCSSPlugin } = require('purgecss-webpack-plugin'); // 用于css的tree-shaking(树摇)
-
 const path = require('path') // 需要安装@types/node -D
+
+const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
 
 const prodConfig: Configuration = merge(baseConfig, {
   mode: "production", // 生产模式，会开启tree-shaking和压缩代码，以及其他优化
@@ -46,6 +47,16 @@ const prodConfig: Configuration = merge(baseConfig, {
       safelist: {
         standard: [/^ant-/] // 过滤以ant-开头的类名，哪怕没用到也不删除
       }
+    }),
+    new PreloadWebpackPlugin({
+      rel: "preload",
+      as(entry: string) {
+        if (/.css$/.test(entry)) return 'style';
+        if (/.woff$/.test(entry)) return 'font';
+        if (/.png$/.test(entry)) return 'image';
+        return 'script';
+      },
+      include: "asyncChunks"
     }),
   ],
   // 优化

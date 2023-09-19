@@ -199,6 +199,12 @@ const baseConfig: Configuration = {
         minifyCSS: true, // 缩小css样式元素和样式属性
       },
     }),
+    
+  //   new PreloadWebpackPlugin({
+  //     rel: "preload",
+  //     // as: "script",
+  //     include: "initial"
+  //   })
     new DefinePlugin({
       // 将process.env注入到业务代码中，可以借助 dotenv-webpack 插件自动处理，不需要手动处理
       'process.env': JSON.stringify(envConfig.parsed),

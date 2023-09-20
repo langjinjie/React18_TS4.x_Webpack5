@@ -2096,3 +2096,185 @@ javascript复制代码plugins: [
 在项目中引入 `editorconfig` 是为了在多人协作开发中保持代码的风格和一致性。不同的开发者使用不同的编辑器或IDE，可能会有不同的缩进（比如有的人喜欢4个空格，有的喜欢2个空格）、换行符、编码格式等。甚至相同的编辑器因为开发者自定义配置的不同也会导致不同风格的代码，这会导致代码的可读性降低，增加代码冲突的可能性，降低了代码的可维护性。
 
 > **EditorConfig 使不同编辑器可以保持同样的配置。因此，我们得以无需在每次编写新代码时，再依靠 Prettier 来按照团队约定格式化一遍（出现保存时格式化突然改变的情况）** 。当然这需要在你的 IDE 上安装了必要的 EditorConfig 插件或扩展。
+
+### 17.2 安装EditorConfig for VS Code
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/15a8c49a6bf7484c98e48acd426909ab~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+目前主流的编辑器或者 IDE 基本上都有对应的 `EditorConfig` 插件，有的是内置支持的（比如，`WebStorm` 不需要独立安装 `EditorConfig` 的插件），有的需要独立安装。
+
+> 需要注意的是，不同的插件对 `EditorConfig` 属性的支持度不一样，笔者使用的是 `VS Code`。
+
+然后在插件的介绍页上点击**设置的齿轮**，并且选择**Add to Workspace Recommendations**，就可以将其加入清单。也可以直接开启 `.vscode/extensions.json` 进行编辑：
+
+```json
+json复制代码{ 
+    "recommendations": ["editorconfig.editorconfig"] 
+}
+```
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/9229abfe671149cd8c31712b5260c84c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+> **为什么要做这个操作？** 假如哪天项目新来一个协同开发的同学，当他拉取取项目，用 `vscode` 打开项目的时候，编辑器就会自动提醒他安装这个插件，并将相关的配置做设定。下面的 `eslint` 和 `prettier` 插件也是类似。
+
+### 17.3 新建.editorconfig
+
+在根目录新建`.editorconfig`文件：
+
+```ini
+ini复制代码# https://editorconfig.org
+root = true # 设置为true表示根目录，控制配置文件 .editorconfig 是否生效的字段
+
+[*] # 匹配全部文件，匹配除了 `/` 路径分隔符之外的任意字符串
+charset = utf-8                  # 设置字符编码，取值为 latin1，utf-8，utf-8-bom，utf-16be 和 utf-16le，当然 utf-8-bom 不推荐使用
+end_of_line = lf                 # 设置使用的换行符，取值为 lf，cr 或者 crlf
+indent_size = 2                  # 设置缩进的大小，即缩进的列数，当 indexstyle 取值 tab 时，indentsize 会使用 tab_width 的值
+indent_style = space             # 缩进风格，可选space｜tab
+insert_final_newline = true      # 设为true表示使文件以一个空白行结尾
+trim_trailing_whitespace = true  # 删除一行中的前后空格
+
+[*.md] # 匹配全部 .md 文件
+trim_trailing_whitespace = false
+```
+
+上面的配置可以规范本项目中文件的缩进风格，和缩进空格数等，会覆盖 `vscode` 的配置，来达到不同编辑器中代码默认行为一致的作用。
+
+VS Code 的 `EditorConfig` 目前支持下列属性：
+
+- `indent_style`
+- `indent_size`
+- `tab_width`
+- `end_of_line`(on save)
+- `insert_final_newline`(on save)
+- `trim_trailing_whitespace`(on save)
+
+## 18 prettier
+
+每个人写代码的风格习惯不一样，比如代码换行，结尾是否带分号，单双引号，缩进等，并且不能只靠口头规范来约束，项目紧急的时候可能会不太注意代码格式，这时候需要有工具来帮我们自动格式化代码，而perttier就是帮我们做这件事的
+
+### 18.1 安装VS Code 插件和 prettier
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/feee906b19e94483ba5c9a04b5de18b3~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7e5cf587fefc4481830078f28cc83b92~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+安装 `prettier`：
+
+```shell
+pnpm add prettier -D
+```
+
+### 18.2 新建.prettier.js
+
+在根目录下新建 `.prettierrc.js` 和 `.prettierignore` 文件：
+
+```javascript
+// .prettierrc.js
+module.exports = {
+    tabWidth: 2, // 一个tab代表几个空格数，默认就是2
+    useTabs: false, // 是否启用tab取代空格符缩进，.editorconfig设置空格缩进，所以设置为false
+    printWidth: 100, // 一行的字符数，如果超过会进行换行
+    semi: false, // 行尾是否使用分号，默认为true
+    singleQuote: true, // 字符串是否使用单引号
+    trailingComma: 'none', // 对象或数组末尾是否添加逗号 none| es5| all
+    jsxSingleQuote: true, // 在jsx里是否使用单引号，你看着办
+    bracketSpacing: true, // 对象大括号直接是否有空格，默认为true，效果：{ foo: bar }
+    arrowParens: 'avoid' // 箭头函数如果只有一个参数则省略括号
+}
+
+```
+
+```txt
+// .prettierignore
+node_modules
+dist
+env
+.gitignore
+pnpm-lock.yaml
+README.md
+
+```
+
+### 18.3 配置.vscode/setting.json
+
+配置前两步后，虽然已经配置`prettier`格式化规则，但还需要让`vscode`来支持保存后出发格式化，在项目根目录新建`.vscode`文件夹，内部新建`settings.json`文件配置文件，代码如下：
+
+```json
+{
+  "search.exclude": {
+    "/node_modules": true,
+    "dist": true,
+    "pnpm-lock.yaml": true
+  },
+  "files.autoSave": "onFocusChange",
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "javascript.validate.enable": false,
+}
+
+```
+
+- 若配置 `"prettier.requireConfig": true` 则要求根目录下有 `Prettier` 的配置文件，它会覆盖 `Prettier扩展` 中的默认配置，**否则保存时不会自动格式化**。可以参考[这里](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fprettier%2Fprettier-vscode%2Fissues%2F1161%23issuecomment-579415976)。
+- 若配置 `"prettier.requireConfig": false` 则不要求根目录下有配置文件，若有的话也会被感知到并以配置文件的内容为准。
+
+> 这些代码的作用是：在编辑后保存 `[xxx]` 文件时，自动应用 `Prettier` 进行格式化，以确保代码风格的一致性。
+
+先配置了忽略哪些文件不进行格式化，又添加了保存代码后触发格式化代码配置，以及各类型文件格式化使用的格式。这一步配置完成后，修改项目代码，把格式打乱，点击保存时就会看到编辑器自动把代码格式规范化了。
+
+若设置需要配置文件，则必须要求根目录下有配置文件 `.prettierrc.js` 或 `.editorconfig` 中的一个或者两个同时存在，否则代码保存不会进行格式化。
+
+可能你会对上面 `.editorconfig` 文件作为 `Prettier` 的配置文件感到疑惑，`vscode` 的 `Prettier` 插件中有关配置文件有这样的一段描述，如下图：
+
+![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/961ae2c8a65842f4b9cdd7d9a3b46f0d~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
+
+- 可以看出Prettier插件获取配置文件有一个优先级：`.prettierrc > .editorconfig > vscode默认配置`。
+- 上面的前两者并不是说 `.prettierrc` 和 `.editorconfig` 同时存在时，后者的配置内容就被忽略，实际的表现：
+- `.prettierrc.js` 和 `.editorconfig` 同时存在时，二者内容会进行合并，若配置项有冲突，这 `.prettierrc` 的优先级更高。
+
+为了保证我们的编辑器是使用 `prettier` 作为默认格式化的工具，最好是手动配置一下默认的格式化插件：
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/03bd2465491d4aeda0cba72184fb7f4c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/890dbba10da64a25a6bdce52d6ed2800~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/3ea82691c9dc43ccbddb797869e37f6c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+### 18.4 脚本命令检查和修复格式
+
+在 `package.json` 的 `"scripts"` 中加入以下脚本命令：
+
+```json
+"lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,ts,json,tsx,css,less,scss,stylus,html,md}\""
+```
+
+这段代码是一个脚本命令，用于运行 `Prettier` 工具来格式化指定目录下的文件。具体解释如下：
+
+- `"--write"`: 表示将格式化后的结果直接写回原文件中，而不是输出到控制台。
+- `"--loglevel warn"`: 表示只输出警告级别的日志信息。
+- `"src/**/*.{js,ts,json,tsx,css,less,scss,stylus,html,md}"`: 是要格式化的文件的路径，这里指定了在 `src` 目录下，所有扩展名为 `.js`、`.ts`、`.json`、`.tsx`、`.css`、`.less`、`.scss`、`.stylus`、`.html`、`.md` 的文件。
+
+> 这个脚本命令的作用是：运行 Prettier 工具来格式化指定目录下的文件，并将格式化后的结果直接写回原文件中。同时，只输出警告级别的日志信息。
+
+现在可以测试一下，将 `.prettierrc.js` 中的 `tabWidth` 值修改为 4（缩进为 4 个空格），然后运行 `pnpm run lint:prettier`，随便打开一个 `src` 下的文件，你就会发现缩进从 2 变成 4 了。

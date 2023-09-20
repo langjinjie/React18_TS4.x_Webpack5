@@ -65,7 +65,7 @@ function Index() {
       </div>
       <h2>图片引入测试</h2>
       <div>
-        <div>背景图片引入测试11</div>
+        <div>背景图片引入测试</div>
         <div className={lessStyle.bgImgTest}>
           <div></div>
           <div></div>
@@ -79,12 +79,12 @@ function Index() {
       <h2>字体引入测试</h2>
       <div className={lessStyle.fontTest}>文字字体测试哈哈哈</div>
       <Class />
-      <h2>热更新测试111</h2>
+      <h2>热更新测试</h2>
       <button className={lessStyle.btn} onClick={addCount}>
         count：{count}
       </button>
       <Demo1 />
-      <h2>懒1加载测试</h2>
+      <h2>懒加载测试</h2>
       <button onClick={showHandle}>{show ? '隐藏' : '显示'}</button>
       {show && (
         <Suspense fallback='组件加载中...'>

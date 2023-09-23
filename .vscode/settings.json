@@ -9,7 +9,7 @@
   "editor.formatOnType": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   },
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -18,7 +18,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   },
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
@@ -30,4 +30,12 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "javascript.validate.enable": false,
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.markdownlint": true,
+    "source.fixAll.stylelint": true,
+    "source.fixAll.eslint": true,
+  },
+  "stylelint.validate": ["css", "less", "sass", "stylus", "postcss"],
+  "eslint.enable": true,
 }

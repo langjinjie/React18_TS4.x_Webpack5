@@ -1,47 +1,49 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
-import { test } from 'src/utils/base'
-import { Icon, Demo1 } from 'src/components'
-import Class from 'src/pages/Class/Class'
-import jsonTest from 'src/assets/json/test.json'
-import lessStyle from './style.module.less'
-import scssStyle from './style.module.scss'
+import {
+  Suspense, lazy, useEffect, useState,
+} from 'react';
+import { test } from 'src/utils/base';
+import { Icon, Demo1 } from 'src/components';
+import Class from 'src/pages/Class/Class';
+import jsonTest from 'src/assets/json/test.json';
+import lessStyle from './style.module.less';
+import scssStyle from './style.module.scss';
 
-const LazyDemo = lazy(() => import('src/pages/LazyDemo/LazyDemo'))
-const PrefetchDemo = lazy(() => import('src/pages/PrefetchDemo/PrefetchDemo'))
-const PreloadDemo = lazy(() => import('src/pages/PreloadDemo/PreloadDemo'))
+const LazyDemo = lazy(() => import('src/pages/LazyDemo/LazyDemo'));
+const PrefetchDemo = lazy(() => import('src/pages/PrefetchDemo/PrefetchDemo'));
+const PreloadDemo = lazy(() => import('src/pages/PreloadDemo/PreloadDemo'));
 
 function Index() {
-  const [count, setCount] = useState(1)
-  const [show, setShow] = useState(false)
-  const [prefetchShow, setPrefetchShow] = useState(false)
-  const [preloadShow, setPreloadShow] = useState(false)
+  const [count, setCount] = useState(1);
+  const [show, setShow] = useState(false);
+  const [prefetchShow, setPrefetchShow] = useState(false);
+  const [preloadShow, setPreloadShow] = useState(false);
 
   // 计数器+1
   const addCount = () => {
-    setCount(count + 1)
-  }
+    setCount(count + 1);
+  };
 
   // 显示/隐藏
   const showHandle = () => {
-    setShow(!show)
-  }
+    setShow(!show);
+  };
 
   // 预加载prefetch
   const prefetchShowHanle = () => {
-    setPrefetchShow(!prefetchShow)
-  }
+    setPrefetchShow(!prefetchShow);
+  };
 
   // 预加载preload
   const preloadShowHanle = () => {
-    setPreloadShow(!preloadShow)
-  }
+    setPreloadShow(!preloadShow);
+  };
 
   useEffect(() => {
-    test()
+    test();
     // @ts-ignore
-    console.log('jsonTest', JSON.parse(jsonTest as string))
-    console.log('123')
-  }, [])
+    console.log('jsonTest', JSON.parse(jsonTest as string));
+    console.log('123');
+  }, []);
   return (
     <>
       <h1>1122</h1>
@@ -53,7 +55,10 @@ function Index() {
         <div>img处理测试</div>
         <div>
           <div>
-            <img src={require('src/assets/image/1cc35821-7988-410f-88e7-ace8abcc7f38.jpg')} alt='' />
+            <img
+              src={require('src/assets/image/1cc35821-7988-410f-88e7-ace8abcc7f38.jpg')}
+              alt=''
+            />
           </div>
           <div>
             <img src={require('src/assets/image/3c5c6aaa3a0be16af90fdf3b9a87487.png')} alt='' />
@@ -106,7 +111,7 @@ function Index() {
         </Suspense>
       )}
     </>
-  )
+  );
 }
 
-export default Index
+export default Index;

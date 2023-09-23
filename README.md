@@ -2278,3 +2278,263 @@ README.md
 > 这个脚本命令的作用是：运行 Prettier 工具来格式化指定目录下的文件，并将格式化后的结果直接写回原文件中。同时，只输出警告级别的日志信息。
 
 现在可以测试一下，将 `.prettierrc.js` 中的 `tabWidth` 值修改为 4（缩进为 4 个空格），然后运行 `pnpm run lint:prettier`，随便打开一个 `src` 下的文件，你就会发现缩进从 2 变成 4 了。
+
+## 19 MarkDownlint
+
+### 19.1 安装markdown lint-cli
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2914e90499ef425fb1d4c88cfc3757b2~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/c6a332a8c3cd4ad6a2029559d2dd5d3f~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+安装依赖：
+
+```shell
+pnpm add markdownlint-cli -D
+```
+
+设定完成后执行 `Markdownlint`：
+
+```shell
+npx markdownlint --config .markdownlint.js --fix .
+```
+
+这个指令会依照 `.markdownlint.js` 所设定的规则规范项目中所有的 `Markdown` 文件。
+
+最后一步，将其加入到 `package.json` 的 `scripts` 中：
+
+```json\
+"scripts": {
+// ...
+"lint:md": "npx markdownlint --config .markdownlint.js --fix ."
+},
+```
+
+## 20 stylelint
+
+### 20.1 安装 stylelint 插件和依赖
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0c11293be9c74e13bd34c12ec54040e4~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+```shell
+shell
+复制代码pnpm add stylelint stylelint-config-css-modules stylelint-config-prettier stylelint-config-standard stylelint-order -D
+```
+
+### 20.2 新建 .stylelintrc.js 和 .stylelintignore
+
+```js
+js复制代码// @see: https://stylelint.io
+module.exports = {
+  extends: [
+    'stylelint-config-standard',
+    'stylelint-config-prettier'
+  ],
+  plugins: ['stylelint-order'],
+  rules: {
+    'selector-class-pattern': [
+      // 命名规范 -
+      '^([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
+      {
+        message: 'Expected class selector to be kebab-case'
+      }
+    ],
+    'string-quotes': 'double', // 单引号
+    'at-rule-empty-line-before': null,
+    'at-rule-no-unknown': null,
+    'at-rule-name-case': 'lower', // 指定@规则名的大小写
+    'length-zero-no-unit': true, // 禁止零长度的单位（可自动修复）
+    'shorthand-property-no-redundant-values': true, // 简写属性
+    'number-leading-zero': 'always', // 小数不带0
+    'declaration-block-no-duplicate-properties': true, // 禁止声明快重复属性
+    'no-descending-specificity': true, // 禁止在具有较高优先级的选择器后出现被其覆盖的较低优先级的选择器。
+    'selector-max-id': null, // 限制一个选择器中 ID 选择器的数量
+    'max-nesting-depth': 10,
+    'declaration-block-single-line-max-declarations': 1,
+    'block-opening-brace-space-before': 'always',
+    'selector-max-type': [0, { ignore: ['child', 'descendant', 'compounded'] }],
+    indentation: [
+      2,
+      {
+        // 指定缩进  warning 提醒
+        severity: 'warning'
+      }
+    ],
+    'order/order': ['custom-properties', 'dollar-variables', 'declarations', 'rules', 'at-rules'],
+    'order/properties-order': [
+      // 规则顺序
+      // ...  这块太长，去我 github repo 找吧
+    ]
+  }
+}
+```
+
+`.stylelintignore` 文件：
+
+```ini
+ini复制代码dist
+public
+env
+build
+.vscode
+.husky
+.DS_Store
+.github
+typings
+README.md
+node_modules
+```
+
+### 20.3 配置 .vscode/settings.json
+
+最后记得在 `.vscode/settings.json` 中加入：
+
+```json
+{ 
+    // ...
+    "editor.codeActionsOnSave": { 
+         "source.fixAll.stylelint": true 
+     },
+     "stylelint.validate": [
+        "css",
+        "less",
+        "sass",
+        "stylus",
+        "postcss"
+      ]
+}
+```
+
+## 21 eslint
+
+`ESLint`是什么呢？一个开源的`JavaScript`的`linting`工具，是一个在`JavaScript`代码中通过规则模式匹配作代码识别和报告的113241插件化的检测工具，它的目的是保证代码规范的一致性和即使发现代码问题，提前避免错误发生，它使用[espree](https://link.juejin.cn/?target=https%3A%2F%2Flink.zhihu.com%2F%3Ftarget%3Dhttps%3A%2F%2Fgithub.com%2Feslint%2Fespree) 
+
+1. **代码质量问题**：使用方式有可能有问题，eslint 可以发现代码中存在的可能错误，如*使用未声明变量*、*声明而未使用的变量*、*修改 const 变量*、*代码中使用debugger*等等
+2. **代码风格问题**：风格不符合一定规则，eslint 也可以用来统一团队的代码风格，比如*加不加分号*、*使用* *tab* *还是空格*、*字符串使用单引号* 等等
+
+`ESLint` 的关注点是代码质量，检查代码风格并且会提示不符合风格规范的代码。除此之外 `ESLint` 也具有一部分代码格式化的功能。
+
+> `ESLint` 最初是由 `Nicholas C. Zakas` ( JavaScript 高级程序设计 作者)于2013年6月创建的开源项目。它的目标是提供一个插件化的javascript代码检测工具。
+
+JavaScript发展历程中出现的Lint工具：`JSLint`->`JSHint`->`ESLint/TSLint`；
+
+- `JSLint`是最早出现的 Lint 工具，不支持灵活拓展及配置，必须接受它所有规则；
+- `JSHint` 在 `JSLint` 的基础上提供了一定的配置项，给了开发者较大的自由，但无法添加自定义规则；
+- `Zakas`创建`ESLint`的初衷就是觉得当时的JSHint存在局限性，无法添加自定义规则。
+- `ES6`的出现后则让`ESLint`迅速大火。
+  因为ES6新增了很多语法，`JSHint` 短期内无法提供支持，而 ESLint 只需要有合适的解析器以及拓展校验规则 就能够进行 Lint 检查。此时 `babel` 就为兼容 `ESLint` 开发了 `babel-eslint` 解析器，提供支持的同时也让 `ESLint` 成为最快支持 `ES6` 语法的 Lint 工具。
+
+### 21.1 安装eslint插件和包
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/b611e827d5d44ce2ad6af0e09ca061f0~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/cddbf5d8919a44d28a1939bc6ed0e943~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+安装 `eslint`：
+
+```shell
+pnpm add eslint eslint-config-airbnb eslint-config-standard eslint-friendly-formatter eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-node eslint-plugin-promise eslint-plugin-react-hooks eslint-plugin-react @typescript-eslint/eslint-plugin @typescript-eslint/parser -D 
+
+```
+
+### 21.2 新建.eslintrc.js
+
+在跟目录新建`.exlintrc.js`文件：
+
+```txt
+node_modules
+dist
+env
+.gitignore
+pnpm-lock.yaml
+README.md
+src/assets/*
+```
+
+`.eslintignore` 用于指定 ESLint 工具在检查代码时要忽略的文件和目录。具体来说，`.eslintignore` 文件中列出的文件和目录将被 ESLint 忽略，不会对其进行代码检查和报告。这个文件中的每一行都是一个文件或目录的模式，支持使用通配符（`*`）和正则表达式来匹配多个文件或目录。
+
+> 通常情况下，`.eslintignore` 文件中会列出一些不需要检查的文件或目录，比如第三方库、测试代码、构建输出等，以减少 ESLint 的检查范围，提高代码检查的效率。
+
+### 21.3 新建 .eslintignore
+
+在根目录新建一个 `.eslintignore` 文件：
+
+```txt
+txt复制代码node_modules
+dist
+env
+.gitignore
+pnpm-lock.yaml
+README.md
+src/assets/*
+```
+
+`.eslintignore` 用于指定 ESLint 工具在检查代码时要忽略的文件和目录。具体来说，`.eslintignore` 文件中列出的文件和目录将被 ESLint 忽略，不会对其进行代码检查和报告。这个文件中的每一行都是一个文件或目录的模式，支持使用通配符（`*`）和正则表达式来匹配多个文件或目录。
+
+> 通常情况下，`.eslintignore` 文件中会列出一些不需要检查的文件或目录，比如第三方库、测试代码、构建输出等，以减少 ESLint 的检查范围，提高代码检查的效率。
+
+### 21.4 添加eslint语法检测脚本
+
+前面的eslint报错和警告都是我们用眼睛看到的，有时候需要通过脚本执行能检测出来，在`package.json`的`scripts`中新增：
+
+```json
+json复制代码// --fix：此项指示 ESLint 尝试修复尽可能多的问题。这些修复是对实际文件本身进行的，只有剩余的未修复的问题才会被输出。
+"lint:eslint": "eslint --fix --ext .js,.ts,.tsx ./src",
+```
+
+现在执行 `pnpm run lint:eslint`，控制台将会爆出一系列 `warning`：
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/93ce62e9462846108479c52ce991843f~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+除此之外再解决一个问题就是 `eslint` 报的警告：
+
+```txt
+React version not specified in eslint-plugin-react settings
+```
+
+需要告诉 `eslint` 使用的 `react版本`，在 `.eslintrc.js` 和`rules` 平级添加 `settings` 配置，让 `eslint` 自己检测 `react` 版本，对应 [issuse](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fyannickcr%2Feslint-plugin-react%2Fissues%2F2157)：
+
+```js
+settings: {
+  "react": {
+     "version": "detect"
+  }
+}
+```
+
+再执行`pnpm run lint:eslint`就不会报这个未设置`react`版本的警告了。
+
+### 21.5 eslint 与 prettier 冲突
+
+安装两个依赖：
+
+```shell
+pnpm add eslint-config-prettier eslint-plugin-prettier -D
+```
+
+在 `.eslintrc.js` 的 `extends` 中加入：
+
+```js
+module.exports = {
+  // ...
+  extends: [
+    // ...
+    'plugin:prettier/recommended', // <==== 增加一行
+  ],
+  // ...
+}
+```
+
+最后再配置一下 `.vscode/settings.json`：
+
+```json
+{
+  // ...
+  "eslint.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+  },
+}
+```
+
+## 22 husky + lint-statged

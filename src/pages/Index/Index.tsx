@@ -38,8 +38,14 @@ function Index() {
     setPreloadShow(!preloadShow);
   };
 
+  // tsc检测
+  const hello = (name: string) => {
+    console.log('name', name);
+  };
+
   useEffect(() => {
     test();
+    hello('123');
     // @ts-ignore
     console.log('jsonTest', JSON.parse(jsonTest as string));
     console.log('123');

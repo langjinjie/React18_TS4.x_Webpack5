@@ -2512,6 +2512,9 @@ settings: {
 pnpm add eslint-config-prettier eslint-plugin-prettier -D
 ```
 
+- `eslint-plugin-prettier`:把`Prettier`推荐的格式问题的配置以`ESlint rules`的方式写入，这样可以统一代码问题的来源，报错的来源依旧是`ESlint`。
+- `eslint-config-plugin`:禁用掉和`Prettier`配置有冲突的规则
+
 在 `.eslintrc.js` 的 `extends` 中加入：
 
 ```js
@@ -2538,3 +2541,540 @@ module.exports = {
 ```
 
 ## 22 husky + lint-statged
+
+### 22.1 使用lint-staged优化eslint检测速度
+
+在上面配置的`eslint`会检测`src`文件下所有的 `.ts, .tsx`文件，虽然功能可以实现，但是当项目文件多的时候，检测的文件会很多，需要的时间也会越来越长，但其实只需要检测提交到暂存区，就是`git add`添加的文件，不在暂存区的文件不用再次检测，而`lint-staged`就是来帮我们做这件事情的。
+
+在`package.json`添加`lint-staged`配置
+
+```json
+json复制代码"lint-staged": {
+  "src/**/*.{ts,tsx}": [
+    "pnpm run lint:eslint",
+    "pnpm run lint:prettier"
+  ]
+},
+```
+
+因为要检测 `git` 暂存区代码，所以如果你的项目还没有使用 `git` 来做版本控制，需要执行`git init`初始化一下`git`：
+
+```shell
+shell
+复制代码git init 
+```
+
+初始化`git`完成后就可以进行测试了，先提交一下没有语法问题的`App.tsx`
+
+```shell
+shell
+复制代码git add src/App.tsx 
+```
+
+把`src/App.tsx`提交到暂存区后，执行`npx lint-staged`，会顺利通过检测。
+
+假如我们现在把 `package.json` 中的 `"lint:eslint"` 改一下，加一个 `--max-warnings=0`，表示允许最多 0 个警告，就是只要出现警告就会报错：
+
+```json
+json
+复制代码"lint:eslint": "eslint --fix --ext .js,.ts,.tsx ./src --max-warnings=0",
+```
+
+然后在 `App.tsx` 中加入一个未使用的变量：
+
+```ts
+ts复制代码// ...
+const a = 1
+// ...
+```
+
+然后执行：
+
+```js
+js复制代码git add src/App.tsx 
+
+npx lint-staged
+```
+
+你就会发现控制台出现了 `warning`：
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/56d9d14aa4ab40968c0ac47d573aa7da~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+这就是 `lint-staged` 的作用。
+
+### 22.2 使用tsc检测类型和报错
+
+需要注意的是，执行 tsc 命令可能会生成一个编译后的产物文件，需想要避免这个问题，需要在 `tsconfig.json` 中加入 `"noEmit": true`：
+
+```json
+json复制代码{
+  "compilerOptions": {
+    "target": "es2016", // 指定ECMAScript目标版本
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": false, // 允许编辑js文件
+    "noEmit": true, // 不生成输出文件
+    "noImplicitAny": false,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "typeRoots": ["./typings/*.d.ts", "node_modules/@types"],
+    "jsx": "react-jsx" // react18这里改成react-jsx，就不需要在tsx文件中手动引入React了
+  },
+  "include": ["./src/*", "./src/**/*.ts", "./src/**/*.tsx", "./typings/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+更多的配置参考：
+
+```json
+json复制代码{
+  "compilerOptions": {
+
+    /* 基本选项 */
+    "target": "es5",                       // 指定 ECMAScript 目标版本: 'ES3' (default), 'ES5', 'ES6'/'ES2015', 'ES2016', 'ES2017', or 'ESNEXT'
+    "module": "commonjs",                  // 指定使用模块: 'commonjs', 'amd', 'system', 'umd' or 'es2015'
+    "lib": [],                             // 指定要包含在编译中的库文件
+    "allowJs": true,                       // 允许编译 javascript 文件
+    "checkJs": true,                       // 报告 javascript 文件中的错误
+    "jsx": "preserve",                     // 指定 jsx 代码的生成: 'preserve', 'react-native', or 'react'
+    "declaration": true,                   // 生成相应的 '.d.ts' 文件
+    "sourceMap": true,                     // 生成相应的 '.map' 文件
+    "outFile": "./",                       // 将输出文件合并为一个文件
+    "outDir": "./",                        // 指定输出目录
+    "rootDir": "./",                       // 用来控制输出目录结构 --outDir.
+    "removeComments": true,                // 删除编译后的所有的注释
+    "noEmit": true,                        // 不生成输出文件
+    "importHelpers": true,                 // 从 tslib 导入辅助工具函数
+    "isolatedModules": true,               // 将每个文件作为单独的模块 （与 'ts.transpileModule' 类似）.
+
+    /* 严格的类型检查选项 */
+    "strict": true,                        // 启用所有严格类型检查选项
+    "noImplicitAny": true,                 // 在表达式和声明上有隐含的 any类型时报错
+    "strictNullChecks": true,              // 启用严格的 null 检查
+    "noImplicitThis": true,                // 当 this 表达式值为 any 类型的时候，生成一个错误
+    "alwaysStrict": true,                  // 以严格模式检查每个模块，并在每个文件里加入 'use strict'
+
+    /* 额外的检查 */
+    "noUnusedLocals": true,                // 有未使用的变量时，抛出错误
+    "noUnusedParameters": true,            // 有未使用的参数时，抛出错误
+    "noImplicitReturns": true,             // 并不是所有函数里的代码都有返回值时，抛出错误
+    "noFallthroughCasesInSwitch": true,    // 报告 switch 语句的 fallthrough 错误。（即，不允许 switch 的 case 语句贯穿）
+
+    /* 模块解析选项 */
+    "moduleResolution": "node",            // 选择模块解析策略： 'node' (Node.js) or 'classic' (TypeScript pre-1.6)
+    "baseUrl": "./",                       // 用于解析非相对模块名称的基目录
+    "paths": {},                           // 模块名到基于 baseUrl 的路径映射的列表
+    "rootDirs": [],                        // 根文件夹列表，其组合内容表示项目运行时的结构内容
+    "typeRoots": [],                       // 包含类型声明的文件列表
+    "types": [],                           // 需要包含的类型声明文件名列表
+    "allowSyntheticDefaultImports": true,  // 允许从没有设置默认导出的模块中默认导入。
+
+    /* Source Map Options */
+    "sourceRoot": "./",                    // 指定调试器应该找到 TypeScript 文件而不是源文件的位置
+    "mapRoot": "./",                       // 指定调试器应该找到映射文件而不是生成文件的位置
+    "inlineSourceMap": true,               // 生成单个 soucemaps 文件，而不是将 sourcemaps 生成不同的文件
+    "inlineSources": true,                 // 将代码与 sourcemaps 生成到一个文件中，要求同时设置了 --inlineSourceMap 或 --sourceMap 属性
+
+    /* 其他选项 */
+    "experimentalDecorators": true,        // 启用装饰器
+    "emitDecoratorMetadata": true          // 为装饰器提供元数据的支持
+  }
+}
+```
+
+在项目中使用了`ts`，但一些类型问题，现在配置的`eslint`是检测不出来的，需要使用`ts`提供的`tsc`工具进行检测，如下示例
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5fdfcb71c8924a9091482ce73aadf97d~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+在`index.tsx`定义了函数`hello`，参数`name`是`string`类型，当调用传`number`类型参数时，页面有了明显的ts报错，但此时提交`index.tsx`文件到暂存区后执行`npx lint-staged`：
+
+![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bf4bf07c5a7d4a53afd8f8d5992200ab~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+发现没有检测到报错，所以需要配置下`tsc`来检测类型，在`package.json`添加脚本命令
+
+```json
+json
+复制代码"pre-check": "tsc && npx lint-staged" 
+```
+
+执行`pnpm run pre-check`，发现已经可以检测出类型报错了。
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a0bc0a85df2948109b658a4a4869906c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+### 22.3 配置 husk
+
+为了避免把不规范的代码提交到远程仓库，一般会在git提交代码时对代码语法进行检测，只有检测通过时才能被提交，git提供了一系列的`githooks`，而我们需要其中的`pre-commit`钩子，它会在`git commit`把代码提交到本地仓库之前执行，可以在这个阶段检测代码，如果检测不通过就退出命令行进程停止`commit`。
+
+#### 22.3.1 代码提交前husky检测语法
+
+而`husky`就是可以监听`githooks`的工具，可以借助它来完成这件事情。
+
+#### 22.3.2 安装husky
+
+```shell
+shell
+复制代码pnpm add husky -D 
+```
+
+#### 22.3.3 配置husky的pre-commit钩子
+
+生成`.husky`配置文件夹（如果项目中没有初始化`git`，需要先执行`git init`）
+
+```shell
+shell
+复制代码npx husky install 
+```
+
+会在项目根目录生成 `.husky`文件夹，生成文件成功后，需要让`husky`支持监听`pre-commit`钩子，监听到后执行上面定义的`pnpm run pre-check`语法检测。
+
+```shell
+shell
+复制代码npx husky add .husky/pre-commit 'pnpm run pre-check' 
+```
+
+会在 `.husky`目录下生成`pre-commit`文件，里面可以看到我们设置的`npm run pre-check`命令。
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2f8113c1f2a142938fc85228f33c22f0~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+然后提交代码进行测试
+
+```shell
+shell复制代码git add . 
+git commit -m "feat: add code validate" 
+```
+
+会发现监听`pre-commit`钩子执行了`pnpm run pre-check`, 使用`eslint`检测了`git`暂存区的两个文件，并且发现了`index.tsx`的警告，退出了命令行，没有执行`git commit`把暂存区代码提交到本地仓库。
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/72d2cf587db94270843c106f8241a97a~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+到这里代码提交语法验证就配置完成了，可以有效的保障仓库的代码质量。
+
+## 23、Commit 信息的 Linter - Commitlint
+
+`Commitlint` 是个 npm 包，它使用 [commit conventions](https://link.juejin.cn?target=https%3A%2F%2Fwww.conventionalcommits.org%2Fen%2Fv1.0.0%2F) 规范来检查 `commit` 的信息是否符合我们约定好的提交规范。
+
+通过配置 `commitlint.config.js`， `Commitlint` 可以知道要使用哪些规则规范 `commit` 信息，并输出相对的提示供使用者作为修改的依据。
+
+使用 `Commitlint` 规范项目的 `commit`，可以让所有人的代码提交保持一致的格式，这样做会有下列好处：
+
+- 容易检索：利用定义的关键字可以轻松地找到想要找的 `commit`
+- 自动输出 `Changelog` ：固定的讯息格式可以藉由[changelog 工具](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fconventional-changelog%2Fconventional-changelog)的帮助输出 `Changelog`
+
+### 23.1 安装Commitlint
+
+首先安装 `Commitlint` ：
+
+```shell
+shell
+复制代码pnpm add @commitlint/cli -D
+```
+
+### 23.2 使用Commitlint
+
+安装完成后，由于 `Commitlint` 的配置档是必要的，因此要建立配置档 `commitlint.config.js`：
+
+```js
+js复制代码module.exports = {
+  rules: {
+    'header-min-length': [2, 'always', 10],
+  },
+};
+```
+
+配置属性 `rules` 可以设定规则，规则列表请参考 [Commitlint 的官方页面](https://link.juejin.cn?target=https%3A%2F%2Fcommitlint.js.org%2F%23%2Freference-rules)。范例中设定讯息标头的最小长度要大于10。
+
+接着执行 `commitlint`：
+
+```python
+> echo 'foo' | npx commitlint
+⧗   input: foo
+✖   header must not be shorter than 10 characters, current length is 3 [header-min-length]
+
+✖   found 1 problems, 0 warnings
+ⓘ   Get help: https://github.com/conventional-changelog/commitlint/#what-is-commitlint
+```
+
+当 `message` 信息为 `foo` 时，由于长度只有3，因此 `Commitlint` 会视为违规而输出错误讯息。
+
+、8.3 配置规则包
+
+为了节省配置规则的时间， `Commitlint` 可以使用预先配置的规则包来设定多项规则。使用前须要先安装：
+
+```shell
+shell
+复制代码pnpm add @commitlint/config-conventional -D
+```
+
+这里使用 `@commitlint/config-conventional` 是 `Commitlint` 提供的规则包。安装完成后，要在配置中设定使用规则包：
+
+```js
+js复制代码module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  // ...
+};
+```
+
+这样一来 `Commitlint` 就会将 [@commitlint/config-conventional所配置的规则](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fconventional-changelog%2Fcommitlint%2Fblob%2F5403f0b5bcab43803708997c482a44a7d1151480%2F@commitlint%2Fconfig-conventional%2Findex.js)都纳入并对讯息做相应的检查。
+
+### 23.4 使用 Husky 为 Commitlint 注册 Git Hooks
+
+到目前为止，我们都必须自己去手动调用 `Commitlint` 才能作用，使用起来的步骤较原本多，也不直观，容易被忽略。
+
+接下来我们使用 `Husky` 将 `Commitlint` 融入 `Git flow` 中，让其更加的易用。使用 `husky add` 将指令加入 `Git hooks` ：
+
+```shell
+shell
+复制代码npx husky add .husky/commit-msg 'npx --no-install commitlint --edit "$1"'
+```
+
+修改完后，要重新注册 `Git hooks`：
+
+```shell
+shell
+复制代码npx husky install
+```
+
+这会触发相关的初始化工作。完成设定后，当你输入指令 `git commit`，在完成编辑讯息后会启动 `Commitlint` 检查讯息。
+
+## 24、Commitizen
+
+为了避免写出不符规范的 `commit message` 而提交失败， `Commitizen` 使用问答的方式，让使用者在完成问答时就可以边写出符合规范的信息，以减少来回的次数。
+
+`Commitizen` 是个指令式的工具，使用 `Commitizen` 来 `commit` 代码时会启动设定的`adapter`，使用 `adapter` 提供的问题一一询问开发者，每个问题都会确认一部分的 `commit message`，到最后将所有的回答组合起来，变成一个完整并符合规范的 `commit message`。
+
+### 24.1 cz-git
+
+指定提交文字规范，一款工程性更强、高度自定义、标准输出格式的 `commitizen` 适配器：
+
+```shell
+shell
+复制代码pnpm add commitizen cz-git -D
+```
+
+配置 `package.json`：
+
+```json
+json复制代码"config": {
+  "commitizen": {
+    "path": "node_modules/cz-git"
+  }
+}
+```
+
+### 24.2 配置 `commitlint.config.js` 文件
+
+```js
+js复制代码// @see: https://cz-git.qbenben.com/zh/guide
+/** @type {import('cz-git').UserConfig} */
+
+module.exports = {
+  ignores: [commit => commit.includes('init')],
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    // @see: https://commitlint.js.org/#/reference-rules
+    'body-leading-blank': [2, 'always'],
+    'footer-leading-blank': [1, 'always'],
+    'header-max-length': [2, 'always', 108],
+    'subject-empty': [2, 'never'],
+    'type-empty': [2, 'never'],
+    'subject-case': [0],
+    'type-enum': [
+      2,
+      'always',
+      [
+        'feat',
+        'fix',
+        'docs',
+        'style',
+        'refactor',
+        'perf',
+        'test',
+        'build',
+        'ci',
+        'chore',
+        'revert',
+        'wip',
+        'workflow',
+        'types',
+        'release'
+      ]
+    ]
+  },
+  prompt: {
+    messages: {
+      type: "Select the type of change that you're committing:",
+      scope: 'Denote the SCOPE of this change (optional):',
+      customScope: 'Denote the SCOPE of this change:',
+      subject: 'Write a SHORT, IMPERATIVE tense description of the change:\n',
+      body: 'Provide a LONGER description of the change (optional). Use "|" to break new line:\n',
+      breaking: 'List any BREAKING CHANGES (optional). Use "|" to break new line:\n',
+      footerPrefixsSelect: 'Select the ISSUES type of changeList by this change (optional):',
+      customFooterPrefixs: 'Input ISSUES prefix:',
+      footer: 'List any ISSUES by this change. E.g.: #31, #34:\n',
+      confirmCommit: 'Are you sure you want to proceed with the commit above?'
+      // 中文版
+      // type: "选择你要提交的类型 :",
+      // scope: "选择一个提交范围（可选）:",
+      // customScope: "请输入自定义的提交范围 :",
+      // subject: "填写简短精炼的变更描述 :\n",
+      // body: '填写更加详细的变更描述（可选）。使用 "|" 换行 :\n',
+      // breaking: '列举非兼容性重大的变更（可选）。使用 "|" 换行 :\n',
+      // footerPrefixsSelect: "选择关联issue前缀（可选）:",
+      // customFooterPrefixs: "输入自定义issue前缀 :",
+      // footer: "列举关联issue (可选) 例如: #31, #I3244 :\n",
+      // confirmCommit: "是否提交或修改commit ?"
+    },
+    types: [
+      {
+        value: 'feat',
+        name: 'feat:     🚀  A new feature',
+        emoji: '🚀'
+      },
+      {
+        value: 'fix',
+        name: 'fix:      🧩  A bug fix',
+        emoji: '🧩'
+      },
+      {
+        value: 'docs',
+        name: 'docs:     📚  Documentation only changes',
+        emoji: '📚'
+      },
+      {
+        value: 'style',
+        name: 'style:    🎨  Changes that do not affect the meaning of the code',
+        emoji: '🎨'
+      },
+      {
+        value: 'refactor',
+        name: 'refactor: ♻️   A code change that neither fixes a bug nor adds a feature',
+        emoji: '♻️'
+      },
+      {
+        value: 'perf',
+        name: 'perf:     ⚡️  A code change that improves performance',
+        emoji: '⚡️'
+      },
+      {
+        value: 'test',
+        name: 'test:     ✅  Adding missing tests or correcting existing tests',
+        emoji: '✅'
+      },
+      {
+        value: 'build',
+        name: 'build:    📦️   Changes that affect the build system or external dependencies',
+        emoji: '📦️'
+      },
+      {
+        value: 'ci',
+        name: 'ci:       🎡  Changes to our CI configuration files and scripts',
+        emoji: '🎡'
+      },
+      {
+        value: 'chore',
+        name: "chore:    🔨  Other changes that don't modify src or test files",
+        emoji: '🔨'
+      },
+      {
+        value: 'revert',
+        name: 'revert:   ⏪️  Reverts a previous commit',
+        emoji: '⏪️'
+      }
+      // 中文版
+      // { value: "特性", name: "特性:   🚀  新增功能", emoji: "🚀" },
+      // { value: "修复", name: "修复:   🧩  修复缺陷", emoji: "🧩" },
+      // { value: "文档", name: "文档:   📚  文档变更", emoji: "📚" },
+      // { value: "格式", name: "格式:   🎨  代码格式（不影响功能，例如空格、分号等格式修正）", emoji: "🎨" },
+      // { value: "重构", name: "重构:   ♻️  代码重构（不包括 bug 修复、功能新增）", emoji: "♻️" },
+      // { value: "性能", name: "性能:   ⚡️  性能优化", emoji: "⚡️" },
+      // { value: "测试", name: "测试:   ✅  添加疏漏测试或已有测试改动", emoji: "✅" },
+      // { value: "构建", name: "构建:   📦️  构建流程、外部依赖变更（如升级 npm 包、修改 webpack 配置等）", emoji: "📦️" },
+      // { value: "集成", name: "集成:   🎡  修改 CI 配置、脚本", emoji: "🎡" },
+      // { value: "回退", name: "回退:   ⏪️  回滚 commit", emoji: "⏪️" },
+      // { value: "其他", name: "其他:   🔨  对构建过程或辅助工具和库的更改（不影响源文件、测试用例）", emoji: "🔨" }
+    ],
+    useEmoji: true,
+    themeColorCode: '',
+    scopes: [],
+    allowCustomScopes: true,
+    allowEmptyScopes: true,
+    customScopesAlign: 'bottom',
+    customScopesAlias: 'custom',
+    emptyScopesAlias: 'empty',
+    upperCaseSubject: false,
+    allowBreakingChanges: ['feat', 'fix'],
+    breaklineNumber: 100,
+    breaklineChar: '|',
+    skipQuestions: [],
+    issuePrefixs: [{ value: 'closed', name: 'closed:   ISSUES has been processed' }],
+    customIssuePrefixsAlign: 'top',
+    emptyIssuePrefixsAlias: 'skip',
+    customIssuePrefixsAlias: 'custom',
+    allowCustomIssuePrefixs: true,
+    allowEmptyIssuePrefixs: true,
+    confirmColorize: true,
+    maxHeaderLength: Infinity,
+    maxSubjectLength: Infinity,
+    minSubjectLength: 0,
+    scopeOverrides: undefined,
+    defaultBody: '',
+    defaultIssues: '',
+    defaultScope: '',
+    defaultSubject: ''
+  }
+}
+```
+
+然后测试：
+
+```shell
+shell复制代码git add .
+git cz
+```
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ca0dabe4618e4240abc7016cba8d6353~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
+
+### 24.3 一键提交
+
+我们还可以通过一个script来集成之前所有的这些步骤：
+
+```json
+json复制代码"scripts": {
+    // ...
+    "commit": "git pull && git add -A && git-cz && git push",
+}
+```
+
+现在，我们只需要执行 `pnpm run commit` 即可完成代码的质量检测、`style format`、代码提交规范等一系列流程了。
+
+## 25、change-log
+
+### 25.1 简单使用
+
+安装 `standard-version`（[github地址](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fconventional-changelog%2Fstandard-version)）
+
+```shell
+shell
+复制代码pnpm add standard-version -D
+```
+
+自动化升级版本号、生成 `changelog` 及 `tag`
+
+添加到 `package.json` 脚本命令
+
+```json
+json复制代码"scripts": {
+    // ...
+    "release": "standard-version"
+}
+```
+
+通过 `pnpm run release`，生成日志。

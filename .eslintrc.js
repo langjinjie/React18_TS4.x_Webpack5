@@ -2,21 +2,22 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    node: true,
+    node: true
   },
   extends: [
     'airbnb-base',
     'eslint:recommended',
     'plugin:import/recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended' // <==== 增加一行
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
-      jsx: true,
+      jsx: true
     },
     ecmaVersion: 'latest',
-    sourceType: 'module',
+    sourceType: 'module'
   },
   plugins: ['react', '@typescript-eslint'],
   rules: {
@@ -51,8 +52,8 @@ module.exports = {
         js: 'never',
         jsx: 'never',
         ts: 'never',
-        tsx: 'never',
-      },
+        tsx: 'never'
+      }
     ],
     // "no-var": "error", // 要求使用 let 或 const 而不是 var
     // "no-multiple-empty-lines": ["error", { max: 1 }], // 不允许多个空行
@@ -72,7 +73,7 @@ module.exports = {
     // "@typescript-eslint/no-var-requires": "off", // 不允许在 import 语句中使用 require 语句
     // "@typescript-eslint/no-empty-function": "off", // 禁止空函数
     // "@typescript-eslint/no-use-before-define": "off", // 禁止在变量定义之前使用它们
-    '@typescript-eslint/ban-ts-comment': 'off', // 禁止 @ts-<directive> 使用注释或要求在指令后进行描述
+    '@typescript-eslint/ban-ts-comment': 'off' // 禁止 @ts-<directive> 使用注释或要求在指令后进行描述
     // "@typescript-eslint/no-non-null-assertion": "off", // 不允许使用后缀运算符的非空断言(!)
     // "@typescript-eslint/explicit-module-boundary-types": "off", // 要求导出函数和类的公共类方法的显式返回和参数类型
 
@@ -81,16 +82,19 @@ module.exports = {
     // "react-hooks/exhaustive-deps": "off"
   },
   settings: {
+    react: {
+      version: 'detect'
+    },
     'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
     'import/parsers': {
-      '@typescript-eslint/parser': ['.ts', '.tsx'],
+      '@typescript-eslint/parser': ['.ts', '.tsx']
     },
     'import/resolver': {
       node: {
         paths: ['src'],
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
-        moduleDirectory: ['node_modules', 'src/'],
-      },
-    },
-  },
+        moduleDirectory: ['node_modules', 'src/']
+      }
+    }
+  }
 };

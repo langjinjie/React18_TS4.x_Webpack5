@@ -1,6 +1,4 @@
-import {
-  Suspense, lazy, useEffect, useState,
-} from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { test } from 'src/utils/base';
 import { Icon, Demo1 } from 'src/components';
 import Class from 'src/pages/Class/Class';
@@ -48,7 +46,6 @@ function Index() {
     hello('123');
     // @ts-ignore
     console.log('jsonTest', JSON.parse(jsonTest as string));
-    console.log('123');
   }, []);
   return (
     <>

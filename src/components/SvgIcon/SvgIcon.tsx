@@ -2,7 +2,7 @@
 // import style from './style.module.less'
 
 interface ISvgIconProps {
-  name: string
+  name: string;
 }
 
 const SvgIcon: React.FC<ISvgIconProps> = ({ name }) => (

@@ -1,15 +1,16 @@
 {
+  "prettier.requireConfig": true,
   "search.exclude": {
     "/node_modules": true,
     "dist": true,
     "pnpm-lock.yaml": true
   },
-  "files.autoSave": "onFocusChange",
+  // "files.autoSave": "onFocusChange",
   "editor.formatOnSave": true,
-  "editor.formatOnType": true,
+  "editor.formatOnType": false,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -18,7 +19,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
@@ -34,7 +35,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.markdownlint": true,
     "source.fixAll.stylelint": true,
-    "source.fixAll.eslint": true,
   },
   "stylelint.validate": ["css", "less", "sass", "stylus", "postcss"],
   "eslint.enable": true,

@@ -2164,7 +2164,7 @@ VS Code 的 `EditorConfig` 目前支持下列属性：
 pnpm add prettier -D
 ```
 
-### 18.2 新建.prettier.js
+### 18.2 新建.prettierrc.js
 
 在根目录下新建 `.prettierrc.js` 和 `.prettierignore` 文件：
 
@@ -2549,7 +2549,7 @@ module.exports = {
 在`package.json`添加`lint-staged`配置
 
 ```json
-json复制代码"lint-staged": {
+"lint-staged": {
   "src/**/*.{ts,tsx}": [
     "pnpm run lint:eslint",
     "pnpm run lint:prettier"
@@ -2560,15 +2560,13 @@ json复制代码"lint-staged": {
 因为要检测 `git` 暂存区代码，所以如果你的项目还没有使用 `git` 来做版本控制，需要执行`git init`初始化一下`git`：
 
 ```shell
-shell
-复制代码git init 
+git init 
 ```
 
 初始化`git`完成后就可以进行测试了，先提交一下没有语法问题的`App.tsx`
 
 ```shell
-shell
-复制代码git add src/App.tsx 
+git add src/App.tsx 
 ```
 
 把`src/App.tsx`提交到暂存区后，执行`npx lint-staged`，会顺利通过检测。
@@ -2576,14 +2574,13 @@ shell
 假如我们现在把 `package.json` 中的 `"lint:eslint"` 改一下，加一个 `--max-warnings=0`，表示允许最多 0 个警告，就是只要出现警告就会报错：
 
 ```json
-json
-复制代码"lint:eslint": "eslint --fix --ext .js,.ts,.tsx ./src --max-warnings=0",
+"lint:eslint": "eslint --fix --ext .js,.ts,.tsx ./src --max-warnings=0",
 ```
 
 然后在 `App.tsx` 中加入一个未使用的变量：
 
 ```ts
-ts复制代码// ...
+// ...
 const a = 1
 // ...
 ```
@@ -2591,7 +2588,7 @@ const a = 1
 然后执行：
 
 ```js
-js复制代码git add src/App.tsx 
+git add src/App.tsx 
 
 npx lint-staged
 ```
@@ -2607,7 +2604,7 @@ npx lint-staged
 需要注意的是，执行 tsc 命令可能会生成一个编译后的产物文件，需想要避免这个问题，需要在 `tsconfig.json` 中加入 `"noEmit": true`：
 
 ```json
-json复制代码{
+{
   "compilerOptions": {
     "target": "es2016", // 指定ECMAScript目标版本
     "esModuleInterop": true,
@@ -2635,7 +2632,7 @@ json复制代码{
 更多的配置参考：
 
 ```json
-json复制代码{
+{
   "compilerOptions": {
 
     /* 基本选项 */
@@ -2701,8 +2698,7 @@ json复制代码{
 发现没有检测到报错，所以需要配置下`tsc`来检测类型，在`package.json`添加脚本命令
 
 ```json
-json
-复制代码"pre-check": "tsc && npx lint-staged" 
+"pre-check": "tsc && npx lint-staged" 
 ```
 
 执行`pnpm run pre-check`，发现已经可以检测出类型报错了。
@@ -2720,8 +2716,7 @@ json
 #### 22.3.2 安装husky
 
 ```shell
-shell
-复制代码pnpm add husky -D 
+pnpm add husky -D
 ```
 
 #### 22.3.3 配置husky的pre-commit钩子
@@ -2729,15 +2724,13 @@ shell
 生成`.husky`配置文件夹（如果项目中没有初始化`git`，需要先执行`git init`）
 
 ```shell
-shell
-复制代码npx husky install 
+npx husky install 
 ```
 
 会在项目根目录生成 `.husky`文件夹，生成文件成功后，需要让`husky`支持监听`pre-commit`钩子，监听到后执行上面定义的`pnpm run pre-check`语法检测。
 
 ```shell
-shell
-复制代码npx husky add .husky/pre-commit 'pnpm run pre-check' 
+npx husky add .husky/pre-commit 'pnpm run pre-check' 
 ```
 
 会在 `.husky`目录下生成`pre-commit`文件，里面可以看到我们设置的`npm run pre-check`命令。
@@ -2747,7 +2740,7 @@ shell
 然后提交代码进行测试
 
 ```shell
-shell复制代码git add . 
+git add . 
 git commit -m "feat: add code validate" 
 ```
 
@@ -2773,8 +2766,7 @@ git commit -m "feat: add code validate"
 首先安装 `Commitlint` ：
 
 ```shell
-shell
-复制代码pnpm add @commitlint/cli -D
+pnpm add @commitlint/cli -D
 ```
 
 ### 23.2 使用Commitlint
@@ -2782,7 +2774,7 @@ shell
 安装完成后，由于 `Commitlint` 的配置档是必要的，因此要建立配置档 `commitlint.config.js`：
 
 ```js
-js复制代码module.exports = {
+module.exports = {
   rules: {
     'header-min-length': [2, 'always', 10],
   },
@@ -2809,14 +2801,13 @@ js复制代码module.exports = {
 为了节省配置规则的时间， `Commitlint` 可以使用预先配置的规则包来设定多项规则。使用前须要先安装：
 
 ```shell
-shell
-复制代码pnpm add @commitlint/config-conventional -D
+pnpm add @commitlint/config-conventional -D
 ```
 
 这里使用 `@commitlint/config-conventional` 是 `Commitlint` 提供的规则包。安装完成后，要在配置中设定使用规则包：
 
 ```js
-js复制代码module.exports = {
+module.exports = {
   extends: ['@commitlint/config-conventional'],
   // ...
 };
@@ -2831,15 +2822,13 @@ js复制代码module.exports = {
 接下来我们使用 `Husky` 将 `Commitlint` 融入 `Git flow` 中，让其更加的易用。使用 `husky add` 将指令加入 `Git hooks` ：
 
 ```shell
-shell
-复制代码npx husky add .husky/commit-msg 'npx --no-install commitlint --edit "$1"'
+npx husky add .husky/commit-msg 'npx --no-install commitlint --edit "$1"'
 ```
 
 修改完后，要重新注册 `Git hooks`：
 
 ```shell
-shell
-复制代码npx husky install
+npx husky install
 ```
 
 这会触发相关的初始化工作。完成设定后，当你输入指令 `git commit`，在完成编辑讯息后会启动 `Commitlint` 检查讯息。
@@ -2855,14 +2844,13 @@ shell
 指定提交文字规范，一款工程性更强、高度自定义、标准输出格式的 `commitizen` 适配器：
 
 ```shell
-shell
-复制代码pnpm add commitizen cz-git -D
+pnpm add commitizen cz-git -D
 ```
 
 配置 `package.json`：
 
 ```json
-json复制代码"config": {
+"config": {
   "commitizen": {
     "path": "node_modules/cz-git"
   }
@@ -2872,7 +2860,7 @@ json复制代码"config": {
 ### 24.2 配置 `commitlint.config.js` 文件
 
 ```js
-js复制代码// @see: https://cz-git.qbenben.com/zh/guide
+// @see: https://cz-git.qbenben.com/zh/guide
 /** @type {import('cz-git').UserConfig} */
 
 module.exports = {
@@ -3036,7 +3024,7 @@ module.exports = {
 然后测试：
 
 ```shell
-shell复制代码git add .
+git add .
 git cz
 ```
 
@@ -3047,7 +3035,7 @@ git cz
 我们还可以通过一个script来集成之前所有的这些步骤：
 
 ```json
-json复制代码"scripts": {
+"scripts": {
     // ...
     "commit": "git pull && git add -A && git-cz && git push",
 }
@@ -3062,8 +3050,7 @@ json复制代码"scripts": {
 安装 `standard-version`（[github地址](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2Fconventional-changelog%2Fstandard-version)）
 
 ```shell
-shell
-复制代码pnpm add standard-version -D
+pnpm add standard-version -D
 ```
 
 自动化升级版本号、生成 `changelog` 及 `tag`
@@ -3071,7 +3058,7 @@ shell
 添加到 `package.json` 脚本命令
 
 ```json
-json复制代码"scripts": {
+"scripts": {
     // ...
     "release": "standard-version"
 }

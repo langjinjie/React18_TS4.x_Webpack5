@@ -14,7 +14,7 @@ export default class Class extends PureComponent<any, any> {
   constructor(props: any) {
     super(props);
     this.state = {
-      name: 'jeff',
+      name: 'jeff'
     };
   }
 

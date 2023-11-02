@@ -38,4 +38,7 @@
   },
   "stylelint.validate": ["css", "less", "sass", "stylus", "postcss"],
   "eslint.enable": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 }

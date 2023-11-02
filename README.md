@@ -1125,7 +1125,6 @@ pnpm add @babel/plugin-proposal-decorators -D
 
 ## 12、热更新
 
-
 在之前的章节我们已经在 `devServer`中配置 `hot`为 `true`，在 `webpack4`中，还需要在插件中添加了 `HotModuleReplacementPlugin`，在 `webpack5`中，只要 `devServer.hot`为 `true`了，该插件就已经内置了。
 
 现在开发模式下修改 `css`和 `less`文件，页面样式可以在不刷新浏览器的情况实时生效，因为此时样式都在 `style`标签里面，`style-loader`做了替换样式的热替换功能。但是修改 `App.tsx`，浏览器会自动刷新后再显示修改后的内容，但我们想要的不是刷新浏览器，而是在不需要刷新浏览器的前提下模块热更新，并且能够保留 `react`组件的状态。
@@ -1215,6 +1214,7 @@ module.exports = {
 };
 
 ```
+
 ## 13、webpack构建速度优化
 
 ### 13.1webpack进度条
@@ -1292,7 +1292,7 @@ export default baseConfig;
 pnpm add speed-measure-webpack-plugin -D
 ```
 
-使用的时候为了不影响到正常的开发/打包模式，我们选择新建一个配置文件，新增`webpack`构建分析配置文件`build/webpack.analy.ts`
+使用的时候为了不影响到正常的开发/打包模式，我们选择新建一个配置文件，新增 `webpack`构建分析配置文件 `build/webpack.analy.ts`
 
 ```typescript
 const prodConfig = require('./webpack.prod.js') // 引入打包配置
@@ -1307,7 +1307,7 @@ module.exports = smp.wrap(merge(prodConfig, {
 
 ```
 
-修改`package.json`添加启动`webpack`打包分析脚本命令，在`script`新增：
+修改 `package.json`添加启动 `webpack`打包分析脚本命令，在 `script`新增：
 
 ```json
 {
@@ -1321,17 +1321,17 @@ module.exports = smp.wrap(merge(prodConfig, {
 
 ```
 
-执行`npm run build:analy`命令
+执行 `npm run build:analy`命令
 
 ![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/e4a14a7402ba4e2ca3e7a139a371045c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp)
 
-可以在图中看到各`plugin`和`loader`的耗时时间,现在因为项目内容比较少，所以耗时都比较少，在真正的项目中可以通过这个来分析打包时间花费在什么地方，然后来针对性的优化。
+可以在图中看到各 `plugin`和 `loader`的耗时时间,现在因为项目内容比较少，所以耗时都比较少，在真正的项目中可以通过这个来分析打包时间花费在什么地方，然后来针对性的优化。
 
 ### 13.2 开启持久化存储缓存
 
-在`webpack5`之前做缓存是使用`babel-loader`缓存解决 js 的解析结果，`cache-loader`缓存`css`等资源的解析结果，还有模块缓存插件`hard-source-webpack-plugin`，配置好缓存后第二次打包，通过对文件做哈希对比来验证文件前后是否一致，如果一致则采用上一次的缓存，可以极大地节省时间。
+在 `webpack5`之前做缓存是使用 `babel-loader`缓存解决 js 的解析结果，`cache-loader`缓存 `css`等资源的解析结果，还有模块缓存插件 `hard-source-webpack-plugin`，配置好缓存后第二次打包，通过对文件做哈希对比来验证文件前后是否一致，如果一致则采用上一次的缓存，可以极大地节省时间。
 
-`webpack5` 较于 `webpack4`，新增了持久化缓存、改进缓存算法等优化，通过配置 [webpack 持久化缓存](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Fconfiguration%2Fcache%2F%23root)，来缓存生成的 `webpack` 模块和 `chunk`，改善下一次打包的构建速度,可提速 `90%` 左右,配置也简单，修改`webpack.base.ts`：
+`webpack5` 较于 `webpack4`，新增了持久化缓存、改进缓存算法等优化，通过配置 [webpack 持久化缓存](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Fconfiguration%2Fcache%2F%23root)，来缓存生成的 `webpack` 模块和 `chunk`，改善下一次打包的构建速度,可提速 `90%` 左右,配置也简单，修改 `webpack.base.ts`：
 
 ```ts
 ts复制代码// webpack.base.ts
@@ -1351,9 +1351,7 @@ module.exports = {
 | 开发模式 | 4151毫秒   | 1310毫秒   |
 | 打包模式 | 4945毫秒   | 590毫秒    |
 
-
-
-通过开启`webpack5`持久化存储缓存，极大缩短了启动和打包的时间。缓存的存储位置在`node_modules/.cache/webpack`，里面又区分了`development`和`production`缓存。
+通过开启 `webpack5`持久化存储缓存，极大缩短了启动和打包的时间。缓存的存储位置在 `node_modules/.cache/webpack`，里面又区分了 `development`和 `production`缓存。
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/fd880d8b1f5b46ffa9d012209f92c6af~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
@@ -1367,7 +1365,7 @@ module.exports = {
 - `parallel-webpack`
 - `HappyPack`
 
-`webpack`的`loader`默认在单线程执行，现代电脑一般都有多核`cpu`，可以借助多核`cpu`开启多线程`loader`解析，可以极大地提升loader解析的速度，[thread-loader](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Floaders%2Fthread-loader%2F%23root)就是用来开启多进程解析`loader`的，安装依赖
+`webpack`的 `loader`默认在单线程执行，现代电脑一般都有多核 `cpu`，可以借助多核 `cpu`开启多线程 `loader`解析，可以极大地提升loader解析的速度，[thread-loader](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Floaders%2Fthread-loader%2F%23root)就是用来开启多进程解析 `loader`的，安装依赖
 
 ```arduino
 arduino
@@ -1376,7 +1374,7 @@ arduino
 
 使用时,需将此 `loader` 放置在其他 `loader` 之前。放置在此 `loader` 之后的 `loader` 会在一个独立的 `worker` 池中运行。
 
-修改`webpack.base.ts`
+修改 `webpack.base.ts`
 
 ```typescript
 module: {
@@ -1389,18 +1387,18 @@ module: {
 }
 ```
 
-由于`thread-loader`不支持抽离`css`插件`MiniCssExtractPlugin.loader`(下面会讲)，所以这里只配置了多进程解析 `ts`。
+由于 `thread-loader`不支持抽离 `css`插件 `MiniCssExtractPlugin.loader`(下面会讲)，所以这里只配置了多进程解析 `ts`。
 
 > 值得注意的是，开启多线程也是需要启动时间，`thread-loader` 会将你的 `loader` 放置在一个 `worker` 池里面运行，每个 `worker` 都是一个单独的有 `600ms` 限制的 node.js 进程。同时跨进程的数据交换也会被限制，所以最好是项目变大到一定程度之时再采用，否则效果反而不好。
 
 ### 13.4 缩小构建目标
 
-一般第三库都是已经处理好的,不需要再次使用`loader`去解析，可以按照实际情况合理配置`loader`的作用范围，来减少不必要的`loader`解析，节省时间，通过使用 `include`和`exclude` 两个配置项，可以实现这个功能，常见的例如：
+一般第三库都是已经处理好的,不需要再次使用 `loader`去解析，可以按照实际情况合理配置 `loader`的作用范围，来减少不必要的 `loader`解析，节省时间，通过使用 `include`和 `exclude` 两个配置项，可以实现这个功能，常见的例如：
 
 - `include`：只解析该选项配置的模块
 - `exclude`：不解该选项配置的模块,优先级更高
 
-修改`webpack.base.ts`
+修改 `webpack.base.ts`
 
 ```ts
 ts复制代码module: {
@@ -1414,11 +1412,11 @@ ts复制代码module: {
 }
 ```
 
-其他`loader`也是相同的配置方式，如果除`src`文件外也还有需要解析的，就把对应的目录地址加上就可以了，比如需要引入`antd`的`css`，可以把`antd`的文件目录路径添加解析`css`规则到`include`里面。
+其他 `loader`也是相同的配置方式，如果除 `src`文件外也还有需要解析的，就把对应的目录地址加上就可以了，比如需要引入 `antd`的 `css`，可以把 `antd`的文件目录路径添加解析 `css`规则到 `include`里面。
 
 ### 13.5 devtools配置
 
-开发过程中或者打包后的代码都是`webpack`处理后的代码，如果进行调试肯定希望看到源代码，而不是编译后的代码，`source map`就是用来做源码映射的，不同的映射模式会明显影响到构建和重新构建的速度，`devtool`选项就是`webpack`提供的选择源码映射方式的配置。
+开发过程中或者打包后的代码都是 `webpack`处理后的代码，如果进行调试肯定希望看到源代码，而不是编译后的代码，`source map`就是用来做源码映射的，不同的映射模式会明显影响到构建和重新构建的速度，`devtool`选项就是 `webpack`提供的选择源码映射方式的配置。
 
 `devtool`的命名规则为：
 
@@ -1426,16 +1424,14 @@ ts复制代码module: {
 ^(inline-|hidden-|eval-)?(nosources-)?(cheap-(module-)?)?source-map$
 ```
 
-| 关键字      | 描述                                                         |
-| ----------- | ------------------------------------------------------------ |
-| `inline`    | 代码内通过 `dataUrl` 形式引入 `SourceMap`                    |
-| `hidden`    | 生成 `SourceMap` 文件,但不使用                               |
+| 关键字        | 描述                                                               |
+| ------------- | ------------------------------------------------------------------ |
+| `inline`    | 代码内通过 `dataUrl` 形式引入 `SourceMap`                      |
+| `hidden`    | 生成 `SourceMap` 文件,但不使用                                   |
 | `eval`      | `eval(...)` 形式执行代码,通过 `dataUrl` 形式引入 `SourceMap` |
-| `nosources` | 不生成 `SourceMap`                                           |
-| `cheap`     | 只需要定位到行信息,不需要列信息                              |
-| `module`    | 展示源代码中的错误位置                                       |
-
-
+| `nosources` | 不生成 `SourceMap`                                               |
+| `cheap`     | 只需要定位到行信息,不需要列信息                                    |
+| `module`    | 展示源代码中的错误位置                                             |
 
 开发环境推荐：`eval-cheap-module-source-map`
 
@@ -1443,7 +1439,7 @@ ts复制代码module: {
 - 开发中，我们每行代码不会写的太长，只需要定位到行就行，所以加上 `cheap`
 - 我们希望能够找到源代码的错误，而不是打包后的，所以需要加上 `module`
 
-修改`webpack.dev.ts`
+修改 `webpack.dev.ts`
 
 ```ts
 // webpack.dev.ts
@@ -1469,7 +1465,7 @@ module.exports = {
 
 ### 14.1bundle体积分析工具
 
-`webpack-bundle-analyzer`是分析`webpack`打包后文件的插件，使用交互式可缩放树形图可视化`webpack` 输出文件的大小。通过该插件可以对打包后的文件进行观察和分析，可以方便我们对不完美的地方针对性的优化，安装依赖：
+`webpack-bundle-analyzer`是分析 `webpack`打包后文件的插件，使用交互式可缩放树形图可视化 `webpack` 输出文件的大小。通过该插件可以对打包后的文件进行观察和分析，可以方便我们对不完美的地方针对性的优化，安装依赖：
 
 ```shell
 pnpm add webpack-bundle-analyzer -D
@@ -1501,13 +1497,13 @@ module.exports = smp.wrap(merge(prodConfig, {
 
 ### 14.2 样式提取
 
-在开发环境我们希望`css`嵌入在`style`标签里面，方便样式热替换，但打包时我们希望把`css`单独抽离出来,方便配置缓存策略。而插件[mini-css-extract-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fwebpack-contrib%2Fmini-css-extract-plugin)就是来帮我们做这件事的，安装依赖：
+在开发环境我们希望 `css`嵌入在 `style`标签里面，方便样式热替换，但打包时我们希望把 `css`单独抽离出来,方便配置缓存策略。而插件[mini-css-extract-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fwebpack-contrib%2Fmini-css-extract-plugin)就是来帮我们做这件事的，安装依赖：
 
 ```shell
 pnpm add mini-css-extract-plugin -D
 ```
 
-修改 `webpack.base.ts`，根据环境变量设置开发环境使用 `style-looader`，打包模式抽离`css`
+修改 `webpack.base.ts`，根据环境变量设置开发环境使用 `style-looader`，打包模式抽离 `css`
 
 ```typescript
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
@@ -1539,7 +1535,7 @@ const styleLoadersArray = [
 ]
 ```
 
-再修改`webpack.prod.ts`，打包时添加抽离`css`插件：
+再修改 `webpack.prod.ts`，打包时添加抽离 `css`插件：
 
 ```typescript
 import { Configuration } from 'webpack' // 引入webpack的类型接口
@@ -1564,13 +1560,13 @@ const prodConfig: Configuration = merge(baseConfig, {
 export default prodConfig
 ```
 
-配置完成后，在开发模式`css`会嵌入到`style`标签里面，方便样式热替换，打包时会把`css`抽离成单独的`css`文件。
+配置完成后，在开发模式 `css`会嵌入到 `style`标签里面，方便样式热替换，打包时会把 `css`抽离成单独的 `css`文件。
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/92dabe1db7ea482ba14f54785c9299e0~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
 ### 14.3 样式压缩
 
-可以看到，上面配置了打包时把`css`抽离为单独`css`文件的配置，打开打包后的文件查看，可以看到默认`css`是没有压缩的，需要手动配置一下压缩`css`的插件。
+可以看到，上面配置了打包时把 `css`抽离为单独 `css`文件的配置，打开打包后的文件查看，可以看到默认 `css`是没有压缩的，需要手动配置一下压缩 `css`的插件。
 
 可以借助 [css-minimizer-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcss-minimizer-webpack-plugin) 来压缩css，安装依赖：
 
@@ -1594,7 +1590,7 @@ module.exports = {
 }
 ```
 
-再次执行打包就可以看到`css`已经被压缩了：
+再次执行打包就可以看到 `css`已经被压缩了：
 
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7b24ef715b9e421b90fddaeacdacb7b1~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
@@ -1606,9 +1602,7 @@ module.exports = {
 | css-minimizer-webpack-plugin | 压缩css文件                                                |
 | compression-webpack-plugin   | 预先准备的资源压缩版本，使用 Content-Encoding 提供访问服务 |
 
-
-
-设置mode为production时,webpack会使用内置插件[terser-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fterser-webpack-plugin)压缩js文件,该插件默认支持多线程压缩,但是上面配置`optimization.minimizer`压缩css后,js压缩就失效了,需要手动再添加一下,`webpack`内部安装了该插件,由于`pnpm`解决了幽灵依赖问题,如果用的`pnpm`的话,需要手动再安装一下依赖。
+设置mode为production时,webpack会使用内置插件[terser-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fterser-webpack-plugin)压缩js文件,该插件默认支持多线程压缩,但是上面配置 `optimization.minimizer`压缩css后,js压缩就失效了,需要手动再添加一下,`webpack`内部安装了该插件,由于 `pnpm`解决了幽灵依赖问题,如果用的 `pnpm`的话,需要手动再安装一下依赖。
 
 ```shell
 pnpm i terser-webpack-plugin compression-webpack-plugin -D
@@ -1671,22 +1665,20 @@ export default prodConfig
 项目维护的时候，一般只会修改一部分代码，可以合理配置文件缓存，来提升前端加载页面速度和减少服务器压力，而 `hash` 就是浏览器缓存策略很重要的一部分。`webpack` 打包的 `hash` 分三种：
 
 - `hash`：跟整个项目的构建相关，只要项目里有文件更改，整个项目构建的 `hash` 值都会更改，并且全部文件都共用相同的 `hash` 值
-- `chunkhash`：不同的入口文件进行依赖文件解析、构建对应的`chunk`，生成对应的哈希值，文件本身修改或者依赖文件修改，`chunkhash` 值会变化
+- `chunkhash`：不同的入口文件进行依赖文件解析、构建对应的 `chunk`，生成对应的哈希值，文件本身修改或者依赖文件修改，`chunkhash` 值会变化
 - `contenthash`：每个文件自己单独的 `hash` 值，文件的改动只会影响自身的 `hash` 值
 
 `hash` 是在输出文件时配置的，格式是 `filename: "[name].[chunkhash:8][ext]"`，`[xx]` 格式是 `webpack` 提供的占位符，`:8` 是生成 `hash` 的长度。
 
-| 占位符        | 解释                         |
-| ------------- | ---------------------------- |
-| `ext`         | 文件后缀名                   |
-| `name`        | 文件名                       |
-| `path`        | 文件相对路径                 |
-| `folder`      | 文件所在文件夹               |
-| `hash`        | 每次构建生成的唯一 `hash` 值 |
-| `chunkhash`   | 根据 `chunk` 生成 `hash` 值  |
-| `contenthash` | 根据文件内容生成 `hash` 值   |
-
-
+| 占位符          | 解释                            |
+| --------------- | ------------------------------- |
+| `ext`         | 文件后缀名                      |
+| `name`        | 文件名                          |
+| `path`        | 文件相对路径                    |
+| `folder`      | 文件所在文件夹                  |
+| `hash`        | 每次构建生成的唯一 `hash` 值  |
+| `chunkhash`   | 根据 `chunk` 生成 `hash` 值 |
+| `contenthash` | 根据文件内容生成 `hash` 值    |
 
 因为 `js` 我们在生产环境里会把一些公共库和程序入口文件区分开，单独打包构建，采用 `chunkhash` 的方式生成哈希值，那么只要我们不改动公共库的代码，就可以保证其哈希值不会受影响，可以继续使用浏览器缓存，所以js适合使用 `chunkhash`。
 
@@ -1794,9 +1786,7 @@ js中会有未使用到的代码，css中也会有未被页面使用到的样式
 pnpm i purgecss-webpack-plugin glob-all -D
 ```
 
-
-
-修改`webpack.prod.ts`:
+修改 `webpack.prod.ts`:
 
 ```typescript
 // 清理无用css，检测src下所有tsx文件和public下index.html中使用的类名和id和标签名称
@@ -1825,7 +1815,7 @@ js中会有未安装使用到的代码，css中也会有未被页面使用到的
 pnpm i purgecss-webpack-plugin glob-all -D
 ```
 
-修改`webpack.prod.ts`：
+修改 `webpack.prod.ts`：
 
 ```typescript
 // 清理无用css，检测src下所有tsx文件和public下index.html中使用的类名和id和标签名称
@@ -1848,11 +1838,11 @@ new PurgeCSSPlugin({
 
 ### 14.9 资源懒加载
 
-像`react`，`vue`等单页面应用打包默认回打包到一个js文件中，虽然使用代码分割可以把`node_modules`模块和公共模块分离，但页面初始加载还是会把整个项目的代码下载下来，其实只需要公共资源和当前页面的资源就可以了，其他页面可以等使用到的时候在加载，可以有效提升首屏加载速度。
+像 `react`，`vue`等单页面应用打包默认回打包到一个js文件中，虽然使用代码分割可以把 `node_modules`模块和公共模块分离，但页面初始加载还是会把整个项目的代码下载下来，其实只需要公共资源和当前页面的资源就可以了，其他页面可以等使用到的时候在加载，可以有效提升首屏加载速度。
 
-`webpack`默认支持资源懒加载，只需要引入资源使用`import`语法来引入资源，`webpack`打包的时候就会自动打包为单独的资源文件，等使用到的时候动态加载。
+`webpack`默认支持资源懒加载，只需要引入资源使用 `import`语法来引入资源，`webpack`打包的时候就会自动打包为单独的资源文件，等使用到的时候动态加载。
 
-以懒加载组件和`css`为例，新建懒加载组件`src/component/LazyDemo.tsx`：
+以懒加载组件和 `css`为例，新建懒加载组件 `src/component/LazyDemo.tsx`：
 
 ```tsx
 import React from "react";
@@ -1873,7 +1863,7 @@ rel的属性值
 - `preload`是告诉浏览器页面必定需要的资源，浏览器一定会加载这些资源。
 - `prefetch`是告诉浏览器页面可能需要的资源，浏览器不一定会加载这些资源，会在空闲时加载。
 
-借助`preload-webpack-plugin`插件
+借助 `preload-webpack-plugin`插件
 
 #### 1.基础配置
 
@@ -2032,8 +2022,6 @@ javascript复制代码plugins: [
 ]
 ```
 
-
-
 ### 14.11 gzip压缩
 
 见 14.4
@@ -2046,7 +2034,7 @@ javascript复制代码plugins: [
   - [DllPlugin](https://link.juejin.cn?target=https%3A%2F%2Fwebpack.docschina.org%2Fplugins%2Fdll-plugin%23root)：动态链接库
   - [sideEffect](https://link.juejin.cn?target=https%3A%2F%2Fwebpack.docschina.org%2Fconfiguration%2Foptimization%2F%23optimizationsideeffects)：副作用
   - [externals](https://link.juejin.cn?target=https%3A%2F%2Fwww.webpackjs.com%2Fconfiguration%2Fexternals%2F): 外包拓展，打包时会忽略配置的依赖，会从上下文中寻找对应变量
-  - [module.noParse](https://link.juejin.cn?target=https%3A%2F%2Fwww.webpackjs.com%2Fconfiguration%2Fmodule%2F%23module-noparse): 匹配到设置的模块，将不进行依赖解析，适合`jquery`，`boostrap`这类不依赖外部模块的包
+  - [module.noParse](https://link.juejin.cn?target=https%3A%2F%2Fwww.webpackjs.com%2Fconfiguration%2Fmodule%2F%23module-noparse): 匹配到设置的模块，将不进行依赖解析，适合 `jquery`，`boostrap`这类不依赖外部模块的包
   - [ignorePlugin](https://link.juejin.cn?target=https%3A%2F%2Fwebpack.js.org%2Fplugins%2Fignore-plugin%2F%23root): 可以使用正则忽略一部分文件，常在使用多语言的包时可以把非中文语言包过滤掉
 
 ## 16 代码规范
@@ -2056,13 +2044,9 @@ javascript复制代码plugins: [
 ### 16.1 代码规范格式规范和语法检测工具
 
 1. [**EditorConfig**](https://link.juejin.cn?target=https%3A%2F%2Feditorconfig.org%2F)：`EditorConfig` 是一个用于统一编辑器和 IDE 的配置文件的工具。它可以帮助团队协作中的开发人员保持一致的编码风格，无论他们使用的是哪个编辑器或 IDE。`EditorConfig` 支持配置文件的语法规则、缩进、换行符、字符编码等，可以通过在项目中添加一个 `.editorconfig` 文件来使用。
-
 2. [**ESLint**](https://link.juejin.cn?target=https%3A%2F%2Feslint.org%2F)：`ESLint` 是一个广泛使用的 JavaScript 代码检查工具，它可以帮助开发人员遵循代码风格规范，并发现代码中潜在的问题。`ESLint` 有很多可定制的规则，可以根据团队的代码风格和项目的要求进行配置。ESLint 还支持集成到许多编辑器和 IDE 中，如 Visual Studio Code、Sublime Text、Atom、WebStorm 等，以提供实时的语法和格式错误检查。
-
 3. [**Prettier**](https://link.juejin.cn?target=https%3A%2F%2Fprettier.io%2F)：`Prettier` 是一个代码格式化工具，它可以自动化地将代码格式化为一致的风格。与 `ESLint` 不同的是，`Prettier` 不关心代码的语义或质量，只关心代码的外观。`Prettier` 与 `ESLint` 集成使用可以让代码保持一致性和规范性。
-
 4. [**Stylelint**](https://link.juejin.cn?target=https%3A%2F%2Fstylelint.io%2F)：`Stylelint` 是一个 CSS 样式检查工具，它可以帮助开发人员遵循 CSS 代码风格规范，并发现代码中潜在的问题。`Stylelint` 有很多可定制的规则，可以根据团队的代码风格和项目的要求进行配置。`Stylelint` 也支持集成到许多编辑器和 IDE 中，如 Visual Studio Code、Sublime Text、Atom、WebStorm 等，以提供实时的语法和格式错误检查。
-
 5. [**Markdownlint**](https://link.juejin.cn?target=https%3A%2F%2Fgithub.com%2FDavidAnson%2Fmarkdownlint)：`Markdownlint` 是一个用于检查 `Markdown` 文件中语法和格式的工具，它可以帮助你保证 `Markdown` 文件的一致性和可读性。`Markdownlint` 支持在命令行、编辑器和 `CI/CD` 工具中使用。
 
 这些工具都有相似的目标：
@@ -2073,13 +2057,9 @@ javascript复制代码plugins: [
 总的来说：
 
 - `EditorConfig`: 跨编辑器和IDE编写代码，保持一致的简单编码风格；
-
 - `Prettier`: 专注于代码格式化的工具，美化代码；
-
 - `ESLint`：专注于代码质量检测、编码风格约束等；
-
 - `Stylelint`：专注于样式代码语法检查和格式错误检查；
-
 - `Markdownlint`：专注作为 `Markdown` 的 `linter`；
 
 ### 16.2 代码提交规范工具
@@ -2119,7 +2099,7 @@ json复制代码{
 
 ### 17.3 新建.editorconfig
 
-在根目录新建`.editorconfig`文件：
+在根目录新建 `.editorconfig`文件：
 
 ```ini
 ini复制代码# https://editorconfig.org
@@ -2197,7 +2177,7 @@ README.md
 
 ### 18.3 配置.vscode/setting.json
 
-配置前两步后，虽然已经配置`prettier`格式化规则，但还需要让`vscode`来支持保存后出发格式化，在项目根目录新建`.vscode`文件夹，内部新建`settings.json`文件配置文件，代码如下：
+配置前两步后，虽然已经配置 `prettier`格式化规则，但还需要让 `vscode`来支持保存后出发格式化，在项目根目录新建 `.vscode`文件夹，内部新建 `settings.json`文件配置文件，代码如下：
 
 ```json
 {
@@ -2407,7 +2387,7 @@ node_modules
 
 ## 21 eslint
 
-`ESLint`是什么呢？一个开源的`JavaScript`的`linting`工具，是一个在`JavaScript`代码中通过规则模式匹配作代码识别和报告的113241插件化的检测工具，它的目的是保证代码规范的一致性和即使发现代码问题，提前避免错误发生，它使用[espree](https://link.juejin.cn/?target=https%3A%2F%2Flink.zhihu.com%2F%3Ftarget%3Dhttps%3A%2F%2Fgithub.com%2Feslint%2Fespree) 
+`ESLint`是什么呢？一个开源的 `JavaScript`的 `linting`工具，是一个在 `JavaScript`代码中通过规则模式匹配作代码识别和报告的113241插件化的检测工具，它的目的是保证代码规范的一致性和即使发现代码问题，提前避免错误发生，它使用[espree](https://link.juejin.cn/?target=https%3A%2F%2Flink.zhihu.com%2F%3Ftarget%3Dhttps%3A%2F%2Fgithub.com%2Feslint%2Fespree)
 
 1. **代码质量问题**：使用方式有可能有问题，eslint 可以发现代码中存在的可能错误，如*使用未声明变量*、*声明而未使用的变量*、*修改 const 变量*、*代码中使用debugger*等等
 2. **代码风格问题**：风格不符合一定规则，eslint 也可以用来统一团队的代码风格，比如*加不加分号*、*使用* *tab* *还是空格*、*字符串使用单引号* 等等
@@ -2420,8 +2400,8 @@ JavaScript发展历程中出现的Lint工具：`JSLint`->`JSHint`->`ESLint/TSLin
 
 - `JSLint`是最早出现的 Lint 工具，不支持灵活拓展及配置，必须接受它所有规则；
 - `JSHint` 在 `JSLint` 的基础上提供了一定的配置项，给了开发者较大的自由，但无法添加自定义规则；
-- `Zakas`创建`ESLint`的初衷就是觉得当时的JSHint存在局限性，无法添加自定义规则。
-- `ES6`的出现后则让`ESLint`迅速大火。
+- `Zakas`创建 `ESLint`的初衷就是觉得当时的JSHint存在局限性，无法添加自定义规则。
+- `ES6`的出现后则让 `ESLint`迅速大火。
   因为ES6新增了很多语法，`JSHint` 短期内无法提供支持，而 ESLint 只需要有合适的解析器以及拓展校验规则 就能够进行 Lint 检查。此时 `babel` 就为兼容 `ESLint` 开发了 `babel-eslint` 解析器，提供支持的同时也让 `ESLint` 成为最快支持 `ES6` 语法的 Lint 工具。
 
 ### 21.1 安装eslint插件和包
@@ -2439,7 +2419,7 @@ pnpm add eslint eslint-config-airbnb eslint-config-standard eslint-friendly-form
 
 ### 21.2 新建.eslintrc.js
 
-在跟目录新建`.exlintrc.js`文件：
+在跟目录新建 `.exlintrc.js`文件：
 
 ```txt
 node_modules
@@ -2475,7 +2455,7 @@ src/assets/*
 
 ### 21.4 添加eslint语法检测脚本
 
-前面的eslint报错和警告都是我们用眼睛看到的，有时候需要通过脚本执行能检测出来，在`package.json`的`scripts`中新增：
+前面的eslint报错和警告都是我们用眼睛看到的，有时候需要通过脚本执行能检测出来，在 `package.json`的 `scripts`中新增：
 
 ```json
 json复制代码// --fix：此项指示 ESLint 尝试修复尽可能多的问题。这些修复是对实际文件本身进行的，只有剩余的未修复的问题才会被输出。
@@ -2492,7 +2472,7 @@ json复制代码// --fix：此项指示 ESLint 尝试修复尽可能多的问题
 React version not specified in eslint-plugin-react settings
 ```
 
-需要告诉 `eslint` 使用的 `react版本`，在 `.eslintrc.js` 和`rules` 平级添加 `settings` 配置，让 `eslint` 自己检测 `react` 版本，对应 [issuse](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fyannickcr%2Feslint-plugin-react%2Fissues%2F2157)：
+需要告诉 `eslint` 使用的 `react版本`，在 `.eslintrc.js` 和 `rules` 平级添加 `settings` 配置，让 `eslint` 自己检测 `react` 版本，对应 [issuse](https://link.juejin.cn/?target=https%3A%2F%2Fgithub.com%2Fyannickcr%2Feslint-plugin-react%2Fissues%2F2157)：
 
 ```js
 settings: {
@@ -2502,7 +2482,7 @@ settings: {
 }
 ```
 
-再执行`pnpm run lint:eslint`就不会报这个未设置`react`版本的警告了。
+再执行 `pnpm run lint:eslint`就不会报这个未设置 `react`版本的警告了。
 
 ### 21.5 eslint 与 prettier 冲突
 
@@ -2512,8 +2492,8 @@ settings: {
 pnpm add eslint-config-prettier eslint-plugin-prettier -D
 ```
 
-- `eslint-plugin-prettier`:把`Prettier`推荐的格式问题的配置以`ESlint rules`的方式写入，这样可以统一代码问题的来源，报错的来源依旧是`ESlint`。
-- `eslint-config-plugin`:禁用掉和`Prettier`配置有冲突的规则
+- `eslint-plugin-prettier`:把 `Prettier`推荐的格式问题的配置以 `ESlint rules`的方式写入，这样可以统一代码问题的来源，报错的来源依旧是 `ESlint`。
+- `eslint-config-plugin`:禁用掉和 `Prettier`配置有冲突的规则
 
 在 `.eslintrc.js` 的 `extends` 中加入：
 
@@ -2544,9 +2524,9 @@ module.exports = {
 
 ### 22.1 使用lint-staged优化eslint检测速度
 
-在上面配置的`eslint`会检测`src`文件下所有的 `.ts, .tsx`文件，虽然功能可以实现，但是当项目文件多的时候，检测的文件会很多，需要的时间也会越来越长，但其实只需要检测提交到暂存区，就是`git add`添加的文件，不在暂存区的文件不用再次检测，而`lint-staged`就是来帮我们做这件事情的。
+在上面配置的 `eslint`会检测 `src`文件下所有的 `.ts, .tsx`文件，虽然功能可以实现，但是当项目文件多的时候，检测的文件会很多，需要的时间也会越来越长，但其实只需要检测提交到暂存区，就是 `git add`添加的文件，不在暂存区的文件不用再次检测，而 `lint-staged`就是来帮我们做这件事情的。
 
-在`package.json`添加`lint-staged`配置
+在 `package.json`添加 `lint-staged`配置
 
 ```json
 "lint-staged": {
@@ -2557,19 +2537,19 @@ module.exports = {
 },
 ```
 
-因为要检测 `git` 暂存区代码，所以如果你的项目还没有使用 `git` 来做版本控制，需要执行`git init`初始化一下`git`：
+因为要检测 `git` 暂存区代码，所以如果你的项目还没有使用 `git` 来做版本控制，需要执行 `git init`初始化一下 `git`：
 
 ```shell
 git init 
 ```
 
-初始化`git`完成后就可以进行测试了，先提交一下没有语法问题的`App.tsx`
+初始化 `git`完成后就可以进行测试了，先提交一下没有语法问题的 `App.tsx`
 
 ```shell
 git add src/App.tsx 
 ```
 
-把`src/App.tsx`提交到暂存区后，执行`npx lint-staged`，会顺利通过检测。
+把 `src/App.tsx`提交到暂存区后，执行 `npx lint-staged`，会顺利通过检测。
 
 假如我们现在把 `package.json` 中的 `"lint:eslint"` 改一下，加一个 `--max-warnings=0`，表示允许最多 0 个警告，就是只要出现警告就会报错：
 
@@ -2687,31 +2667,31 @@ npx lint-staged
 }
 ```
 
-在项目中使用了`ts`，但一些类型问题，现在配置的`eslint`是检测不出来的，需要使用`ts`提供的`tsc`工具进行检测，如下示例
+在项目中使用了 `ts`，但一些类型问题，现在配置的 `eslint`是检测不出来的，需要使用 `ts`提供的 `tsc`工具进行检测，如下示例
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5fdfcb71c8924a9091482ce73aadf97d~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
-在`index.tsx`定义了函数`hello`，参数`name`是`string`类型，当调用传`number`类型参数时，页面有了明显的ts报错，但此时提交`index.tsx`文件到暂存区后执行`npx lint-staged`：
+在 `index.tsx`定义了函数 `hello`，参数 `name`是 `string`类型，当调用传 `number`类型参数时，页面有了明显的ts报错，但此时提交 `index.tsx`文件到暂存区后执行 `npx lint-staged`：
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/bf4bf07c5a7d4a53afd8f8d5992200ab~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
-发现没有检测到报错，所以需要配置下`tsc`来检测类型，在`package.json`添加脚本命令
+发现没有检测到报错，所以需要配置下 `tsc`来检测类型，在 `package.json`添加脚本命令
 
 ```json
 "pre-check": "tsc && npx lint-staged" 
 ```
 
-执行`pnpm run pre-check`，发现已经可以检测出类型报错了。
+执行 `pnpm run pre-check`，发现已经可以检测出类型报错了。
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/a0bc0a85df2948109b658a4a4869906c~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
 ### 22.3 配置 husk
 
-为了避免把不规范的代码提交到远程仓库，一般会在git提交代码时对代码语法进行检测，只有检测通过时才能被提交，git提供了一系列的`githooks`，而我们需要其中的`pre-commit`钩子，它会在`git commit`把代码提交到本地仓库之前执行，可以在这个阶段检测代码，如果检测不通过就退出命令行进程停止`commit`。
+为了避免把不规范的代码提交到远程仓库，一般会在git提交代码时对代码语法进行检测，只有检测通过时才能被提交，git提供了一系列的 `githooks`，而我们需要其中的 `pre-commit`钩子，它会在 `git commit`把代码提交到本地仓库之前执行，可以在这个阶段检测代码，如果检测不通过就退出命令行进程停止 `commit`。
 
 #### 22.3.1 代码提交前husky检测语法
 
-而`husky`就是可以监听`githooks`的工具，可以借助它来完成这件事情。
+而 `husky`就是可以监听 `githooks`的工具，可以借助它来完成这件事情。
 
 #### 22.3.2 安装husky
 
@@ -2721,19 +2701,19 @@ pnpm add husky -D
 
 #### 22.3.3 配置husky的pre-commit钩子
 
-生成`.husky`配置文件夹（如果项目中没有初始化`git`，需要先执行`git init`）
+生成 `.husky`配置文件夹（如果项目中没有初始化 `git`，需要先执行 `git init`）
 
 ```shell
 npx husky install 
 ```
 
-会在项目根目录生成 `.husky`文件夹，生成文件成功后，需要让`husky`支持监听`pre-commit`钩子，监听到后执行上面定义的`pnpm run pre-check`语法检测。
+会在项目根目录生成 `.husky`文件夹，生成文件成功后，需要让 `husky`支持监听 `pre-commit`钩子，监听到后执行上面定义的 `pnpm run pre-check`语法检测。
 
 ```shell
 npx husky add .husky/pre-commit 'pnpm run pre-check' 
 ```
 
-会在 `.husky`目录下生成`pre-commit`文件，里面可以看到我们设置的`npm run pre-check`命令。
+会在 `.husky`目录下生成 `pre-commit`文件，里面可以看到我们设置的 `npm run pre-check`命令。
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/2f8113c1f2a142938fc85228f33c22f0~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
@@ -2744,7 +2724,7 @@ git add .
 git commit -m "feat: add code validate" 
 ```
 
-会发现监听`pre-commit`钩子执行了`pnpm run pre-check`, 使用`eslint`检测了`git`暂存区的两个文件，并且发现了`index.tsx`的警告，退出了命令行，没有执行`git commit`把暂存区代码提交到本地仓库。
+会发现监听 `pre-commit`钩子执行了 `pnpm run pre-check`, 使用 `eslint`检测了 `git`暂存区的两个文件，并且发现了 `index.tsx`的警告，退出了命令行，没有执行 `git commit`把暂存区代码提交到本地仓库。
 
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/72d2cf587db94270843c106f8241a97a~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
@@ -2796,7 +2776,7 @@ module.exports = {
 
 当 `message` 信息为 `foo` 时，由于长度只有3，因此 `Commitlint` 会视为违规而输出错误讯息。
 
-、8.3 配置规则包
+### 23.3 配置规则包
 
 为了节省配置规则的时间， `Commitlint` 可以使用预先配置的规则包来设定多项规则。使用前须要先安装：
 
@@ -2837,14 +2817,15 @@ npx husky install
 
 为了避免写出不符规范的 `commit message` 而提交失败， `Commitizen` 使用问答的方式，让使用者在完成问答时就可以边写出符合规范的信息，以减少来回的次数。
 
-`Commitizen` 是个指令式的工具，使用 `Commitizen` 来 `commit` 代码时会启动设定的`adapter`，使用 `adapter` 提供的问题一一询问开发者，每个问题都会确认一部分的 `commit message`，到最后将所有的回答组合起来，变成一个完整并符合规范的 `commit message`。
+`Commitizen` 是个指令式的工具，使用 `Commitizen` 来 `commit` 代码时会启动设定的 `adapter`，使用 `adapter` 提供的问题一一询问开发者，每个问题都会确认一部分的 `commit message`，到最后将所有的回答组合起来，变成一个完整并符合规范的 `commit message`。
 
 ### 24.1 cz-git
 
 指定提交文字规范，一款工程性更强、高度自定义、标准输出格式的 `commitizen` 适配器：
 
 ```shell
-pnpm add commitizen cz-git -D
+npm install -g commitizen // 注意commitizen需要全局安装
+pnpm add cz-git -D
 ```
 
 配置 `package.json`：

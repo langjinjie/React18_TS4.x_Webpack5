@@ -43,12 +43,14 @@
     "@vue/preload-webpack-plugin": "^2.0.0",
     "autoprefixer": "^10.4.14",
     "babel-loader": "^9.1.2",
+    "commitizen": "^4.3.0",
     "compression-webpack-plugin": "^10.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "core-js": "^3.29.1",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.3",
     "css-minimizer-webpack-plugin": "^5.0.1",
+    "cz-git": "^1.7.1",
     "dotenv": "^16.0.3",
     "eslint": "^8.50.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -94,5 +96,10 @@
     "webpack-dev-server": "^4.13.2",
     "webpack-merge": "^5.8.0",
     "webpackbar": "^5.0.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
   }
 }

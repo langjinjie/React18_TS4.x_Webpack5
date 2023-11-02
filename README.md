@@ -3024,6 +3024,33 @@ git cz
 
 现在，我们只需要执行 `pnpm run commit` 即可完成代码的质量检测、`style format`、代码提交规范等一系列流程了。
 
+传统的提交方式
+
+在 Git 中，每次提交代码，都要写 Commit message（提交说明），否则就不允许提交。这个操作将通过 git commit 完成。
+
+```bash
+git commit -m"hello world"
+```
+
+> 上面代码的-m 参数，就是用来指定 commit mesage 的。 如果一行不够，可以只执行 git commit，就会跳出文本编译器，让你写多行。进入vim之后按下 `i`进入编辑页面，编写完成后按钮 `ESC`在输入 `:wq`保存退出
+
+```bash
+git commit
+```
+
+**格式**
+
+Commit message 包括三个部分：Header，Body 和 Footer。可以用下方的格式表示它的结构。
+
+```bash
+<type>(<scope>): <subject>// 空一行<body>// 空一行<footer>
+```
+
+
+>
+>
+> 其中，Header 是必需的，Body 和 Footer 可以省略 (默认忽略)，一般我们在 git commit 提交时指定的 -m 参数，就相当于默认指定 Header。 不管是哪一个部分，任何一行都不得超过 72 个字符（或 100 个字符）。这是为了避免自动换行影响美观。
+
 ## 25、change-log
 
 ### 25.1 简单使用

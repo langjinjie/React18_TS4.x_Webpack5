@@ -2970,34 +2970,34 @@ module.exports = {
       // { value: "回退", name: "回退:   ⏪️  回滚 commit", emoji: "⏪️" },
       // { value: "其他", name: "其他:   🔨  对构建过程或辅助工具和库的更改（不影响源文件、测试用例）", emoji: "🔨" }
     ],
-    useEmoji: true,
-    themeColorCode: '',
-    scopes: [],
-    allowCustomScopes: true,
-    allowEmptyScopes: true,
-    customScopesAlign: 'bottom',
-    customScopesAlias: 'custom',
-    emptyScopesAlias: 'empty',
-    upperCaseSubject: false,
-    allowBreakingChanges: ['feat', 'fix'],
-    breaklineNumber: 100,
-    breaklineChar: '|',
-    skipQuestions: [],
-    issuePrefixs: [{ value: 'closed', name: 'closed:   ISSUES has been processed' }],
-    customIssuePrefixsAlign: 'top',
-    emptyIssuePrefixsAlias: 'skip',
-    customIssuePrefixsAlias: 'custom',
-    allowCustomIssuePrefixs: true,
-    allowEmptyIssuePrefixs: true,
-    confirmColorize: true,
-    maxHeaderLength: Infinity,
-    maxSubjectLength: Infinity,
-    minSubjectLength: 0,
-    scopeOverrides: undefined,
-    defaultBody: '',
-    defaultIssues: '',
-    defaultScope: '',
-    defaultSubject: ''
+    useEmoji: true, // 定是否使用表情符号来表示提交消息的类型
+    themeColorCode: '', // 主题颜色代码，通常用于自定义提交消息的显示样式
+    scopes: [], // 允许自定义的提交消息范围
+    allowCustomScopes: true, // 是否允许自定义范围
+    allowEmptyScopes: true, // 是否允许空范围
+    customScopesAlign: 'bottom', // 自定义范围的对齐方式
+    customScopesAlias: 'custom', // 自定义范围的别名
+    emptyScopesAlias: 'empty', // 自定义范围的别名
+    upperCaseSubject: false, // 主题是否需要大写
+    allowBreakingChanges: ['feat', 'fix'], // 允许定义哪些类型的提交消息可以包含破坏性更改
+    breaklineNumber: 100, // 正文中每行的最大字符数
+    breaklineChar: '|', // 正文中用于换行的字符
+    skipQuestions: [], // 跳过哪些问题的配置
+    issuePrefixs: [{ value: 'closed', name: 'closed: ISSUES has been processed' }], // 定义问题前缀，例如 "closed" 表示已处理的问题
+    customIssuePrefixsAlign: 'top', // 自定义问题前缀的对齐方式
+    emptyIssuePrefixsAlias: 'skip', // 空问题前缀的别名
+    customIssuePrefixsAlias: 'custom', // 自定义问题前缀的别名
+    allowCustomIssuePrefixs: true, // 是否允许自定义问题前缀
+    allowEmptyIssuePrefixs: true, // 是否允许空问题前缀
+    confirmColorize: true, // 确认提交时是否使用颜色
+    maxHeaderLength: Infinity, // 提交消息标题的最大字符数
+    maxSubjectLength: Infinity, // 主题的最大字符数
+    minSubjectLength: 0, // 主题的最小字符数
+    scopeOverrides: undefined, // 覆盖范围的配置
+    defaultBody: '', // 默认正文内容
+    defaultIssues: '', // 默认问题内容
+    defaultScope: '', // 默认范围
+    defaultSubject: '' // 默认主题内容
   }
 }
 ```

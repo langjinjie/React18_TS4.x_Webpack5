@@ -2088,7 +2088,7 @@ javascript复制代码plugins: [
 然后在插件的介绍页上点击**设置的齿轮**，并且选择**Add to Workspace Recommendations**，就可以将其加入清单。也可以直接开启 `.vscode/extensions.json` 进行编辑：
 
 ```json
-json复制代码{ 
+{ 
     "recommendations": ["editorconfig.editorconfig"] 
 }
 ```
@@ -2458,7 +2458,7 @@ src/assets/*
 前面的eslint报错和警告都是我们用眼睛看到的，有时候需要通过脚本执行能检测出来，在 `package.json`的 `scripts`中新增：
 
 ```json
-json复制代码// --fix：此项指示 ESLint 尝试修复尽可能多的问题。这些修复是对实际文件本身进行的，只有剩余的未修复的问题才会被输出。
+// --fix：此项指示 ESLint 尝试修复尽可能多的问题。这些修复是对实际文件本身进行的，只有剩余的未修复的问题才会被输出。
 "lint:eslint": "eslint --fix --ext .js,.ts,.tsx ./src",
 ```
 
@@ -3108,7 +3108,112 @@ pnpm add standard-version -D
 
 `standard-verstion` 生成的 `CHANGELOG` 只会包含 `feat`、`fix`、`BREACK-CHANGE` 类型的提交记录：
 
+```json
+{
+  scripts: {
+    "release": "standard-version",
+    "release:alpha": "standard-version --prerelease alpha",
+    "release:rc": "standard-version --prerelease rc",
+    "release:major": "pnpm run release -- --release-as major",
+    "release:minor": "pnpm run release -- --release-as minor",
+    "release:patch": "pnpm run release -- --release-as patch"
+  }
+}
+```
 
+#### 25.2.3 手动控制版本更新
+
+##### 1. 直接升级major
+
+```json
+"scripts": {
+    "release-major": "standard-version --release-as major",
+}
+```
+
+##### 2. 直接升级minor
+
+```json
+"scripts": {
+    "release-minor": "standard-version --release-as minor",
+}
+```
+
+##### 3. 直接升级patch
+
+```json
+"scripts": {
+    "release-patch": "standard-version --release-as patch",
+}
+```
+
+##### 4. 按默认规则升级版本号
+
+```json
+"scripts": {
+    "release": "standard-version",
+}
+```
+
+##### 5. 强制打一个静态版本号
+
+```json
+"scripts": {
+    "release-static": "standard-version --release-as 3.3.3",
+}
+```
+
+##### 第一个版本(该方式不会升级版本号)
+
+```shell
+shell复制代码# npm run script
+pnpm run release -- --first-release
+
+# global bin
+standard-version --first-release
+
+# npx
+npx standard-version --first-release
+```
+
+#### 25.2.4 配置哪些commit消息写入changelog
+
+`hidden` 属性值控制是否将该类型的 `commit` 消息写入 `changlog`, 不填的情况下默认是: `false`，在根目录下新建 `.versionrc.js`：
+
+```js
+module.exports = {
+  types: [
+    { type: 'feat', section: '✨ Features | 新功能' },
+    { type: 'fix', section: '🐛 Bug Fixes | Bug 修复' },
+    { type: 'init', section: '🎉 Init | 初始化' },
+    { type: 'docs', section: '✏️ Documentation | 文档' },
+    { type: 'style', section: '💄 Styles | 风格' },
+    { type: 'refactor', section: '♻️ Code Refactoring | 代码重构' },
+    { type: 'perf', section: '⚡ Performance Improvements | 性能优化' },
+    { type: 'test', section: '✅ Tests | 测试' },
+    { type: 'revert', section: '⏪ Revert | 回退', hidden: true },
+    { type: 'build', section: '📦‍ Build System | 打包构建' },
+    { type: 'chore', section: '🚀 Chore | 构建/工程依赖/工具' },
+    { type: 'ci', section: '👷 Continuous Integration | CI 配置' }
+  ]
+}
+```
+
+#### 25.2.5 配置跳过生成changelog这个步骤
+
+所有可配置跳过的有: bump, changelog, commit, tag:
+
+```json
+{
+  "standard-version": {
+    "skip": {
+      "changelog": true
+    }
+  }
+}
+```
+
+至此，我们就完成了脚手架的代码质量和 `git` 提交规范的配置。就当前的脚手架已具备基本的 `React` 项目的配置，可以作为大多数项目的基础架子了~
 
 
 

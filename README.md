@@ -1938,14 +1938,14 @@ javascript复制代码plugins: [
 - `[文件name]`：如果chunks是显示命名的，可以使用这种方式；
 
 ```javascript
-javascript复制代码plugins: [
+plugins: [
   new HtmlWebpackPlugin(),
   new PreloadWebpackPlugin({
     rel: 'preload',
     include: 'allChunks' // or 'initial', or 'allAssets'
   })
 ]
-javascript复制代码plugins: [
+plugins: [
   new HtmlWebpackPlugin(),
   new PreloadWebpackPlugin({
     rel: 'preload',

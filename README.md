@@ -257,7 +257,7 @@ shell
 
 与 `npm`一样，`TypeScript`世界也在庆祝开源代码。社区很活跃，不断对常用的 `npm`包的更新和变化做出反应。你几乎总能找到npm包的类型，所以你不必单独为你的成千上万的依赖创建类型。
 
-通常，现有软件包的类型可以从 `npm`内部的 `@types`组织中找到，你可以通过安装一个带有 `@types/`前缀的软件包名称的 `npm`包将相关类型添加到你的项目中。比如说 `npm install --save-dev @types/react @types/express @types/lodash @types/jest @types/mongoose`等等，等等。 `@types/*` 由[Definitely typed](https://link.juejin.cn?target=http%3A%2F%2Fdefinitelytyped.org%2F)维护，这是一个社区项目，目的是在一个地方维护所有的类型。
+通常，现有软件包的类型可以从 `npm`内部的 `@types`组织中找到，你可以通过安装一个带有 `@types/`前缀的软件包名称的 `npm`包将相关类型添加到你的项目中。比如说 `npm install --save-dev @types/react @types/express @types/lodash @types/jest @types/mongoose`等等。 `@types/*` 由[Definitely typed](https://link.juejin.cn?target=http%3A%2F%2Fdefinitelytyped.org%2F)维护，这是一个社区项目，目的是在一个地方维护所有的类型。
 
 有时，一个 `npm`包也可以在代码中包含它的类型，在这种情况下，安装相应的 `@types/*` 就没有必要。
 
@@ -270,14 +270,8 @@ shell
 另外因为我们在 `App.tsx`中引入了 `css`文件，所以还需要安装相关的 `loader`：
 
 ```shell
-shell
-复制代码pnpm add style-loader css-loader -D
+pnpm add style-loader css-loader -D
 ```
-
-作者：_你当像鸟飞往你的山
-链接：https://juejin.cn/post/7203169721839042615
-来源：稀土掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
 因为 `webpack.base.ts`文件承载了基本得配置，随着 `webpack`做的事情越来越多，会逐渐变得很庞大，我们可以将其中得 `bael-loader`相关的配置抽离出来进行管理。在根目录新建 `babel.config.js`
 
@@ -321,7 +315,7 @@ module: {
 
 typescript自身的机制，需要一份 `xx.d.ts`声明文件，来说明模块对外公开的方法和属性的类型以及内容。对于内建模块，安装一个 `@types/node`模块可以整体解决模块的声明文件问题。
 
-### 5.2 webpack.dev.ts
+### 5.2 xwebpack.dev.ts
 
 接下来，我们需要通过 `webpack-dev-server`来启动我们的项目，所以需要安装相关的依赖：
 
@@ -3209,3 +3203,49 @@ module.exports = {
 ```
 
 至此，我们就完成了脚手架的代码质量和 `git` 提交规范的配置。就当前的脚手架已具备基本的 `React` 项目的配置，可以作为大多数项目的基础架子了~
+
+## 26 react-router-dom 配置
+
+### 26.1 安装`react-router-dom`
+
+在此处我们使用的是`v5`版本
+
+```shell
+pnpm install --save react-router-dom@5
+```
+
+`App.tsx`
+
+```tsx
+// import { lazy } from 'react';
+import 'src/App.css';
+import 'src/App.less';
+import Layout from 'src/Layouts/Layouts';
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import { /* Suspense, */ lazy } from 'react';
+// import { Loading } from './components';
+
+const NotFound = lazy(() => import('src/pages/NotFound/NotFound'));
+
+function App() {
+  return (
+    // <Suspense fallback={<Loading />}>
+    <Router>
+      <Router>
+        <Switch>
+          <Route path='/404' component={NotFound} />
+          <Route path='/' component={Layout} />
+        </Switch>
+      </Router>
+    </Router>
+    // </Suspense>
+  );
+}
+
+export default App;
+
+```
+
+> 注意点：
+>
+> 1. 

@@ -7,8 +7,8 @@ import lessStyle from './style.module.less';
 import scssStyle from './style.module.scss';
 
 const LazyDemo = lazy(() => import('src/pages/LazyDemo/LazyDemo'));
-const PrefetchDemo = lazy(() => import('src/pages/PrefetchDemo/PrefetchDemo'));
-const PreloadDemo = lazy(() => import('src/pages/PreloadDemo/PreloadDemo'));
+// const PrefetchDemo = lazy(() => import('src/pages/PrefetchDemo/PrefetchDemo'));
+// const PreloadDemo = lazy(() => import('src/pages/PreloadDemo/PreloadDemo'));
 
 function Index() {
   const [count, setCount] = useState(1);
@@ -101,18 +101,18 @@ function Index() {
       )}
       <h2>Prefetch预加载</h2>
       <button onClick={prefetchShowHanle}>{prefetchShow ? '隐藏' : '显示'}</button>
-      {prefetchShow && (
+      {/* {prefetchShow && (
         <Suspense fallback='组件加载中...'>
           <PrefetchDemo />
         </Suspense>
-      )}
+      )} */}
       <h2>Preload预加载</h2>
       <button onClick={preloadShowHanle}>{preloadShow ? '隐藏' : '显示'}</button>
-      {preloadShow && (
+      {/* {preloadShow && (
         <Suspense fallback='组件加载中...'>
           <PreloadDemo />
         </Suspense>
-      )}
+      )} */}
     </>
   );
 }

@@ -12,7 +12,7 @@
     "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,ts,json,tsx,css,less,scss,stylus,html,md}\"",
     "lint:eslint": "eslint --fix --ext .js,.ts,.tsx ./src",
     "pre-check": "tsc && npx lint-staged",
-    "commit": "git pull && git add . && git cz && git push",
+    "commit": "git pull && git add ./ && git cz && git push",
     "release": "standard-version",
     "release:alpha": "standard-version --prerelease alpha",
     "release:rc": "standard-version --prerelease rc",
@@ -31,8 +31,10 @@
     ]
   },
   "dependencies": {
+    "@types/react-router-dom": "^5.3.3",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
     "@babel/core": "^7.21.3",

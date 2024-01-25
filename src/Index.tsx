@@ -6,7 +6,6 @@ import App from 'src/App';
 
 // 获取root节点
 const root = document.getElementById('root');
-
 // 判断是否存在
 if (root) {
   createRoot(root).render(<App />);

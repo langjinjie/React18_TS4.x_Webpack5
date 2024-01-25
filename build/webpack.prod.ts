@@ -1,10 +1,10 @@
 import { Configuration } from 'webpack'; // 引入webpack的类型接口
 import { merge } from 'webpack-merge';
+import CompressionPlugin from 'compression-webpack-plugin'; // 压缩css js
+import TerserPlugin from 'terser-webpack-plugin'; // 多线程压缩混淆
 // const baseConfig = require('./webpack.base') // 引入基本配置
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'; // css样式提取及css的tree-shaking
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import TerserPlugin from 'terser-webpack-plugin'; // 多线程压缩混淆
-import CompressionPlugin from 'compression-webpack-plugin'; // 压缩css js
 import baseConfig from './webpack.base'; // 引入基本配置
 
 const globAll = require('glob-all'); // 用于css的tree-shaking（树摇）

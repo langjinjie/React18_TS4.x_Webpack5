@@ -8,13 +8,14 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 const path = require('path'); // 需要安装@types/node -D
 
 const isDev = process.env.NODE_ENV === 'development'; // 是否是开发模式
-const cssModuleRegex = /module.css$/;
+
+const cssModuleRegex = /\.module.css$/;
 const cssRegex = /\.css$/;
-const sassModuleRegex = /module.(scss|sass)$/;
+const sassModuleRegex = /\.module.(scss|sass)$/;
 const sassRegex = /\.(scss|sass)$/;
 const lessModuleRegex = /\.module.less$/;
 const lesseRegex = /\.less$/;
-const stylModuleRegex = /module.styl$/;
+const stylModuleRegex = /\.module.styl$/;
 const stylRegex = /\.styl$/;
 
 // 模块化样式编译
@@ -43,7 +44,7 @@ const styleLoadersArray = [
 
 // 加载配置文件
 const envConfig = dotenv.config({
-  path: path.resolve(__dirname, `../evn/.env.${process.env.BASE_ENV}`)
+  path: path.resolve(__dirname, `../env/.env.${process.env.BASE_ENV}`)
 });
 
 const baseConfig: Configuration = {
@@ -79,7 +80,7 @@ const baseConfig: Configuration = {
       },
       {
         test: lesseRegex, // 匹配非模块化less文件
-        exclude: lessModuleRegex, // 排除模块化less文件
+        exclude: lessModuleRegex, // 排除模块化less文件 可以使用 style-resources-loader 添加公共样式,这样就不用每次在less文件都引入公共的样式了
         use: [...styleLoadersArray, 'less-loader']
       },
       {

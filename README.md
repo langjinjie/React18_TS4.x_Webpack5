@@ -77,17 +77,34 @@ pnpm add @types/react @types/react-dom
 
 接下来先将入口文件 `src.index.tsx`写好：
 
-```tsx
-import React from 'react'
-import {createRoot} from 'react-dom/client'
-import App from './App'
+- 新方法
 
-const root = document.getElementById('root')
+  ```tsx
+  import React from 'react'; // 
+  import {createRoot} from 'react-dom/client'
+  import App from './App'
+  
+  const root = document.getElementById('root')
+  
+  if( root){
+      creatRoot(root).render(<App/>)
+  }
+  ```
 
-if( root){
-    creatRoot(root).render(<App/>)
-}
-```
+  
+
+- 旧方法
+
+  ```tsx
+  import ReactDom from 'react-dom';
+  import App from './app';
+  
+  const root = document.getElementById('root')
+  
+  ReactDom.render(<App/>, root)
+  ```
+
+  
 
 `App.css`
 
@@ -3222,23 +3239,21 @@ import 'src/App.css';
 import 'src/App.less';
 import Layout from 'src/Layouts/Layouts';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { /* Suspense, */ lazy } from 'react';
-// import { Loading } from './components';
+import { Suspense, lazy } from 'react';
+import { Loading } from './components';
 
 const NotFound = lazy(() => import('src/pages/NotFound/NotFound'));
 
 function App() {
   return (
-    // <Suspense fallback={<Loading />}>
-    <Router>
-      <Router>
+    <Suspense fallback={<Loading />}>
+      <Router basename='/admin'>
         <Switch>
           <Route path='/404' component={NotFound} />
           <Route path='/' component={Layout} />
         </Switch>
       </Router>
-    </Router>
-    // </Suspense>
+    </Suspense>
   );
 }
 
@@ -3248,4 +3263,72 @@ export default App;
 
 > 注意点：
 >
-> 1. 
+> 1. `Suspense`配合`fallback`可以实现代码分割和懒加载
+> 1. `Router`的`basename`可以设置路由的根目录
+
+`indexRouter.ts`
+
+```tsx
+import { lazy } from 'react';
+import { RouteProps } from 'react-router-dom';
+
+export const indexRoutes: RouteProps[] = [
+  {
+    path: '/login',
+    component: lazy(() => import('src/pages/Login/Login'))
+  },
+  {
+    path: '/404',
+    component: lazy(() => import('src/pages/Login/Login'))
+  },
+  {
+    path: '/index',
+    component: lazy(() => import('src/pages/Index/Index'))
+  },
+  {
+    path: '/class',
+    component: lazy(() => import('src/pages/Class/Class'))
+  }
+];
+
+```
+
+`Layouts.tsx`
+
+```tsx
+/**
+ * 此处处理router
+ */
+
+import { Suspense } from 'react';
+import { Route, Switch, withRouter, RouteComponentProps, Link } from 'react-router-dom';
+// import { indexRoutes } from 'src/routes/index';
+// import { Loading } from 'src/components';
+import { Loading } from 'src/components';
+import { indexRoutes } from 'src/routes';
+import style from './style.module.less';
+
+const Layouts: React.FC<RouteComponentProps> = ({ location }) => {
+  return (
+    <div className={style.wrap}>
+      <ul className={style.menu}>
+        <Link to='/index'>Index</Link>
+        <Link to='/login'>login</Link>
+        <Link to='/class'>Class</Link>
+      </ul>
+      <div>
+        <Suspense fallback={<Loading />}>
+          <Switch location={location}>
+            {indexRoutes.map(({ path, component }) => (
+              <Route key={`${path}`} path={path} component={component} />
+            ))}
+          </Switch>
+        </Suspense>
+      </div>
+    </div>
+  );
+};
+export default withRouter(Layouts);
+
+```
+

@@ -1,12 +1,12 @@
-// import React from 'react'
-// import style from './style.module.less'
+import classnames from 'classnames';
 
 interface ISvgIconProps {
   name: string;
+  className?: string;
 }
 
-const SvgIcon: React.FC<ISvgIconProps> = ({ name }) => (
-  <svg className={'icon'} aria-hidden='true'>
+const SvgIcon: React.FC<ISvgIconProps> = ({ name, className }) => (
+  <svg className={classnames('icon', className)} aria-hidden='true'>
     <use xlinkHref={`#${name}`}></use>
   </svg>
 );

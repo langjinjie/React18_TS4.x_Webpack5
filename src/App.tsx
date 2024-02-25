@@ -1,4 +1,3 @@
-// import { lazy } from 'react';
 import 'src/App.css';
 import 'src/App.less';
 import Layout from 'src/Layouts/Layouts';

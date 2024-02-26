@@ -3265,6 +3265,7 @@ export default App;
 >
 > 1. `Suspense`配合`fallback`可以实现代码分割和懒加载
 > 1. `Router`的`basename`可以设置路由的根目录
+> 1. `lazy`函数不能写在组件内，例如：`<Route key={`${path}`} path={path} component={lazy(()=>import('./Demo/Demo'))} />`
 
 `indexRouter.ts`
 
@@ -3301,21 +3302,42 @@ export const indexRoutes: RouteProps[] = [
  */
 
 import { Suspense } from 'react';
-import { Route, Switch, withRouter, RouteComponentProps, Link } from 'react-router-dom';
-// import { indexRoutes } from 'src/routes/index';
-// import { Loading } from 'src/components';
-import { Loading } from 'src/components';
+import { Route, Switch, withRouter, RouteComponentProps } from 'react-router-dom';
+import { Menu, Layout } from 'antd';
+import { Icon, Loading } from 'src/components';
 import { indexRoutes } from 'src/routes';
 import style from './style.module.less';
 
-const Layouts: React.FC<RouteComponentProps> = ({ location }) => {
+const { Sider } = Layout;
+
+const Layouts: React.FC<RouteComponentProps> = ({ location, history }) => {
   return (
-    <div className={style.wrap}>
-      <ul className={style.menu}>
-        <Link to='/index'>Index</Link>
-        <Link to='/login'>login</Link>
-        <Link to='/class'>Class</Link>
-      </ul>
+    <Layout className={style.wrap}>
+      <Sider theme='light'>
+        <Menu
+          mode='inline'
+          items={indexRoutes.map(({ path }) => ({
+            icon: <Icon className={style.icon} name='icon-fangzi-copy' />,
+            key: `nav-${path}`,
+            label: `nav-${path}`,
+            path,
+            type: '',
+            children: [
+              {
+                icon: <Icon className={style.icon} name='icon-shouhoufuwu1' />,
+                key: `sub-${path}`,
+                label: `sub-${path}`,
+                path,
+                type: '',
+                onClick() {
+                  console.log('123');
+                  history.push(path as string);
+                }
+              }
+            ]
+          }))}
+        />
+      </Sider>
       <div>
         <Suspense fallback={<Loading />}>
           <Switch location={location}>
@@ -3325,10 +3347,8 @@ const Layouts: React.FC<RouteComponentProps> = ({ location }) => {
           </Switch>
         </Suspense>
       </div>
-    </div>
+    </Layout>
   );
 };
 export default withRouter(Layouts);
-
 ```
-

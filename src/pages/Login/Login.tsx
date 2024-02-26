@@ -10,11 +10,13 @@ const Login: React.FC = () => {
     <div>
       <button>登录</button>
       <div className={style.linkWrap}>
-        <NavLink className={style.navLink} to='/login/' exact>
+        <NavLink activeClassName={style.active} className={style.navLink} to='/login/' exact>
           children1
         </NavLink>
 
-        <NavLink to='/login/children2'>children2</NavLink>
+        <NavLink activeClassName={style.active} to='/login/children2'>
+          children2
+        </NavLink>
       </div>
       <div className={style.routeWrap}>
         <Suspense fallback='子路由加载中...'>

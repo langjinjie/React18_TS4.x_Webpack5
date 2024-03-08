@@ -1,61 +1,40 @@
-/**
- * 此处处理router
- */
-
-import { Route, withRouter, RouteComponentProps, Switch } from 'react-router-dom';
-import { Menu, Layout } from 'antd';
-import { Icon } from 'src/components';
-import { indexRoutes } from 'src/routes';
-import { Suspense } from 'react';
+import { Outlet, /* useNavigate, */ NavLink, useNavigate } from 'react-router-dom-v6';
+// import { Button } from 'antd';
 import style from './style.module.less';
 
-const { Sider } = Layout;
+function Layouts() {
+  const navigate = useNavigate();
 
-const Layouts: React.FC<RouteComponentProps> = ({ history }) => {
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
-    <Layout className={style.wrap}>
-      <Sider theme='light'>
-        <Menu
-          mode='inline'
-          items={indexRoutes.map(({ path }) => ({
-            icon: <Icon className={style.icon} name='icon-fangzi-copy' />,
-            key: `nav-${path}`,
-            label: `nav-${path}`,
-            path,
-            children: [
-              {
-                icon: <Icon className={style.icon} name='icon-shouhoufuwu1' />,
-                key: `sub-${path}1`,
-                label: `sub-${path}1`,
-                path,
-                onClick() {
-                  history.push(path as string);
-                }
-              },
-              {
-                icon: <Icon className={style.icon} name='icon-shouhoufuwu1' />,
-                key: `sub-${path}2`,
-                label: `sub-${path}2`,
-                path,
-                type: '',
-                onClick() {
-                  history.push(path as string);
-                }
-              }
-            ]
-          }))}
-        />
-      </Sider>
-      <div>
-        <Suspense fallback='加载中...'>
-          <Switch>
-            {indexRoutes.map(({ path, component }) => (
-              <Route key={`${path}`} path={path} component={component} />
-            ))}
-          </Switch>
-        </Suspense>
+    <div className={style.wrap}>
+      <div className={style.backBtn} onClick={handleBack}>
+        返回
       </div>
-    </Layout>
+      <div className={style.nav}>
+        <NavLink to='me'>me</NavLink>
+        <br />
+        <NavLink to=':123' state={'id路由state参数'}>
+          My IdRoute
+        </NavLink>
+        <br />
+        <NavLink to='navLink' state={'id路由state参数'}>
+          NavLink
+        </NavLink>
+        <br />
+        <NavLink to='relative'>Relative</NavLink>
+      </div>
+      {/* <Button onClick={() => navigate('123', { state: 'useNavigate' })}>
+        useNavigate My IdRoute
+      </Button> */}
+      <div>
+        <Outlet />
+      </div>
+    </div>
   );
-};
-export default withRouter(Layouts);
+}
+
+export default Layouts;

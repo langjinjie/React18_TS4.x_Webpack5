@@ -1,19 +1,21 @@
+import { Suspense } from 'react';
 import 'src/App.css';
 import 'src/App.less';
-import Layout from 'src/Layouts/Layouts';
-import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { lazy } from 'react';
+import { BrowserRouter, useRoutes } from 'react-router-dom-v6';
+import { routerV6 } from './routes';
 
-const NotFound = lazy(() => import('src/pages/NotFound/NotFound'));
+const RenderRoute: React.FC = () => {
+  const element = useRoutes(routerV6);
+  return element;
+};
 
 function App() {
   return (
-    <Router basename='/admin'>
-      <Switch>
-        <Route path='/404' component={NotFound} />
-        <Route path='/*' component={Layout} />
-      </Switch>
-    </Router>
+    <Suspense fallback={'加载中...'}>
+      <BrowserRouter>
+        <RenderRoute />
+      </BrowserRouter>
+    </Suspense>
   );
 }
 

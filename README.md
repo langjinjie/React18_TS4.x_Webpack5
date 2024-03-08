@@ -3352,3 +3352,191 @@ const Layouts: React.FC<RouteComponentProps> = ({ location, history }) => {
 };
 export default withRouter(Layouts);
 ```
+
+### 26.1 安装`react-router-dom-v6`
+
+#### 26.1.1  别名安装v6
+
+`pnpm install -S react-router-dom-v6@npm:react-router-dom`
+
+```shell
+pnpm install -S react-router-dom-v6@npm:react-router-dom
+```
+
+[React Router v6 中文指南](https://baimingxuan.github.io/react-router6-doc/upgrading/v5)
+
+#### 26.1.2 v5升级
+
+##### **将 `<Link>` 状态作为单独的属性传递**
+
+`Link` 组件将 `state` 作为单独的属性接收，而不是作为传递给 `to` 的对象的一部分接收，因此，如果 `Link` 组件使用 `state` ，则需要更新这些组件：
+
+```jsx
+import { Link } from "react-router-dom";
+
+// Change this:
+<Link to={{ pathname: "/home", state: state }} />
+
+// to this:
+<Link to="/home" state={state} />
+```
+
+状态值仍然通过 `useLocation()` 在链接组件中检索：
+
+```jsx
+function Home() {
+  const location = useLocation();
+  const state = location.state;
+  return <div>Home</div>;
+}
+```
+
+
+
+---
+
+##### **使用`useRouters`代替`react-router-config`**
+
+v5版本的`react-router-config`包中的所有功能都已移至v6的核心中。
+
+```jsx
+function App() {
+  let element = useRoutes([
+    // These are the same as the props you provide to <Route>
+    { path: "/", element: <Home /> },
+    { path: "dashboard", element: <Dashboard /> },
+    {
+      path: "invoices",
+      element: <Invoices />,
+      // Nested routes use a children property, which is also
+      // the same as <Route>
+      children: [
+        { path: ":id", element: <Invoice /> },
+        { path: "sent", element: <SentInvoices /> },
+      ],
+    },
+    // Not found routes work as you'd expect
+    { path: "*", element: <NotFound /> },
+  ]);
+
+  // The returned element will render the entire element
+  // hierarchy with all the appropriate context it needs
+  return element;
+}
+```
+
+
+
+---
+
+##### **使用`useNavigate`代替`useHistory`**
+
+```jsx
+// This is a React Router v6 app
+import { useNavigate } from "react-router-dom";
+
+function App() {
+  let navigate = useNavigate();
+  function handleClick() {
+    navigate("/home");
+  }
+  return (
+    <div>
+      <button onClick={handleClick}>go home</button>
+    </div>
+  );
+}
+```
+
+如果需要替换当前位置而不是向历史记录栈推送新位置，请使用`navigate(to, {replace: true})`。 如果需要状态，请使用`navigate(to, { state })`。可以将`navigate`的第一个参数视为`<Link to>`，其他参数视为`replace`和`state`
+
+  **注意**：请注意，v5版的`<Redirect />`默认使用`replace`逻辑（可通过`push`属性进行更改），而v6版`<Navigate />`默认使用`push`逻辑，可通过`replace`属性进行更改。
+
+```jsx
+// Change this:
+<Redirect to="about" />
+<Redirect to="home" push />
+
+// to this:
+<Navigate to="about" replace />
+<Navigate to="home" />
+```
+
+如果您当前正在使用`useHistory`中的`go`，`goBack`或者`goForward`来前后导航，则还应该将其替换为`navigate`，并在其中加入一个数组参数，指示指针在历史记录栈中的位置。例如：
+
+```jsx
+// This is a React Router v5 app
+import { useHistory } from "react-router-dom";
+
+function App() {
+  const { go, goBack, goForward } = useHistory();
+
+  return (
+    <>
+      <button onClick={() => go(-2)}>
+        Go 2 pages back
+      </button>
+      <button onClick={goBack}>Go back</button>
+      <button onClick={goForward}>Go forward</button>
+      <button onClick={() => go(2)}>
+        Go 2 pages forward
+      </button>
+    </>
+  );
+}
+```
+
+除了支持 `Suspense` 之外， `navigate` 和 `Link` 一样，支持相对导航。例如：
+
+```jsx
+// assuming we are at `/stuff`
+function SomeForm() {
+  let navigate = useNavigate();
+  return (
+    <form
+      onSubmit={async (event) => {
+        let newRecord = await saveDataFromForm(
+          event.target
+        );
+        // you can build up the URL yourself
+        navigate(`/stuff/${newRecord.id}`);
+        // or navigate relative, just like Link
+        navigate(`${newRecord.id}`);
+      }}
+    >
+      {/* ... */}
+    </form>
+  );
+}
+```
+
+##### **将`<NavLink exact>`重命名为`<NavLink end>`**
+
+这是一个简单的属性重命名，以便更好地与 React 生态系统中其他库的常见做法保持一致。
+
+##### **从`<NavLink />`中移除 `activeClassName` 和 `activeStyle` 属性**
+
+从 `v6.0.0-beta.3` 开始， `activeClassName` 和 `activeStyle` 的属性已从 `NavLinkProps` 中移除。取而代之的是，您可以向 `style` 或 `className` 传递一个函数，从而根据组件的活动状态自定义内联样式或类字符串。
+
+```jsx
+<NavLink
+  to="/messages"
+- style={{ color: 'blue' }}
+- activeStyle={{ color: 'green' }}
++ style={({ isActive }) => ({ color: isActive ? 'green' : 'blue' })}
+>
+  Messages
+</NavLink>
+```
+
+```jsx
+<NavLink
+  to="/messages"
+- className="nav-link"
+- activeClassName="activated"
++ className={({ isActive }) => "nav-link" + (isActive ? " activated" : "")}
+>
+  Messages
+</NavLink>
+```
+

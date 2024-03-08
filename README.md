@@ -3540,3 +3540,55 @@ function SomeForm() {
 </NavLink>
 ```
 
+##### **使用`useMatch`替换`useRouteMatch`**
+
+`useMatch` 与v5的 `useRouteMatch` 非常相似，但有一些主要的区别：
+
+- 它使用我们的新[路径模式匹配算法](https://baimingxuan.github.io/react-router6-doc/upgrading/v5#note-on-route-path-patterns)
+- 现在需要模式参数
+- 不再接受模式数组
+- 以对象形式传递模式时，某些选项已重新命名，以便更好地与 v6 版中的其他 API 保持一致
+  - `useRouteMatch({ strict })` 现在是 `useMatch({ end })`
+  - `useRouteMatch({ sensitive })` 现在是 `useMatch({ caseSensitive })`
+- 它会返回一个形状不同的匹配对象
+
+要查看新 `useMatch` 钩子的准确 API 及其类型声明，请查阅我们的 [API 参考文档](https://baimingxuan.github.io/react-router6-doc/hooks/use-match)
+
+##### 更改传递给 `matchPath` 的参数顺序，更改 pathPattern 选项
+
+从第 6 版开始，传递给 `matchPath` 函数的参数顺序发生了变化。模式选项也发生了变化。
+
+- 第一个参数是 `pathPattern` 对象，然后是 `pathname`
+- pathPattern 不再包括 `exact` 和 `strict` 选项。新增了 `caseSensitive` 和 `end` 选项
+
+请按以下方式重构：
+
+Before:
+
+```jsx
+// This is a React Router v5 app
+import { matchPath } from "react-router-dom";
+
+const match = matchPath("/users/123", {
+  path: "/users/:id",
+  exact: true, // Optional, defaults to false
+  strict: false, // Optional, defaults to false
+});
+```
+
+After:
+
+```jsx
+// This is a React Router v6 app
+import { matchPath } from "react-router-dom";
+
+const match = matchPath(
+  {
+    path: "/users/:id",
+    caseSensitive: false, // Optional, `true` == static parts of `path` should match case
+    end: true, // Optional, `true` == pattern should match the entire URL pathname
+  },
+  "/users/123"
+);
+```
+

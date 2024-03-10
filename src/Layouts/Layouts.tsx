@@ -26,6 +26,10 @@ function Layouts() {
         </NavLink>
         <br />
         <NavLink to='relative'>Relative</NavLink>
+        <br />
+        <NavLink to='ReactToolkitDemo'>ReactToolkitDemo</NavLink>
+        <br />
+        <NavLink to='reduxDemo'>ReduxDemo</NavLink>
       </div>
       {/* <Button onClick={() => navigate('123', { state: 'useNavigate' })}>
         useNavigate My IdRoute

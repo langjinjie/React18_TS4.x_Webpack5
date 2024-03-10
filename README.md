@@ -3592,3 +3592,311 @@ const match = matchPath(
 );
 ```
 
+## 27 Redux
+
+<img src="https://www.redux.org.cn/assets/ReduxDataFlowDiagram.BJJTlKEu.gif" alt="数据流更新动画" style="zoom:33%;" />
+
+### 27.1 v5使用总结
+
+#### 安装Redux Toolkit 和 React-Redux
+
+添加`Redux Toolkit`和`React-Redux`依赖包到你的项目中：
+
+```shell
+pnpm install @reduxjs/toolkit react-redux
+```
+
+#### 创建`Redux Store`
+
+创建`src/pages/store/index.ts`文件。从 Redux Toolkit 引入`fonfigureStore`API。我们从创建一个空的 Redux store开始，并且导入它：
+
+```typescript
+import { configureStore } from '@reduxjs/toolkit';
+
+export default configureStore({
+  reducer: {}
+});
+
+```
+
+上面代码创建了 Redux store，并且自动配置了 Redux DevTools 扩展，这样你就可以在开发时调试 store。
+
+#### 为 React 提供 Redux Store
+
+```tsx
+/* 入口文件 */
+// 引入react-dom
+import { createRoot } from 'react-dom/client';
+
+// 引入App组件
+import App from 'src/App';
+
+// 引入Redux
+import store from 'src/pages/store/index';
+import { Provider } from 'react-redux';
+
+// 获取root节点
+const root = document.getElementById('root');
+// 判断是否存在
+if (root) {
+  createRoot(root).render(
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+}
+
+```
+
+#### 创建 Redux State Slice
+
+创建`src/pages/store/conterSlice.ts`文件。在该文件中从 Redux Toolkit 引入`createSlice`API。
+
+创建slice需要一个字符串名称来标识切片，一个初始state以及一个或多个定义了该如何更新state的reducer函数。slice创建后，我们可以到处slice中生成的Redux action creators和reducers函数。
+
+Redux 要求[我们通过创建数据副本和更新数据副本，来实现不可变地写入所有状态更新](https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow#immutability)。不过 Redux Toolkit `createSlice` 和 `createReducer` 在内部使用 Immer 允许我们[编写“可变”的更新逻辑，变成正确的不可变更新](https://redux.js.org/tutorials/fundamentals/part-8-modern-redux#immutable-updates-with-immer)。
+
+```typescript
+import { createSlice } from '@reduxjs/toolkit';
+
+export const counterSlice = createSlice({
+  // 当前redux的名称
+  name: 'counter',
+  // 默认值
+  initialState: {
+    value: 0
+  },
+  // 定义当前redux的所有reducer
+  reducers: {
+    increment: state => {
+      // Redux Toolkit 允许我们在 reducers 写 "可变" 逻辑。它
+      // 并不是真正的改变状态值，因为它使用了 Immer 库
+      // 可以检测到“草稿状态“ 的变化并且基于这些变化生产全新的
+      // 不可变的状态
+      state.value += 1;
+    },
+    decrement: state => {
+      state.value -= 1;
+    },
+    incrementByAmount: (state, action) => {
+      console.log('state', state);
+      console.log('action', action);
+      state.value += action.payload ?? 0;
+    }
+  }
+});
+
+// 每个 case reducer 函数会生成对应的 Action creators
+// 暴露所有的生成action的方法
+export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+
+// 导出reducer
+export default counterSlice.reducer;
+
+```
+
+#### 异步action
+
+```typescript
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
+// 模拟一个异步请求
+const asyncIncrement = () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(101);
+    }, 1000);
+  });
+};
+
+// 异步新增,createAsyncThunk的第一个参数需要在extraReducers中通过addCase进行监听处理
+export const requestIncrement = createAsyncThunk('requestIncrement', async () => {
+  const res = await asyncIncrement();
+  return res;
+});
+// 异步减少
+export const requestDecrement = createAsyncThunk('requestDecrement', async () => {
+  const res = await asyncIncrement();
+  return res;
+});
+
+export const counterSlice = createSlice({
+  // 此处的name最好跟configureStore中的reducer中的名称一致
+  name: 'counter',
+  initialState: {
+    value: 0,
+    status: 'idle',
+    error: null
+  },
+  reducers: {
+    increment: state => {
+      // Redux Toolkit 允许我们在 reducers 写 "可变" 逻辑。它
+      // 并不是真正的改变状态值，因为它使用了 Immer 库
+      // 可以检测到“草稿状态“ 的变化并且基于这些变化生产全新的
+      // 不可变的状态
+      state.value += 1;
+    },
+    decrement: state => {
+      state.value -= 1;
+    },
+    incrementByAmount: (state, action) => {
+      state.value += action.payload ?? 0;
+    }
+  },
+  // 实现异步处理数据
+  extraReducers(builder) {
+    builder
+      .addCase(requestIncrement.pending, state => {
+        console.log('pending', state);
+        state.status = 'loading';
+      })
+      .addCase(requestIncrement.fulfilled, (state, action) => {
+        console.log('action', action);
+        state.status = 'succeeded';
+        state.value += action.payload as number;
+      })
+      .addCase(requestDecrement.pending, state => {
+        console.log('pending', state);
+        state.status = 'loading';
+      })
+      .addCase(requestDecrement.fulfilled, (state, action) => {
+        console.log('action', action);
+        state.status = 'succeeded';
+        state.value -= action.payload as number;
+      });
+  }
+});
+
+// 每个 case reducer 函数会生成对应的 同步的 Action creators
+export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+
+export default counterSlice.reducer;
+
+```
+
+
+
+### 27.2 v4 使用总结
+
+#### 创建store
+
+v4使用`createStore`进行创建
+
+```typescript
+// 引入createStore
+import { createStore } from 'redux';
+// 引入reducer
+import reducer from './reducers'
+// 创建并导出Redux store 来存放引用的状态
+export default createStore(reducer)
+
+```
+
+#### 创建reducers
+
+所有的`reducer`都在这里写
+
+```typescript
+/*
+该文件是用于创建一个为count组件提供reducer的文件
+*/
+import { AnyAction /* , Reducer */ } from 'redux';
+
+// const counter: Reducer<number, AnyAction> = (state, action) => {
+//   const { type, data } = action;
+//   switch (type) {
+//     case 'INCREMENT':
+//       return state + data;
+//     case 'DECREMENT':
+//       return (state ?? 999) - data;
+//     default:
+//       return 999;
+//   }
+// };
+
+function counter(state: number | undefined, action: AnyAction): number {
+  const { type, data } = action;
+  switch (type) {
+    case 'INCREMENT':
+      return state + data;
+    case 'DECREMENT':
+      return (state ?? 999) - data;
+    default:
+      return 999;
+  }
+}
+
+export default counter;
+```
+
+#### 创建actions
+
+`action.ts`只需返回一个对象即可
+
+```typescript
+/*
+该文件专门为count组件生成action对象
+*/
+// 加法
+function createIncrementAction(data: number) {
+  return { type: 'INCREMENT', data };
+}
+
+// 减法
+function createDecrementAction(data: number) {
+  return { type: 'DECREMENT', data };
+}
+
+export { createIncrementAction, createDecrementAction };
+
+```
+
+#### 异步action
+
+异步action就是`dispatch`接收一个函数
+
+标准的做法是使用 [Redux Thunk 中间件](https://github.com/gaearon/redux-thunk)。要引入 `redux-thunk` 这个专门的库才能使用。我们 [后面](https://v4.redux.org.cn/docs/advanced/Middleware.html) 会介绍 middleware 大体上是如何工作的；目前，你只需要知道一个要点：通过使用指定的 middleware，action 创建函数除了返回 action 对象外还可以返回函数。这时，这个 action 创建函数就成为了 [thunk](https://en.wikipedia.org/wiki/Thunk)。
+
+创建store
+
+```typescript
+// 引入 createStore 用于创建store
+import { createStore, applyMiddleware } from 'redux';
+import { thunk } from 'redux-thunk';
+// 引入为对应的reducer
+import counter from './reducers';
+
+// 创建 Redux store 来存放应用的状态。applyMiddleware(thunk)异步action必须
+export default createStore(counter, applyMiddleware(thunk));
+```
+
+当 action 创建函数返回函数时，这个函数会被 Redux Thunk middleware 执行。这个函数并不需要保持纯净；它还可以带有副作用，包括执行异步 API 请求。这个函数还可以 dispatch action，就像 dispatch 前面定义的同步 action 一样。
+
+```typescript
+/*
+该文件专门为count组件生成action对象
+*/
+// 加法
+function createIncrementAction(data: number) {
+  return { type: 'INCREMENT', data };
+}
+
+// 异步
+function asyncIncrementAction(data: number, time: number) {
+  return (dispatch: any) => {
+    setTimeout(() => dispatch(createIncrementAction(data)), time);
+  };
+}
+
+export { asyncIncrementAction };
+
+```
+
+**总结：v4的异步`action`需要使用`redux-thunk`以及`redux`的`applyMiddleware`来实现**
+
+```typescript
+createStore(counter, applyMiddleware(thunk));
+```
+
+
+

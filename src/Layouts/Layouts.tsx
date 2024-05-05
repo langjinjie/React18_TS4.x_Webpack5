@@ -1,5 +1,5 @@
 import { Outlet, /* useNavigate, */ NavLink, useNavigate } from 'react-router-dom-v6';
-// import { Button } from 'antd';
+import { Space, Switch } from 'antd';
 import style from './style.module.less';
 
 function Layouts() {
@@ -11,6 +11,17 @@ function Layouts() {
 
   return (
     <div className={style.wrap}>
+      <Space>
+        暗黑模式
+        <Switch
+          onChange={event => {
+            console.log('event', event);
+            const htmlNode = document.getElementsByTagName('html')[0];
+            console.log('htmlNode', htmlNode);
+            htmlNode.setAttribute('theme', event ? 'dark' : 'light');
+          }}
+        />
+      </Space>
       <div className={style.backBtn} onClick={handleBack}>
         返回
       </div>

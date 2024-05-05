@@ -1,4 +1,3 @@
-import React from 'react';
 import style from './style.module.less';
 
 const Demo2: React.FC = () => (

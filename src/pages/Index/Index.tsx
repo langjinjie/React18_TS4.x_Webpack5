@@ -1,10 +1,11 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { test } from 'src/utils/base';
-import { Icon, Demo1 } from 'src/components';
+import { Icon, Demo1, ErrorBoundary, Message } from 'src/components';
 import Class from 'src/pages/Class/Class';
 import jsonTest from 'src/assets/json/test.json';
 import lessStyle from './style.module.less';
 import scssStyle from './style.module.scss';
+import ErrorBoundaryDemo from '../ErrorBoundaryDemo/ErrorBoundaryDemo';
 
 const LazyDemo = lazy(() => import('src/pages/LazyDemo/LazyDemo'));
 // const PrefetchDemo = lazy(() => import('src/pages/PrefetchDemo/PrefetchDemo'));
@@ -39,6 +40,11 @@ function Index() {
   // tsc检测
   const hello = (name: string) => {
     console.log('name', name);
+  };
+
+  // 自定义Message
+  const handleMessage = () => {
+    Message('自定义Message消息');
   };
 
   useEffect(() => {
@@ -113,6 +119,12 @@ function Index() {
           <PreloadDemo />
         </Suspense>
       )} */}
+      <h2>错误边界</h2>
+      <ErrorBoundary fallback={<>Oh no! Do something!</>}>
+        <ErrorBoundaryDemo />
+      </ErrorBoundary>
+      <h2>自定义Message</h2>
+      <button onClick={handleMessage}>自定义Message</button>
     </>
   );
 }

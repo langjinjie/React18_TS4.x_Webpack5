@@ -32,7 +32,7 @@ export const NotificationItem: React.FC<INotificationItem> = ({ content, onRemov
       timerId = setTimeout(() => {
         // 移除当前
         onRemove();
-      }, 30000);
+      }, 3000);
     }
     return () => {
       clearTimeout(timerId);

@@ -3,6 +3,10 @@ import { RouteProps } from 'react-router-dom';
 import { Link } from 'react-router-dom-v6';
 import Layouts from 'src/Layouts/Layouts';
 import NotFound from 'src/pages/NotFound/NotFound';
+import PortalsDemo from 'src/pages/PortalsDemo/PortalsDemo';
+import UseFetchDemo from 'src/pages/UseFetchDemo/UseFetchDemo';
+import UseImmerDemo from 'src/pages/UseImmerDemo/UseImmerDemo';
+import UseReducerDemo from 'src/pages/UseReducerDemo/UseReducerDemo';
 
 const Login = lazy(() => import('src/pages/Login/Login'));
 const Index = lazy(() => import('src/pages/Index/Index'));
@@ -30,11 +34,11 @@ export const indexRoutes: RouteProps[] = [
 
 export const routerV6 = [
   {
-    path: '/',
+    path: '/404',
     element: <NotFound />
   },
   {
-    path: 'layouts',
+    path: '/',
     element: <Layouts />,
     children: [
       { path: 'me', element: <Index /> },
@@ -65,6 +69,22 @@ export const routerV6 = [
       {
         path: 'reduxDemo',
         element: <ReduxDemo />
+      },
+      {
+        path: 'useFetchDemo',
+        element: <UseFetchDemo />
+      },
+      {
+        path: 'portalsDemo',
+        element: <PortalsDemo />
+      },
+      {
+        path: 'useReducerDemo',
+        element: <UseReducerDemo />
+      },
+      {
+        path: 'useImmerDemo',
+        element: <UseImmerDemo />
       }
     ]
   }

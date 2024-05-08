@@ -1,19 +1,23 @@
 // 引入store
 import { useEffect, useState } from 'react';
-import store from 'src/pages/storeRedux/index';
+import store from 'src/storeRedux/index';
 // 引入action
 import {
   createDecrementAction,
   createIncrementAction,
   asyncIncrementAction
-} from 'src/pages/storeRedux/actionCreators/counter';
+} from 'src/storeRedux/actionCreators/counter';
 // import style from './style.module.less';
 
 function ReduxDemo() {
   const [num, setNum] = useState(store.getState());
 
   useEffect(() => {
-    store.subscribe(() => setNum(store.getState()));
+    // store.subscribe(() => store.getState());
+    store.subscribe(() => {
+      console.log('监听');
+      setNum(store.getState());
+    });
   }, []);
   return (
     <div>

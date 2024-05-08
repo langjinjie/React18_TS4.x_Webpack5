@@ -4,3 +4,4 @@ export { default as Demo2 } from './Demo2/Demo2';
 export { default as Loading } from './Loading/Loading';
 export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary';
 export { default as Message } from './ShowMessage/ShowMessage';
+export { default as Mask } from './Mask/Mask';

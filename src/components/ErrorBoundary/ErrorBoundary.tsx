@@ -4,7 +4,7 @@ export default class ErrorBoundary extends Component<any> {
   constructor(props: any) {
     super(props);
     // initialize the error state
-    this.state = { hasError: false };
+    this.state = { hasError: false, count: 0 };
   }
 
   // if an error happened, set the state to true
@@ -13,9 +13,9 @@ export default class ErrorBoundary extends Component<any> {
     return { hasError: true };
   }
 
-  componentDidCatch(error: any, errorInfo: any) {
+  componentDidCatch() {
     // 在捕获到错误后，更新状态以显示错误信息,
-    this.setState({ hasError: true, error, errorInfo });
+    this.setState({ hasError: true });
   }
 
   render() {

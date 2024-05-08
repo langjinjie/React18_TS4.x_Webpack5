@@ -6,7 +6,7 @@ import {
   incrementByAmount,
   requestIncrement,
   requestDecrement
-} from 'src/pages/store/counterSlice';
+} from 'src/store/counterSlice';
 // import style from './style.module.less';
 
 export default function ReactToolkitDemo() {

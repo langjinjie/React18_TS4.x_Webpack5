@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client';
 import App from 'src/App';
 
 // 引入Redux
-import store from 'src/pages/store/index';
+import store from 'src/store/index';
 import { Provider } from 'react-redux';
 
 // 获取root节点

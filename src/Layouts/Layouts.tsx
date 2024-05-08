@@ -41,6 +41,15 @@ function Layouts() {
         <NavLink to='ReactToolkitDemo'>ReactToolkitDemo</NavLink>
         <br />
         <NavLink to='reduxDemo'>ReduxDemo</NavLink>
+        <br />
+        <NavLink to='useFetchDemo'>UseFetchDemo</NavLink>
+        <br />
+        <NavLink to='portalsDemo'>PortalsDemo</NavLink>
+        <br />
+        <NavLink to='useReducerDemo'>useReducerDemo</NavLink>
+        <br />
+        <NavLink to='useImmerDemo'>useImmerDemo</NavLink>
+        <br />
       </div>
       {/* <Button onClick={() => navigate('123', { state: 'useNavigate' })}>
         useNavigate My IdRoute

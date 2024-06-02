@@ -90,9 +90,6 @@ pnpm add @types/react @types/react-dom
       creatRoot(root).render(<App/>)
   }
   ```
-
-  
-
 - 旧方法
 
   ```tsx
@@ -103,8 +100,6 @@ pnpm add @types/react @types/react-dom
   
   ReactDom.render(<App/>, root)
   ```
-
-  
 
 `App.css`
 
@@ -183,7 +178,7 @@ tsc --init
 安装依赖，属于开发依赖，打包完成之后就不再需要
 
 ```shell
-pnpm add webpack webpack webpack-cli -D
+pnpm add webpack webpack-cli -D
 ```
 
 ### 5.1 webpack.base.ts
@@ -258,12 +253,15 @@ const baseConfig: Configuration = {
 ```
 
 > PS：[path.resolve 与 path.join 的区别](https://juejin.cn/post/6844903861920989198)
+>
+> `resolve`遇到`/`就会直接当成根目录
+>
+> `join`遇到`/`会拼接，只有遇到`..`或者`../`才跳出当前目录
 
 将会出现以下问题： ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/144a1c6f8e7d47e4a7392406537b7be3~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?) 需要我们安装 `@types/node` 这个依赖：
 
 ```shell
-shell
-复制代码pnpm add @types/node -D
+pnpm add @types/node -D
 ```
 
 错误消失~ 错误虽然消失了，但是这个库是干嘛用的呢？看官方 `npm`包的介绍： ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8f1433102d92480a8b3c8bf59f588136~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
@@ -307,6 +305,7 @@ module.exports = {
             }
         ],
         // 如果使用的是babel和react17,可能需要将"runtime":"automotic"添加到配置中,否则可能会出现Uncaught ReferenceError: React is not defined
+      // preset-typescript 将ts文件识别成js presest-react识别jsx文件
         ["@babel/presest-react", { runtime: "automatic" }],
         "@babel/preset-typescript"
     ]
@@ -330,15 +329,18 @@ module: {
 //...
 ```
 
-typescript自身的机制，需要一份 `xx.d.ts`声明文件，来说明模块对外公开的方法和属性的类型以及内容。对于内建模块，安装一个 `@types/node`模块可以整体解决模块的声明文件问题。
+`typescript`自身的机制，需要一份 `xx.d.ts`声明文件，来说明模块对外公开的方法和属性的类型以及内容。对于内建模块，安装一个 `@types/node`模块可以整体解决模块的声明文件问题。
 
-### 5.2 xwebpack.dev.ts
+### 5.2 webpack.dev.ts
 
 接下来，我们需要通过 `webpack-dev-server`来启动我们的项目，所以需要安装相关的依赖：
 
 ```shell
 pnpm add webpack-dev-server webpack-merge -D
 ```
+
+- `webpack-dev-server`：开发环境服务器
+- `webpack-merge`：合并主配置文件
 
 接着，配置开发环境配置：`webpack.dev.ts`
 
@@ -350,7 +352,7 @@ import {Configuration as WebpackDevServerConfiguration } from 'webpack-dev-serve
 import baseConfig from './webpack.base'; // 引入主配置文件
 
 interface IConfiguration extends webpackConfiguration {
-    devServer?: WebpackDevServerConfiguration
+  devServer?: WebpackDevServerConfiguration
 }
 
 const host = '127.0.0.1'
@@ -358,22 +360,21 @@ const port = '8082'
 
 // 合并公共配置，并添加开发环境配置
 const devConfig: IConfiguration  = merge(baseConfig,{
-    mode: 'development', // 开发模式，打包更加快速
-    devtool:'eval-cheap-module-source-map',
-    devServer:{
-        host,// 本地服务器地址
-        port,// 本地服务器端口号
-        open: true, // 是否自动打开
-        compress: false, // gzi压缩，开发环境不开启，提升热更新速度
-        hot: true,
-        historyApiFallback: true, // 解决history路由404问题
-        setupExitSignals:  true, // 允许在 SIGINT 和 SIGTERM 信号时关闭开发服务器进程。
-        static:{
-            directory: path.join(__dirname, '../public') // 托管静态资源public文件夹
-        },
-        headers: {"Access-Control-Allow-Origin": "*" }, // 允许跨域
-
-    }
+  mode: 'development', // 开发模式，打包更加快速
+  devtool:'eval-cheap-module-source-map',
+  devServer:{
+    host,// 本地服务器地址
+    port,// 本地服务器端口号
+    open: true, // 是否自动打开
+    compress: false, // gzi压缩，开发环境不开启，提升热更新速度
+    hot: true,
+    historyApiFallback: true, // 解决history路由404问题
+    setupExitSignals:  true, // 允许在 SIGINT 和 SIGTERM 信号时关闭开发服务器进程。
+    static:{
+      directory: path.join(__dirname, '../public') // 托管静态资源public文件夹
+    },
+    headers: {"Access-Control-Allow-Origin": "*" }, // 允许跨域
+  }
 })
 
 export default devConfig
@@ -483,10 +484,20 @@ plugins: [
         }
     }),
     // new DefinePlugin({
-    //   "process.env": JSON.stringify(envConfig.parsed),
+    //   "process.env": JSON. stringify(envConfig.parsed),
     //   "process.env.BASE_ENV": JSON.stringify(process.env.BASE_ENV),
     //   "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     // })
+  // 处理静态文件
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.join(__dirname, '../static'), // 静态文件入口
+          to: path.join(__dirname, '../dist/static'), // 静态文件输出
+          filter: sources => !sources.includes('index.html') // 过滤掉 index.html
+        }
+      ]
+    }),
 ]
 ```
 
@@ -592,11 +603,15 @@ new DefinePlugin({
 先在 `webpack.base.ts`中配置：
 
 ```typescript
-// 配置文件别名
-alias: {
-    src: path.join(__dirname, '../src'),
-        modules: [path.resolve(__dirname, '../node_modules')], // 查找第三方模块只在本项目的node_modules中查找
-},
+const baseConfig = {
+  resolve:{
+    // 配置文件别名
+    alias: {
+      src: path.join(__dirname, '../src'),
+      modules: [path.resolve(__dirname, '../node_modules')], // 查找第三方模块只在本项目的node_modules中查找
+    },
+  }
+}
 ```
 
 然后还需要再 `tsconfig.json`中配置：在 `tsconfig.json`中配置映射路径，那么typescript-eslint检查就不会报错了
@@ -915,28 +930,28 @@ chrome 35 # 兼容chrome 35
 对于图片文件，`webpack4`使用 `file-loader`和 `url-loader`来处理的，但 `webpack5`不使用这两个 `loader`了，而是采用自带的 [asset-module](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fguides%2Fasset-modules%2F%23root) 来处理，修改 `webpack.base.ts`，添加图片解析配置
 
 ```typescript
-{
-    output: {
-        // ... 这里自定义输出文件名的方式是，将某些资源发送到指定目录
-        assetModuleFilename: 'images/[hash][ext][query]'
-    },
-        module: {
-            rules: [
-                // ...
-                {
-                    test: /\.(png|jpe?g|gif|svg)$/i, // 匹配图片文件
-                    type: "asset", // type选择asset
-                    parser: {
-                        dataUrlCondition: {
-                            maxSize: 20 * 1024, // 小于10kb转base64
-                        }
-                    },
-                    generator:{ 
-                        filename:'static/images/[hash][ext][query]', // 文件输出目录和命名
-                    },
-                },
-            ]
-        }
+const baseConfig= {
+  output: {
+    // ... 这里自定义输出文件名的方式是，将某些资源发送到指定目录
+    assetModuleFilename: 'images/[hash][ext][query]'
+  },
+  module: {
+    rules: [
+      // ...
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i, // 匹配图片文件
+        type: "asset", // type选择asset
+        parser: {
+          dataUrlCondition: {
+            maxSize: 20 * 1024, // 小于10kb转base64
+          }
+        },
+        generator:{ 
+          filename:'static/images/[hash][ext][query]', // 文件输出目录和命名
+        },
+      },
+    ]
+  }
 }
 
 ```
@@ -1028,7 +1043,7 @@ module: {
 **注意：处理iconfont等静态文件时，在devServer上要做如下配置**
 
 ```typescript
-// 开发环境静态文件托管，也可以在webpack.base.ts借助CopyPlugin插件进行管理
+// 开发环境静态文件托管，也可以在webpack.base.ts借助 CopyPlugin 插件进行管理
 static:{
     directory: path.join(__dirname, '../'), // 整个项目作为静态文件根目录
 },
@@ -1053,10 +1068,8 @@ static:{
 
 > 在Webpack中，`asset/source`和 `asset/resource`是两种资源处理模式，用于处理项目中的静态资源（例如图像、字体、视频等）。它们是Webpack 5中新引入的资源处理方式。
 >
-> 在Webpack中，`asset/source`和 `asset/resource`是两种资源处理模式，用于处理项目中的静态资源（例如图像、字体、视频等）。它们是Webpack 5中新引入的资源处理方式。
->
 > 1. `asset/source`: 这个模式会将资源处理为一个JavaScript模块，返回资源内容的字符串。通常适用于处理文本文件，如SVG图像、文本文件等。处理后的资源可以直接在JavaScript中导入并使用
-> 2. `asset/resource`: 这个模式会将资源原封不动地复制到输出目录，并返回资源的URL路径。通常适用于处理二进制文件，如图像、字体、视频等。处理后的资源可以通过URL路径进行访问。
+>2. `asset/resource`: 这个模式会将资源原封不动地复制到输出目录，并返回资源的URL路径。通常适用于处理二进制文件，如图像、字体、视频等。处理后的资源可以通过URL路径进行访问。
 > 3. `asset/inline`: 这个模式将资源转换为Data URL，并直接嵌入到生成的文件中。适用于较小的资源文件，这样可以减少HTTP请求，但会增加文件的大小。适用于一些小图标或其他小文件
 > 4. `asset`: 这是一个自动选择模式，Webpack会根据资源的大小自动选择是使用 `asset/resource`还是 `asset/inline`，对于较小的资源，它会使用 `asset/inline`，对于较大的资源，它会使用 `asset/resource`。这是Webpack 5中默认的资源处理模式，适用于大多数的资源文件。
 
@@ -1345,7 +1358,7 @@ module.exports = smp.wrap(merge(prodConfig, {
 `webpack5` 较于 `webpack4`，新增了持久化缓存、改进缓存算法等优化，通过配置 [webpack 持久化缓存](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Fconfiguration%2Fcache%2F%23root)，来缓存生成的 `webpack` 模块和 `chunk`，改善下一次打包的构建速度,可提速 `90%` 左右,配置也简单，修改 `webpack.base.ts`：
 
 ```ts
-ts复制代码// webpack.base.ts
+// webpack.base.ts
 // ...
 module.exports = {
   // ...
@@ -1376,11 +1389,10 @@ module.exports = {
 - `parallel-webpack`
 - `HappyPack`
 
-`webpack`的 `loader`默认在单线程执行，现代电脑一般都有多核 `cpu`，可以借助多核 `cpu`开启多线程 `loader`解析，可以极大地提升loader解析的速度，[thread-loader](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Floaders%2Fthread-loader%2F%23root)就是用来开启多进程解析 `loader`的，安装依赖
+`webpack`的 `loader`默认在单线程执行，现代电脑一般都有多核 `cpu`，可以借助多核 `cpu`开启多线程 `loader`解析，可以极大地提升loader解析的速度，[thread-loader](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.docschina.org%2Floaders%2Fthread-loader%2F%23root)就是用来开启 多进程解析 `loader`的，安装依赖
 
 ```arduino
-arduino
-复制代码pnpm add thread-loader -D
+pnpm add thread-loader -D
 ```
 
 使用时,需将此 `loader` 放置在其他 `loader` 之前。放置在此 `loader` 之后的 `loader` 会在一个独立的 `worker` 池中运行。
@@ -1582,7 +1594,7 @@ export default prodConfig
 可以借助 [css-minimizer-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fcss-minimizer-webpack-plugin) 来压缩css，安装依赖：
 
 ```shell
-复制代码pnpm add css-minimizer-webpack-plugin -D
+pnpm add css-minimizer-webpack-plugin -D
 ```
 
 修改 `webpack.prod.ts` 文件， 需要在优化项 [optimization](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Foptimization%2F) 下的 [minimizer](https://link.juejin.cn/?target=https%3A%2F%2Fwebpack.js.org%2Fconfiguration%2Foptimization%2F%23optimizationminimizer) 属性中配置：
@@ -1791,32 +1803,52 @@ export default prodConfig
 
 ### 14.7 tree-shaking清理未引用js
 
-js中会有未使用到的代码，css中也会有未被页面使用到的样式，可以通过 [purgecss-webpack-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fpurgecss-webpack-plugin) 插件打包的时候移除未使用到的css样式，这个插件是和 [mini-css-extract-plugin](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fmini-css-extract-plugin) 插件配合使用的,在上面已经安装过，还需要 [glob-all](https://link.juejin.cn/?target=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Fglob-all) 来选择要检测哪些文件里面的类名和id还有标签名称，安装依赖:
+[Tree Shaking](https://link.juejin.cn?target=https%3A%2F%2Fwebpack.docschina.org%2Fguides%2Ftree-shaking%2F)的字面意思是摇树，伴随着摇树这个动作，树上的枯枝败叶都会被摇下来，这里的 `tree-shaking` 在代码中摇掉的是未使用到的代码，也就是未引用的代码，最早是在 `rollup` 库中出现的，`webpack` 在 `v2` 版本之后也开始支持。模式 `mode` 为 `production` 时就会默认开启 `tree-shaking` 功能以此来标记未引入代码然后移除掉，测试一下。
 
-```shell
-pnpm i purgecss-webpack-plugin glob-all -D
+在 `src/components` 目录下新增 `Demo1.tsx`、`Demo2.tsx` 两个组件
+
+```tsx
+// src/components/Demo1.tsx
+import React from "react";
+function Demo1() {
+  return <h3>我是Demo1组件</h3>
+}
+export default Demo1
+
+// src/components/Demo2.tsx
+import React from "react";
+function Demo2() {
+  return <h3>我是Demo2组件</h3>
+}
+export default Demo2
 ```
 
-修改 `webpack.prod.ts`:
+再在 `src/components` 目录下新增 `index.ts`，把 `Demo1` 和 `Demo2` 组件引入进来再暴露出去：
 
-```typescript
-// 清理无用css，检测src下所有tsx文件和public下index.html中使用的类名和id和标签名称
-    // 只打包这些文件中用到的样式
-    new PurgeCSSPlugin({
-      paths: globAll.sync(
-        [`${path.join(__dirname, '../src')}/**/*`, path.join(__dirname, '../public/index.html')],
-        {
-          nodir: true
-        }
-      ),
-      // 用 only 来指定 purgecss-webpack-plugin 的入口
-      // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
-      only: ["dist"],
-      safelist: {
-        standard: [/^ant-/] // 过滤以ant-开头的类名，哪怕没用到也不删除
-      }
-    }),
+```ts
+// src/components/index.ts
+export { default as Demo1 } from './Demo1'
+export { default as Demo2 } from './Demo2'
 ```
+
+在 `App.tsx` 中引入两个组件，但只使用 `Demo1` 组件：
+
+```tsx
+// ...
+import { Demo1, Demo2 } from '@/components'
+
+function App() {
+  return <>
+      // ...
+      <Demo1 />
+  </>
+}
+export default App
+```
+
+执行打包,可以看到在 `main.js` 中搜索 `Demo`，只搜索到了 `Demo1`，代表 `Demo2` 组件被 `tree-shaking` 移除掉了：
+
+![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/8f7143b04f49477896c90a7c592e2e74~tplv-k3u1fbpfcp-zoom-in-crop-mark:1512:0:0:0.awebp?)
 
 ### 14.8 tree-shaking清理未使用css
 
@@ -1832,18 +1864,18 @@ pnpm i purgecss-webpack-plugin glob-all -D
 // 清理无用css，检测src下所有tsx文件和public下index.html中使用的类名和id和标签名称
 // 只打包这些文件中用到的样式
 new PurgeCSSPlugin({
-    paths: globAll.sync(
-        [`${path.join(__dirname, '../src')}/**/*`, path.join(__dirname, '../public/index.html')],
-        {
-            nodir: true
-        }
-    ),
-    // 用 only 来指定 purgecss-webpack-plugin 的入口
-    // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
-    only: ["dist"],
-    safelist: {
-        standard: [/^ant-/] // 过滤以ant-开头的类名，哪怕没用到也不删除
+  paths: globAll.sync(
+    [`${path.join(__dirname, '../src')}/**/*`, path.join(__dirname, '../public/index.html')],
+    {
+      nodir: true
     }
+  ),
+  // 用 only 来指定 purgecss-webpack-plugin 的入口
+  // https://github.com/FullHuman/purgecss/tree/main/packages/purgecss-webpack-plugin
+  only: ["dist"],
+  safelist: {
+    standard: [/^ant-/] // 过滤以ant-开头的类名，哪怕没用到也不删除
+  }
 }),
 ```
 
@@ -1879,14 +1911,13 @@ rel的属性值
 #### 1.基础配置
 
 ```javascript
-javascript
-复制代码const PreloadWebpackPlugin = require('preload-webpack-plugin');
+const PreloadWebpackPlugin = require('preload-webpack-plugin');
 ```
 
 必须用在HtmlWebpackPlugin插件之后：
 
 ```javascript
-javascript复制代码plugins: [
+plugins: [
   new HtmlWebpackPlugin(),
   new PreloadWebpackPlugin()
 ]
@@ -1905,26 +1936,23 @@ javascript复制代码plugins: [
 - 其他，`as=script`;
 
 ```html
-html
-复制代码<link href="xx/xx/chunk-xxx.f01555ba.css" rel="preload" as="style">
+<link href="xx/xx/chunk-xxx.f01555ba.css" rel="preload" as="style">
 ```
 
 如果不希望as取自文件名的后缀，也可以使用as显示命名：
 
-```javascript
-javascript复制代码plugins: [
+plugins: [
   new HtmlWebpackPlugin(),
   new PreloadWebpackPlugin({
     rel: 'preload',
     as: 'script'
   })
 ]
-```
 
 也可以使用一个函数来进行更细粒度的控制：
 
 ```javascript
-javascript复制代码plugins: [
+plugins: [
   new HtmlWebpackPlugin(),
   new PreloadWebpackPlugin({
     rel: 'preload',
@@ -1968,8 +1996,7 @@ plugins: [
 结果：
 
 ```html
-html
-复制代码<link rel="preload" as="script" href="home.31132ae6680e598f8879.js">
+<link rel="preload" as="script" href="home.31132ae6680e598f8879.js">
 ```
 
 ##### fileBlacklist黑名单
@@ -1985,7 +2012,7 @@ javascript复制代码new PreloadWebpackPlugin({
 2.其他例子：
 
 ```javascript
-javascript复制代码new PreloadWebpackPlugin({
+new PreloadWebpackPlugin({
   fileBlacklist: [/.map/, /.whatever/]
 })
 ```
@@ -2013,7 +2040,7 @@ javascript复制代码plugins: [
 ##### prefetch
 
 ```javascript
-javascript复制代码plugins: [
+plugins: [
   new HtmlWebpackPlugin(),
   new PreloadWebpackPlugin({
     rel: 'prefetch'
@@ -2024,7 +2051,7 @@ javascript复制代码plugins: [
 ### media
 
 ```javascript
-javascript复制代码plugins: [
+plugins: [
   new HtmlWebpackPlugin(),
   new PreloadWebpackPlugin({
     rel: 'preload',
@@ -3223,9 +3250,9 @@ module.exports = {
 
 ## 26 react-router-dom 配置
 
-### 26.1 安装`react-router-dom`
+### 26.1 安装 `react-router-dom`
 
-在此处我们使用的是`v5`版本
+在此处我们使用的是 `v5`版本
 
 ```shell
 pnpm install --save react-router-dom@5
@@ -3263,9 +3290,9 @@ export default App;
 
 > 注意点：
 >
-> 1. `Suspense`配合`fallback`可以实现代码分割和懒加载
-> 1. `Router`的`basename`可以设置路由的根目录
-> 1. `lazy`函数不能写在组件内，例如：`<Route key={`${path}`} path={path} component={lazy(()=>import('./Demo/Demo'))} />`
+> 1. `Suspense`配合 `fallback`可以实现代码分割和懒加载
+> 2. `Router`的 `basename`可以设置路由的根目录
+> 3. `lazy`函数不能写在组件内，例如：`<Route key={`${path}`} path={path} component={lazy(()=>import('./Demo/Demo'))} />`
 
 `indexRouter.ts`
 
@@ -3353,7 +3380,7 @@ const Layouts: React.FC<RouteComponentProps> = ({ location, history }) => {
 export default withRouter(Layouts);
 ```
 
-### 26.1 安装`react-router-dom-v6`
+### 26.1 安装 `react-router-dom-v6`
 
 #### 26.1.1  别名安装v6
 
@@ -3391,13 +3418,11 @@ function Home() {
 }
 ```
 
-
-
 ---
 
-##### **使用`useRouters`代替`react-router-config`**
+##### **使用 `useRouters`代替 `react-router-config`**
 
-v5版本的`react-router-config`包中的所有功能都已移至v6的核心中。
+v5版本的 `react-router-config`包中的所有功能都已移至v6的核心中。
 
 ```jsx
 function App() {
@@ -3425,11 +3450,9 @@ function App() {
 }
 ```
 
-
-
 ---
 
-##### **使用`useNavigate`代替`useHistory`**
+##### **使用 `useNavigate`代替 `useHistory`**
 
 ```jsx
 // This is a React Router v6 app
@@ -3448,9 +3471,9 @@ function App() {
 }
 ```
 
-如果需要替换当前位置而不是向历史记录栈推送新位置，请使用`navigate(to, {replace: true})`。 如果需要状态，请使用`navigate(to, { state })`。可以将`navigate`的第一个参数视为`<Link to>`，其他参数视为`replace`和`state`
+如果需要替换当前位置而不是向历史记录栈推送新位置，请使用 `navigate(to, {replace: true})`。 如果需要状态，请使用 `navigate(to, { state })`。可以将 `navigate`的第一个参数视为 `<Link to>`，其他参数视为 `replace`和 `state`
 
-  **注意**：请注意，v5版的`<Redirect />`默认使用`replace`逻辑（可通过`push`属性进行更改），而v6版`<Navigate />`默认使用`push`逻辑，可通过`replace`属性进行更改。
+  **注意**：请注意，v5版的 `<Redirect />`默认使用 `replace`逻辑（可通过 `push`属性进行更改），而v6版 `<Navigate />`默认使用 `push`逻辑，可通过 `replace`属性进行更改。
 
 ```jsx
 // Change this:
@@ -3462,7 +3485,7 @@ function App() {
 <Navigate to="home" />
 ```
 
-如果您当前正在使用`useHistory`中的`go`，`goBack`或者`goForward`来前后导航，则还应该将其替换为`navigate`，并在其中加入一个数组参数，指示指针在历史记录栈中的位置。例如：
+如果您当前正在使用 `useHistory`中的 `go`，`goBack`或者 `goForward`来前后导航，则还应该将其替换为 `navigate`，并在其中加入一个数组参数，指示指针在历史记录栈中的位置。例如：
 
 ```jsx
 // This is a React Router v5 app
@@ -3510,11 +3533,11 @@ function SomeForm() {
 }
 ```
 
-##### **将`<NavLink exact>`重命名为`<NavLink end>`**
+##### **将 `<NavLink exact>`重命名为 `<NavLink end>`**
 
 这是一个简单的属性重命名，以便更好地与 React 生态系统中其他库的常见做法保持一致。
 
-##### **从`<NavLink />`中移除 `activeClassName` 和 `activeStyle` 属性**
+##### **从 `<NavLink />`中移除 `activeClassName` 和 `activeStyle` 属性**
 
 从 `v6.0.0-beta.3` 开始， `activeClassName` 和 `activeStyle` 的属性已从 `NavLinkProps` 中移除。取而代之的是，您可以向 `style` 或 `className` 传递一个函数，从而根据组件的活动状态自定义内联样式或类字符串。
 
@@ -3540,7 +3563,7 @@ function SomeForm() {
 </NavLink>
 ```
 
-##### **使用`useMatch`替换`useRouteMatch`**
+##### **使用 `useMatch`替换 `useRouteMatch`**
 
 `useMatch` 与v5的 `useRouteMatch` 非常相似，但有一些主要的区别：
 
@@ -3600,15 +3623,15 @@ const match = matchPath(
 
 #### 安装Redux Toolkit 和 React-Redux
 
-添加`Redux Toolkit`和`React-Redux`依赖包到你的项目中：
+添加 `Redux Toolkit`和 `React-Redux`依赖包到你的项目中：
 
 ```shell
 pnpm install @reduxjs/toolkit react-redux
 ```
 
-#### 创建`Redux Store`
+#### 创建 `Redux Store`
 
-创建`src/pages/store/index.ts`文件。从 Redux Toolkit 引入`fonfigureStore`API。我们从创建一个空的 Redux store开始，并且导入它：
+创建 `src/pages/store/index.ts`文件。从 Redux Toolkit 引入 `fonfigureStore`API。我们从创建一个空的 Redux store开始，并且导入它：
 
 ```typescript
 import { configureStore } from '@reduxjs/toolkit';
@@ -3650,7 +3673,7 @@ if (root) {
 
 #### 创建 Redux State Slice
 
-创建`src/pages/store/conterSlice.ts`文件。在该文件中从 Redux Toolkit 引入`createSlice`API。
+创建 `src/pages/store/conterSlice.ts`文件。在该文件中从 Redux Toolkit 引入 `createSlice`API。
 
 创建slice需要一个字符串名称来标识切片，一个初始state以及一个或多个定义了该如何更新state的reducer函数。slice创建后，我们可以到处slice中生成的Redux action creators和reducers函数。
 
@@ -3774,13 +3797,11 @@ export default counterSlice.reducer;
 
 ```
 
-
-
 ### 27.2 v4 使用总结
 
 #### 创建store
 
-v4使用`createStore`进行创建
+v4使用 `createStore`进行创建
 
 ```typescript
 // 引入createStore
@@ -3794,7 +3815,7 @@ export default createStore(reducer)
 
 #### 创建reducers
 
-所有的`reducer`都在这里写
+所有的 `reducer`都在这里写
 
 ```typescript
 /*
@@ -3853,7 +3874,7 @@ export { createIncrementAction, createDecrementAction };
 
 #### 异步action
 
-异步action就是`dispatch`接收一个函数
+异步action就是 `dispatch`接收一个函数
 
 标准的做法是使用 [Redux Thunk 中间件](https://github.com/gaearon/redux-thunk)。要引入 `redux-thunk` 这个专门的库才能使用。我们 [后面](https://v4.redux.org.cn/docs/advanced/Middleware.html) 会介绍 middleware 大体上是如何工作的；目前，你只需要知道一个要点：通过使用指定的 middleware，action 创建函数除了返回 action 对象外还可以返回函数。这时，这个 action 创建函数就成为了 [thunk](https://en.wikipedia.org/wiki/Thunk)。
 
@@ -3892,11 +3913,8 @@ export { asyncIncrementAction };
 
 ```
 
-**总结：v4的异步`action`需要使用`redux-thunk`以及`redux`的`applyMiddleware`来实现**
+**总结：v4的异步 `action`需要使用 `redux-thunk`以及 `redux`的 `applyMiddleware`来实现**
 
 ```typescript
 createStore(counter, applyMiddleware(thunk));
 ```
-
-
-

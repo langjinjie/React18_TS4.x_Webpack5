@@ -2,6 +2,7 @@ import { Configuration as WebpackConfiguration } from 'webpack';
 import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
 import { merge } from 'webpack-merge';
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import path from 'path';
 import baseConfig from './webpack.base';
 
 interface Configuration extends WebpackConfiguration {
@@ -30,9 +31,9 @@ const devConfig: Configuration = merge(baseConfig, {
     hot: true, // 开启热更新，后面会讲react模块热替换具体配置
     historyApiFallback: true, // 解决history路由404问题
     setupExitSignals: true, // 允许在 SIGINT 和 SIGTERM 信号时关闭开发服务器和退出进程。
-    // static: {
-    //   directory: path.join(__dirname, "../static"), // 托管静态资源，注意：此处不能让整个根目录作为静态文件的根目录，不然会热更新不生效
-    // },
+    static: {
+      directory: path.join(__dirname, '../static') // 托管静态资源，注意：此处不能让整个根目录作为静态文件的根目录，不然会热更新不生效
+    },
     headers: { 'Access-Control-Allow-Origin': '*' }
   }
 });

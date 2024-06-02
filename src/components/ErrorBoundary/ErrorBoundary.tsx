@@ -8,14 +8,13 @@ export default class ErrorBoundary extends Component<any> {
   }
 
   // if an error happened, set the state to true
-  static getDerivedStateFromError(error: any) {
-    console.log(error);
+  static getDerivedStateFromError() {
     return { hasError: true };
   }
 
   componentDidCatch() {
     // 在捕获到错误后，更新状态以显示错误信息,
-    this.setState({ hasError: true });
+    // this.setState({ hasError: true });
   }
 
   render() {

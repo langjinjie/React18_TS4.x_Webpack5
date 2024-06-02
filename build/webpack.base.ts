@@ -20,7 +20,9 @@ const stylRegex = /\.styl$/;
 
 // 模块化样式编译
 const moduleStyleLoadersArray = [
+  // dev 环境使用style-loader,生产环境使用 MiniCssExtractPlugin 解析压缩
   isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
+  // MiniCssExtractPlugin.loader,
   {
     loader: 'css-loader',
     options: {
@@ -37,9 +39,10 @@ const moduleStyleLoadersArray = [
 // 非模块化样式编译
 const styleLoadersArray = [
   isDev ? 'style-loader' : MiniCssExtractPlugin.loader,
-  'css-loader'
+  // MiniCssExtractPlugin.loader,
+  'css-loader',
   // 添加 postcss-loader 需要兼容一些低版本浏览器，需要给css3加前缀,可以借助插件来自动加前缀
-  // 'postcss-loader',
+  'postcss-loader'
 ];
 
 // 加载配置文件
@@ -65,6 +68,7 @@ const baseConfig: Configuration = {
       {
         test: /.(ts|tsx)$/, // 正则匹配 .ts .tsx文件
         exclude: '/node_modules/', // 不解该选项配置的模块,优先级更高
+        // babel-loader 的配置文件时 babel.config.js
         use: ['thread-loader', 'babel-loader'] // 配置文件 thread-loader 多线程打包 由于thread-loader不支持抽离css插件MiniCssExtractPlugin.loader
       },
 

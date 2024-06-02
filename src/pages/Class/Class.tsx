@@ -1,4 +1,4 @@
-import { PureComponent, ReactNode } from 'react';
+import { Component, ReactNode } from 'react';
 
 /**
  * @description 装饰器，为组件添加age属性
@@ -10,7 +10,7 @@ function AddAge(Target: Function) {
 
 // 使用装饰器
 @AddAge
-export default class Class extends PureComponent<any, any> {
+export default class Class extends Component<any, { name: string }> {
   constructor(props: any) {
     super(props);
     this.state = {
@@ -26,6 +26,7 @@ export default class Class extends PureComponent<any, any> {
         <h2>我是类组件</h2>
         <h2>我是{this.state.name}</h2>
         <h2>我已经{this.age}</h2>
+        <h2>我已经{this.props.name}</h2>
       </>
     );
   }

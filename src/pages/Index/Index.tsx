@@ -88,7 +88,10 @@ function Index() {
       </div>
       <h2>iconfont引入测试</h2>
       <div>
-        <Icon name='icon-fangzi-copy' />
+        <Icon className={lessStyle.icon} name='icon-xiaxue' />
+      </div>
+      <div>
+        <Icon className={lessStyle.icon} name='icon-shengdanrili' />
       </div>
       <h2>字体引入测试</h2>
       <div className={lessStyle.fontTest}>文字字体测试哈哈哈</div>

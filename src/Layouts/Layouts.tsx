@@ -50,7 +50,12 @@ function Layouts() {
         <br />
         <NavLink to='useImmerDemo'>useImmerDemo</NavLink>
         <br />
+        <NavLink to='eventBind'>EventBind</NavLink>
+        <br />
+        <NavLink to='useCallBackDemo'>UseCallBackDemo</NavLink>
+        <br />
       </div>
+
       {/* <Button onClick={() => navigate('123', { state: 'useNavigate' })}>
         useNavigate My IdRoute
       </Button> */}

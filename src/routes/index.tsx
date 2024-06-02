@@ -2,8 +2,10 @@ import { lazy } from 'react';
 import { RouteProps } from 'react-router-dom';
 import { Link } from 'react-router-dom-v6';
 import Layouts from 'src/Layouts/Layouts';
+import EventBind from 'src/pages/EventBind/EventBind';
 import NotFound from 'src/pages/NotFound/NotFound';
 import PortalsDemo from 'src/pages/PortalsDemo/PortalsDemo';
+import UseCallBackDemo from 'src/pages/UseCallBackDemo/UseCallBackDemo';
 import UseFetchDemo from 'src/pages/UseFetchDemo/UseFetchDemo';
 import UseImmerDemo from 'src/pages/UseImmerDemo/UseImmerDemo';
 import UseReducerDemo from 'src/pages/UseReducerDemo/UseReducerDemo';
@@ -85,6 +87,14 @@ export const routerV6 = [
       {
         path: 'useImmerDemo',
         element: <UseImmerDemo />
+      },
+      {
+        path: 'eventBind',
+        element: <EventBind />
+      },
+      {
+        path: 'useCallBackDemo',
+        element: <UseCallBackDemo />
       }
     ]
   }

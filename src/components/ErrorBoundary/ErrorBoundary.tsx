@@ -1,11 +1,23 @@
 import { Component } from 'react';
 
-export default class ErrorBoundary extends Component<any> {
-  constructor(props: any) {
-    super(props);
-    // initialize the error state
-    this.state = { hasError: false, count: 0 };
-  }
+type IProps = any;
+
+interface IState {
+  hasError: boolean;
+  count: number;
+}
+
+export default class ErrorBoundary extends Component<IProps, IState> {
+  // constructor(props: IProps) {
+  //   super(props);
+  //   // initialize the error state
+  //   // this.;
+  // }
+
+  state = { hasError: false, count: 0 };
+
+  // 定义默认值
+  static defaultProps = {};
 
   // if an error happened, set the state to true
   static getDerivedStateFromError() {

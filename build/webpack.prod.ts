@@ -65,6 +65,7 @@ const prodConfig: Configuration = merge(baseConfig, {
     minimizer: [
       new CssMinimizerPlugin(), // 压缩css
       new TerserPlugin({
+        // 压缩jss
         parallel: true, // 开启多线程压缩
         terserOptions: {
           compress: {

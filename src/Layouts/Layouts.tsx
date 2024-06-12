@@ -1,3 +1,4 @@
+import React from 'react';
 import { Outlet, /* useNavigate, */ NavLink, useNavigate } from 'react-router-dom-v6';
 import { Space, Switch } from 'antd';
 import style from './style.module.less';
@@ -53,6 +54,8 @@ function Layouts() {
         <NavLink to='eventBind'>EventBind</NavLink>
         <br />
         <NavLink to='useCallBackDemo'>UseCallBackDemo</NavLink>
+        <br />
+        <NavLink to='suspenseDemo'>SuspenseDemo</NavLink>
         <br />
       </div>
 

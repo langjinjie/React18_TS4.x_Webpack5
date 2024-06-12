@@ -5,6 +5,7 @@ import Layouts from 'src/Layouts/Layouts';
 import EventBind from 'src/pages/EventBind/EventBind';
 import NotFound from 'src/pages/NotFound/NotFound';
 import PortalsDemo from 'src/pages/PortalsDemo/PortalsDemo';
+import SuspenseDemo from 'src/pages/SuspenseDemo/SuspenseDemo';
 import UseCallBackDemo from 'src/pages/UseCallBackDemo/UseCallBackDemo';
 import UseFetchDemo from 'src/pages/UseFetchDemo/UseFetchDemo';
 import UseImmerDemo from 'src/pages/UseImmerDemo/UseImmerDemo';
@@ -95,6 +96,10 @@ export const routerV6 = [
       {
         path: 'useCallBackDemo',
         element: <UseCallBackDemo />
+      },
+      {
+        path: 'suspenseDemo',
+        element: <SuspenseDemo />
       }
     ]
   }

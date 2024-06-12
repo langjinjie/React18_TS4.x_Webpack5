@@ -11,6 +11,9 @@ import { Provider } from 'react-redux';
 
 // 获取root节点
 const root = document.getElementById('root');
+
+console.log(root?.nodeType);
+console.log(root?.firstChild);
 // 判断是否存在
 if (root) {
   createRoot(root).render(
